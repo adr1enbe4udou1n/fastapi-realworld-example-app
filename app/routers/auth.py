@@ -1,15 +1,14 @@
 from fastapi import APIRouter
-from fastapi.params import Body, Depends
+from fastapi.params import Body
 
-from starlette.status import HTTP_200_OK, HTTP_201_CREATED
-from app.dependencies import get_token_header
+from starlette.status import HTTP_201_CREATED
 
-from app.schemas.users import UpdateUserRequest, User, UserResponse
+from app.schemas.users import LoginUserRequest, NewUserRequest, User, UserResponse
+
 
 router = APIRouter(
-    prefix="/user",
-    tags=["users"],
-    dependencies=[Depends(get_token_header)],
+    prefix="/users",
+    tags=["User and Authentication"],
 )
 
 user = User(
@@ -21,19 +20,25 @@ user = User(
 )
 
 
-@router.get(
+@router.post(
     "/",
-    response_model=UserResponse,
+    summary="Register a new user",
+    description="Register a new user",
+    response_model=UserResponse
 )
-async def current() -> UserResponse:
-    return UserResponse(user)
-
-
-@router.put(
-    "/",
-    response_model=UserResponse,
-)
-async def update(
-    user_update: UpdateUserRequest = Body,
+async def register(
+    user_new: NewUserRequest = Body(...),
 ) -> UserResponse:
-    return UserResponse(user)
+    return UserResponse(user=user)
+
+
+@router.post(
+    "/login",
+    summary="Existing user login",
+    description="Login for existing user",
+    response_model=UserResponse
+)
+async def login(
+    user_credentials: LoginUserRequest = Body(...),
+) -> UserResponse:
+    return UserResponse(user=user)

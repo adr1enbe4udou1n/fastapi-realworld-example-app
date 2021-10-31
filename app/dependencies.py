@@ -1,6 +1,19 @@
-from fastapi import Header, HTTPException
+from typing import Callable
+from fastapi.params import Depends
+from fastapi.security import APIKeyHeader
+
+from app.schemas.users import User
+
+key_scheme = APIKeyHeader(name="Authorization")
+
+user = User(
+    username="John Doe",
+    email="john.doe@example.com",
+    bio="John Bio",
+    image="https://randomuser.me/api/portraits/men/1.jpg",
+    token="secret token",
+)
 
 
-async def get_token_header(x_token: str = Header(...)):
-    if x_token != "fake-super-secret-token":
-        raise HTTPException(status_code=400, detail="X-Token header invalid")
+def get_current_user(token: str = Depends(key_scheme)) -> User:
+    return user
