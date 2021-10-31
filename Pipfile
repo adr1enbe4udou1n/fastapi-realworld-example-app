@@ -8,6 +8,9 @@ fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 pytest = "*"
 typer = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
+passlib = {extras = ["bcrypt"], version = "*"}
+databases = {extras = ["postgresql"], version = "*"}
 
 [dev-packages]
 autopep8 = "*"
