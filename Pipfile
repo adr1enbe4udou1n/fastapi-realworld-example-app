@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+pytest = "*"
+typer = "*"
+
+[dev-packages]
+autopep8 = "*"
+
+[requires]
+python_version = "3.9"

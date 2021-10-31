@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  db:
+    image: "postgres:14"
+    environment:
+      POSTGRES_PASSWORD: main
+      POSTGRES_USER: main
+      POSTGRES_DB: main
+    ports:
+      - "5433:5432"
+
+  db_test:
+    image: "postgres:14"
+    environment:
+      POSTGRES_PASSWORD: main
+      POSTGRES_USER: main
+      POSTGRES_DB: main
+    ports:
+      - "5434:5432"
