@@ -11,9 +11,13 @@ typer = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
 databases = {extras = ["postgresql"], version = "*"}
+alembic = "*"
+python-slugify = "*"
+pydantic = {extras = ["email"], version = "*"}
 
 [dev-packages]
 autopep8 = "*"
+autoflake = "*"
 
 [requires]
 python_version = "3.9"

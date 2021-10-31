@@ -3,22 +3,22 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, HttpUrl
 
 
-class UserLogin:
+class LoginUser(BaseModel):
     email: EmailStr
     password: str
 
 
-class UserLoginRequest:
-    user: UserLogin
+class LoginUserRequest(BaseModel):
+    user: LoginUser
 
 
-class NewUser:
+class NewUser(BaseModel):
     email: EmailStr
     username: str
     password: str
 
 
-class NewUserRequest:
+class NewUserRequest(BaseModel):
     user: NewUser
 
 
@@ -29,17 +29,17 @@ class UpdateUser(BaseModel):
     image: Optional[HttpUrl] = None
 
 
-class UpdateUserRequest:
+class UpdateUserRequest(BaseModel):
     user: UpdateUser
 
 
-class User:
-    username: Optional[str] = None
-    email: Optional[EmailStr] = None
+class User(BaseModel):
+    username: str
+    email: str
     bio: Optional[str] = None
     image: Optional[HttpUrl] = None
     token: str
 
 
-class UserResponse:
+class UserResponse(BaseModel):
     user: User
