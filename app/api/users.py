@@ -1,7 +1,14 @@
 from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.params import Body, Depends
 from pydantic import BaseModel
+
+from starlette.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+
+from app.schemas.users import NewUserRequest, User, UserResponse
+from app import config
+from app.services import jwt
 
 app = FastAPI()
 
@@ -12,16 +19,31 @@ class Item(BaseModel):
     is_offer: Optional[bool] = None
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+@app.post(
+    "",
+    status_code=HTTP_201_CREATED,
+    response_model=UserResponse,
+    name="user:register",
+)
+async def register(
+    user_create: NewUserRequest = Body(..., embed=True, alias="user"),
+    users_repo: UsersRepository = Depends(get_repository(UsersRepository)),
+) -> UserResponse:
+    if await check_email_is_taken(users_repo, user_create.email):
+        raise HTTPException(
+            status_code=HTTP_400_BAD_REQUEST,
+            detail=strings.EMAIL_TAKEN,
+        )
 
+    user = await users_repo.create_user(**user_create.dict())
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
-
-
-@app.put("/items/{item_id}")
-def update_item(item_id: int, item: Item):
-    return {"item_name": item.name, "item_id": item_id}
+    token = jwt.create_access_token_for_user(user, str(config.SECRET_KEY))
+    return UserResponse(
+        user=User(
+            username=user.username,
+            email=user.email,
+            bio=user.bio,
+            image=user.image,
+            token=token,
+        ),
+    )
