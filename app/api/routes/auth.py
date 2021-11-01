@@ -1,28 +1,14 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.params import Body, Depends
-from sqlalchemy.orm import query
 from sqlalchemy.orm.session import Session
 
-from starlette.status import HTTP_201_CREATED
-from app.dependencies import get_db
+from app.api.deps import get_db
+from app.crud import users
 
-from app.schemas.users import LoginUserRequest, NewUserRequest, User, UserResponse
-
-from app.db.queries import users
+from app.schemas.users import LoginUserRequest, NewUserRequest, UserResponse
 
 
-router = APIRouter(
-    prefix="/users",
-    tags=["User and Authentication"],
-)
-
-user = User(
-    username="John Doe",
-    email="john.doe@example.com",
-    bio="John Bio",
-    image="https://randomuser.me/api/portraits/men/1.jpg",
-    token="secret token",
-)
+router = APIRouter()
 
 
 @router.post(
@@ -31,14 +17,16 @@ user = User(
     description="Register a new user",
     response_model=UserResponse
 )
-async def register(
+def register(
     db: Session = Depends(get_db),
     user_new: NewUserRequest = Body(...),
 ) -> UserResponse:
-    db_user = users.get_user_by_email(db, email=user.email)
+    db_user = users.get_by_email(db, email=user_new.user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    return UserResponse(users.create_user(db=db, user=user))
+
+    db_user = users.create(db, user=user_new.user)
+    return UserResponse(db_user.schema())
 
 
 @router.post(
@@ -47,8 +35,13 @@ async def register(
     description="Login for existing user",
     response_model=UserResponse
 )
-async def login(
+def login(
     db: Session = Depends(get_db),
     user_credentials: LoginUserRequest = Body(...),
 ) -> UserResponse:
-    return UserResponse(user=user)
+    db_user = users.authenticate(
+        db, email=user_credentials.user.email, password=user_credentials.user.password
+    )
+    if db_user:
+        raise HTTPException(status_code=400, detail="Bad credentials")
+    return UserResponse(user=db_user.schema())

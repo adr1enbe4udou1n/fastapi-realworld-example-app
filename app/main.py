@@ -1,18 +1,12 @@
 from fastapi import FastAPI
-from fastapi.routing import APIRouter
 
 from fastapi.openapi.utils import get_openapi
 
-from app.config import DEBUG
+from app.core.config import settings
 
-from .routers import user, auth
+from app.api.api import router
 
-app = FastAPI(debug=DEBUG)
-
-router = APIRouter()
-
-router.include_router(auth.router)
-router.include_router(user.router)
+app = FastAPI(debug=settings.DEBUG)
 
 app.include_router(
     router,

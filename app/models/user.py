@@ -1,11 +1,8 @@
 from sqlalchemy import Text, Column, Integer, String, DateTime
 
-from sqlalchemy.ext.declarative import as_declarative
-
-
-@as_declarative()
-class Base:
-    id: int
+from app.schemas.users import User as UserResponse
+from app.db.base_class import Base
+from app.core import security
 
 
 class User(Base):
@@ -19,3 +16,12 @@ class User(Base):
     image = Column(String)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
+
+    def schema(self) -> UserResponse:
+        user = User(
+            username=self.name,
+            email=self.email,
+            bio=self.bio,
+            image=self.image,
+            token=security.create_access_token(self.id),
+        )

@@ -10,7 +10,6 @@ pytest = "*"
 typer = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
-databases = {extras = ["postgresql"], version = "*"}
 alembic = "*"
 python-slugify = "*"
 pydantic = {extras = ["email"], version = "*"}

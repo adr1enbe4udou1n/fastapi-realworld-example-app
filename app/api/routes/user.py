@@ -3,20 +3,10 @@ from fastapi.params import Body, Depends
 from sqlalchemy.orm.session import Session
 
 from app.schemas.users import UpdateUserRequest, User, UserResponse
-from app.dependencies import get_current_user, get_db
+from app.api.deps import get_current_user, get_db
+from app.crud import users
 
-router = APIRouter(
-    prefix="/user",
-    tags=["User and Authentication"],
-)
-
-user = User(
-    username="John Doe",
-    email="john.doe@example.com",
-    bio="John Bio",
-    image="https://randomuser.me/api/portraits/men/1.jpg",
-    token="secret token",
-)
+router = APIRouter()
 
 
 @router.get(
@@ -25,8 +15,8 @@ user = User(
     description="Gets the currently logged-in user",
     response_model=UserResponse
 )
-async def current(user: User = Depends(get_current_user)) -> UserResponse:
-    return UserResponse(user=user)
+def current(current_user: User = Depends(get_current_user)) -> UserResponse:
+    return UserResponse(user=current_user.schema())
 
 
 @router.put(
@@ -35,9 +25,10 @@ async def current(user: User = Depends(get_current_user)) -> UserResponse:
     description="Updated user information for current user",
     response_model=UserResponse
 )
-async def update(
+def update(
     db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     user_update: UpdateUserRequest = Body(...),
 ) -> UserResponse:
-    return UserResponse(user=user)
+    db_user = users.update(db, db_obj=current_user, db_in=user_update.user)
+    return UserResponse(user=db_user.schema())
