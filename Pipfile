@@ -17,8 +17,14 @@ psycopg2-binary = "*"
 requests = "*"
 
 [dev-packages]
-autopep8 = "*"
 autoflake = "*"
+flake8 = "*"
+mypy = "*"
+isort = "*"
+black = "*"
 
 [requires]
 python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true
