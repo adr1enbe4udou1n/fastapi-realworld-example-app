@@ -1,8 +1,9 @@
 from fastapi import APIRouter
 from fastapi.params import Body, Depends
+from sqlalchemy.orm.session import Session
 
 from app.schemas.users import UpdateUserRequest, User, UserResponse
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, get_db
 
 router = APIRouter(
     prefix="/user",
@@ -35,6 +36,7 @@ async def current(user: User = Depends(get_current_user)) -> UserResponse:
     response_model=UserResponse
 )
 async def update(
+    db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
     user_update: UpdateUserRequest = Body(...),
 ) -> UserResponse:

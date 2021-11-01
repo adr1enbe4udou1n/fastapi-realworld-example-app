@@ -1,6 +1,6 @@
-from typing import Callable
 from fastapi.params import Depends
 from fastapi.security import APIKeyHeader
+from app.db.database import SessionLocal
 
 from app.schemas.users import User
 
@@ -17,3 +17,11 @@ user = User(
 
 def get_current_user(token: str = Depends(key_scheme)) -> User:
     return user
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
