@@ -3,7 +3,7 @@ from fastapi.params import Body, Depends
 from sqlalchemy.orm.session import Session
 
 from app.api.deps import get_current_user, get_db
-from app.crud import users
+from app.crud.crud_user import users
 from app.schemas.users import UpdateUserRequest, User, UserResponse
 
 router = APIRouter()

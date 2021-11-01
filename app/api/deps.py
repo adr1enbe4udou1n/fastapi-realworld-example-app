@@ -5,7 +5,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app.core import security
-from app.crud import users
+from app.crud.crud_user import users
 from app.db.session import SessionLocal
 from app.schemas.users import User
 
