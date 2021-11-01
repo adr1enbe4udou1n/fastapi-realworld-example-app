@@ -1,13 +1,13 @@
 from typing import Any, Dict, Optional
 from pydantic.networks import PostgresDsn
-from starlette.datastructures import Secret
 
 from pydantic import BaseSettings, validator
 
 
 class Settings(BaseSettings):
-    API_PREFIX = "/api"
     DEBUG: bool = False
+
+    API_PREFIX = "/api"
     JWT_SECRET_KEY: str = None
     JWT_EXPIRE: int = 60 * 24 * 8
 
@@ -32,7 +32,7 @@ class Settings(BaseSettings):
         )
 
     class Config:
-        env_file = ".env"
+        env_file = ".env.testing"
 
 
 settings = Settings()

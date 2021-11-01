@@ -14,6 +14,7 @@ alembic = "*"
 python-slugify = "*"
 pydantic = {extras = ["email"], version = "*"}
 psycopg2-binary = "*"
+requests = "*"
 
 [dev-packages]
 autopep8 = "*"
