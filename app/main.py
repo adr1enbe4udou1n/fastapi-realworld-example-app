@@ -1,4 +1,5 @@
 from typing import Any, Dict
+
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 

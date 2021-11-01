@@ -1,6 +1,6 @@
-from typing import Optional, Annotated
+from typing import Annotated, Optional
 
-from pydantic import BaseModel, EmailStr, HttpUrl, Field
+from pydantic import BaseModel, EmailStr, Field, HttpUrl
 
 
 class LoginUser(BaseModel):
