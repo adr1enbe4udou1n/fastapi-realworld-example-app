@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     JWT_EXPIRE: int = 60 * 24 * 8
 
     DB_HOST: str
+    DB_PORT: str
     DB_DATABASE: str
     DB_USERNAME: str
     DB_PASSWORD: str
@@ -26,6 +27,7 @@ class Settings(BaseSettings):
             user=values.get("DB_USERNAME"),
             password=values.get("DB_PASSWORD"),
             host=values.get("DB_HOST"),
+            port=values.get("DB_PORT"),
             path=f"/{values.get('DB_DATABASE') or ''}",
         )
 

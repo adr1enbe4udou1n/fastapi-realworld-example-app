@@ -25,8 +25,8 @@ def register(
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    db_user = users.create(db, user=user_new.user)
-    return UserResponse(db_user.schema())
+    db_user = users.create(db, obj_in=user_new.user)
+    return UserResponse(user=db_user.schema())
 
 
 @router.post(
@@ -42,6 +42,6 @@ def login(
     db_user = users.authenticate(
         db, email=user_credentials.user.email, password=user_credentials.user.password
     )
-    if db_user:
+    if not db_user:
         raise HTTPException(status_code=400, detail="Bad credentials")
     return UserResponse(user=db_user.schema())

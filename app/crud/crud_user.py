@@ -28,10 +28,10 @@ class UsersRepository:
     def update(
         self, db: Session, *, db_obj: User, obj_in: UpdateUser
     ) -> User:
-        db_obj.name = obj_in.username
-        db_obj.email = obj_in.email
-        db_obj.bio = obj_in.bio
-        db_obj.image = obj_in.image
+        db_obj.name = obj_in.username or db_obj.name
+        db_obj.email = obj_in.email or db_obj.email
+        db_obj.bio = obj_in.bio or db_obj.bio
+        db_obj.image = obj_in.image or db_obj.image
 
         db.add(db_obj)
         db.commit()
@@ -42,7 +42,7 @@ class UsersRepository:
         user = self.get_by_email(db, email=email)
         if not user:
             return None
-        if not verify_password(password, user.hashed_password):
+        if not verify_password(password, user.password):
             return None
         return user
 

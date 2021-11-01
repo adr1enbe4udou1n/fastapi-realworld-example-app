@@ -1,6 +1,7 @@
+from datetime import datetime
 from sqlalchemy import Text, Column, Integer, String, DateTime
 
-from app.schemas.users import User as UserResponse
+from app.schemas.users import User as UserDto
 from app.db.base_class import Base
 from app.core import security
 
@@ -14,11 +15,11 @@ class User(Base):
     password = Column(String)
     bio = Column(Text)
     image = Column(String)
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    def schema(self) -> UserResponse:
-        user = User(
+    def schema(self) -> UserDto:
+        return UserDto(
             username=self.name,
             email=self.email,
             bio=self.bio,

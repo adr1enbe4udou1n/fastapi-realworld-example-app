@@ -30,5 +30,5 @@ def update(
     current_user: User = Depends(get_current_user),
     user_update: UpdateUserRequest = Body(...),
 ) -> UserResponse:
-    db_user = users.update(db, db_obj=current_user, db_in=user_update.user)
+    db_user = users.update(db, db_obj=current_user, obj_in=user_update.user)
     return UserResponse(user=db_user.schema())
