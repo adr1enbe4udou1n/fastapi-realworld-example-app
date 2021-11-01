@@ -14,6 +14,7 @@ databases = {extras = ["postgresql"], version = "*"}
 alembic = "*"
 python-slugify = "*"
 pydantic = {extras = ["email"], version = "*"}
+psycopg2-binary = "*"
 
 [dev-packages]
 autopep8 = "*"
