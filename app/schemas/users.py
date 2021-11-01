@@ -1,7 +1,6 @@
-from typing import Optional
+from typing import Optional, Annotated
 
-from pydantic import BaseModel, EmailStr, HttpUrl
-from pydantic.types import constr
+from pydantic import BaseModel, EmailStr, HttpUrl, Field
 
 
 class LoginUser(BaseModel):
@@ -16,7 +15,7 @@ class LoginUserRequest(BaseModel):
 class NewUser(BaseModel):
     email: EmailStr
     username: str
-    password: constr(min_length=8)
+    password: Annotated[str, Field(min_length=8)]
 
 
 class NewUserRequest(BaseModel):

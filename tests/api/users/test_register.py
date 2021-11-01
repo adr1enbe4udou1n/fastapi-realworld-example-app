@@ -11,27 +11,21 @@ from tests.conftest import create_john_user
 
 @pytest.mark.parametrize(
     "data",
-    [
-        (
-            {
-                "username": "John Doe",
-                "email": "john.doe",
-                "password": "password",
-            },
-        ),
-        (
-            {
-                "email": "john.doe@example.com",
-            },
-        ),
-        (
-            {
-                "username": "John Doe",
-                "email": "john.doe@example.com",
-                "password": "pass",
-            },
-        ),
-    ],
+    (
+        {
+            "username": "John Doe",
+            "email": "john.doe",
+            "password": "password",
+        },
+        {
+            "email": "john.doe@example.com",
+        },
+        {
+            "username": "John Doe",
+            "email": "john.doe@example.com",
+            "password": "pass",
+        },
+    ),
 )
 def test_cannot_register_with_invalid_data(client: TestClient, data: Dict[str, str]):
     r = client.post("/api/users/", json={"user": data})

@@ -23,6 +23,7 @@ isort = "*"
 black = "*"
 pytest = "*"
 pytest-cov = "*"
+sqlalchemy-stubs = "*"
 
 [requires]
 python_version = "3.9"
