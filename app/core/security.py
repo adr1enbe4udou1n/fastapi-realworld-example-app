@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Any, Union
+from typing import Any, Dict, Union
 
 from jose import jwt
 from passlib.context import CryptContext
@@ -17,7 +17,7 @@ def create_access_token(subject: Union[str, Any]) -> str:
     return jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=ALGORITHM)
 
 
-def decode_access_token(token: str):
+def decode_access_token(token: str) -> Dict[str, str]:
     return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[ALGORITHM])
 
 

@@ -1,3 +1,4 @@
+import secrets
 from typing import Any, Dict, Optional
 
 from pydantic import BaseSettings, validator
@@ -8,7 +9,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     API_PREFIX = "/api"
-    JWT_SECRET_KEY: str = None
+    JWT_SECRET_KEY: str = secrets.token_urlsafe(32)
     JWT_EXPIRE: int = 60 * 24 * 8
 
     DB_HOST: str

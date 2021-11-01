@@ -4,6 +4,7 @@ import pytest
 import sqlalchemy
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
+from sqlalchemy.engine.base import Transaction
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
@@ -16,7 +17,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 
 @pytest.fixture()
-def db():
+def db() -> Generator:
     connection = engine.connect()
     transaction = connection.begin()
     session = TestingSessionLocal(bind=connection)
@@ -24,7 +25,7 @@ def db():
     nested = connection.begin_nested()
 
     @sqlalchemy.event.listens_for(session, "after_transaction_end")
-    def end_savepoint(session, transaction):
+    def end_savepoint(session: Session, transaction: Transaction) -> None:
         nonlocal nested
         if not nested.is_active:
             nested = connection.begin_nested()
@@ -37,8 +38,8 @@ def db():
 
 
 @pytest.fixture()
-def client(db) -> Generator:
-    def override_get_db():
+def client(db: Session) -> Generator:
+    def override_get_db() -> Generator:
         yield db
 
     app.dependency_overrides[get_db] = override_get_db
@@ -46,7 +47,7 @@ def client(db) -> Generator:
     del app.dependency_overrides[get_db]
 
 
-def create_john_user(db: Session):
+def create_john_user(db: Session) -> None:
     db_obj = User(
         name="John Doe",
         email="john.doe@example.com",

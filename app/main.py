@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 
@@ -12,30 +13,22 @@ app.include_router(
 )
 
 
-def custom_openapi():
-    if app.openapi_schema:
-        return app.openapi_schema
-    openapi_schema = get_openapi(
-        title="Conduit API",
-        version="1.0.0",
-        description="Conduit API",
-        contact={"name": "RealWorld - Website", "url": "https://realworld.io/"},
-        license_info={
-            "name": "MIT License",
-            "url": "https://opensource.org/licenses/MIT",
-        },
-        routes=router.routes,
-        servers=[{"url": "/api"}],
-        tags=[
-            {"name": "Articles"},
-            {"name": "Favorites"},
-            {"name": "Profile"},
-            {"name": "Tags"},
-            {"name": "User and Authentication"},
-        ],
-    )
-    app.openapi_schema = openapi_schema
-    return app.openapi_schema
-
-
-app.openapi = custom_openapi
+app.openapi_schema = get_openapi(
+    title="Conduit API",
+    version="1.0.0",
+    description="Conduit API",
+    contact={"name": "RealWorld - Website", "url": "https://realworld.io/"},
+    license_info={
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+    },
+    routes=router.routes,
+    servers=[{"url": "/api"}],
+    tags=[
+        {"name": "Articles"},
+        {"name": "Favorites"},
+        {"name": "Profile"},
+        {"name": "Tags"},
+        {"name": "User and Authentication"},
+    ],
+)

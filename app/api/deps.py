@@ -1,3 +1,4 @@
+from typing import Generator
 from fastapi import Depends, HTTPException, status
 from fastapi.security import APIKeyHeader
 from jose import jwt
@@ -7,12 +8,12 @@ from sqlalchemy.orm import Session
 from app.core import security
 from app.crud.crud_user import users
 from app.db.session import SessionLocal
-from app.schemas.users import User
+from app.models.user import User
 
 key_scheme = APIKeyHeader(name="Authorization")
 
 
-def get_db():
+def get_db() -> Generator:
     db = SessionLocal()
     try:
         yield db
