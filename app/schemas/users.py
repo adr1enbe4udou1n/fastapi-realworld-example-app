@@ -1,6 +1,7 @@
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr, HttpUrl
+from pydantic.types import constr
 
 
 class LoginUser(BaseModel):
@@ -15,7 +16,7 @@ class LoginUserRequest(BaseModel):
 class NewUser(BaseModel):
     email: EmailStr
     username: str
-    password: str
+    password: constr(min_length=8)
 
 
 class NewUserRequest(BaseModel):
