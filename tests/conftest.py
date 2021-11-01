@@ -1,21 +1,18 @@
 from typing import Generator
 
 import pytest
-from fastapi.testclient import TestClient
 import sqlalchemy
-from sqlalchemy.orm.session import Session
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.session import Session
 
-from app.main import app
 from app.api.deps import get_db
+from app.main import app
 from app.models.user import User
 
-
-engine = create_engine(
-    "postgresql://main:main@127.0.0.1:5434", pool_pre_ping=True)
-TestingSessionLocal = sessionmaker(
-    autocommit=False, autoflush=False, bind=engine)
+engine = create_engine("postgresql://main:main@127.0.0.1:5434", pool_pre_ping=True)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 @pytest.fixture()

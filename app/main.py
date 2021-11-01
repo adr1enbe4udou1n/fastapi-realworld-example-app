@@ -1,10 +1,8 @@
 from fastapi import FastAPI
-
 from fastapi.openapi.utils import get_openapi
 
-from app.core.config import settings
-
 from app.api.api import router
+from app.core.config import settings
 
 app = FastAPI(debug=settings.DEBUG)
 
@@ -21,10 +19,11 @@ def custom_openapi():
         title="Conduit API",
         version="1.0.0",
         description="Conduit API",
-        contact={"name": "RealWorld - Website",
-                 "url": "https://realworld.io/"},
-        license_info={"name": "MIT License",
-                      "url": "https://opensource.org/licenses/MIT"},
+        contact={"name": "RealWorld - Website", "url": "https://realworld.io/"},
+        license_info={
+            "name": "MIT License",
+            "url": "https://opensource.org/licenses/MIT",
+        },
         routes=router.routes,
         servers=[{"url": "/api"}],
         tags=[
@@ -33,7 +32,7 @@ def custom_openapi():
             {"name": "Profile"},
             {"name": "Tags"},
             {"name": "User and Authentication"},
-        ]
+        ],
     )
     app.openapi_schema = openapi_schema
     return app.openapi_schema

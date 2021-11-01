@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
-pytest = "*"
 typer = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
@@ -22,6 +21,8 @@ flake8 = "*"
 mypy = "*"
 isort = "*"
 black = "*"
+pytest = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.9"

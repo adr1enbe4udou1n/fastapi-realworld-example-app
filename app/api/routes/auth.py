@@ -4,9 +4,7 @@ from sqlalchemy.orm.session import Session
 
 from app.api.deps import get_db
 from app.crud import users
-
 from app.schemas.users import LoginUserRequest, NewUserRequest, UserResponse
-
 
 router = APIRouter()
 
@@ -15,7 +13,7 @@ router = APIRouter()
     "/",
     summary="Register a new user",
     description="Register a new user",
-    response_model=UserResponse
+    response_model=UserResponse,
 )
 def register(
     db: Session = Depends(get_db),
@@ -33,7 +31,7 @@ def register(
     "/login",
     summary="Existing user login",
     description="Login for existing user",
-    response_model=UserResponse
+    response_model=UserResponse,
 )
 def login(
     db: Session = Depends(get_db),

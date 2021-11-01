@@ -1,9 +1,10 @@
 from datetime import datetime
-from sqlalchemy import Text, Column, Integer, String, DateTime
 
-from app.schemas.users import User as UserDto
-from app.db.base_class import Base
+from sqlalchemy import Column, DateTime, Integer, String, Text
+
 from app.core import security
+from app.db.base_class import Base
+from app.schemas.users import User as UserDto
 
 
 class User(Base):

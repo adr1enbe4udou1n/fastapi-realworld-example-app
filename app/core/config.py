@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional
-from pydantic.networks import PostgresDsn
 
 from pydantic import BaseSettings, validator
+from pydantic.networks import PostgresDsn
 
 
 class Settings(BaseSettings):

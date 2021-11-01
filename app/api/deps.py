@@ -1,13 +1,13 @@
-from fastapi import HTTPException, status, Depends
+from fastapi import Depends, HTTPException, status
 from fastapi.security import APIKeyHeader
-from sqlalchemy.orm import Session
-from pydantic import ValidationError
 from jose import jwt
+from pydantic import ValidationError
+from sqlalchemy.orm import Session
 
-from app.db.session import SessionLocal
 from app.core import security
-from app.schemas.users import User
 from app.crud import users
+from app.db.session import SessionLocal
+from app.schemas.users import User
 
 key_scheme = APIKeyHeader(name="Authorization")
 
