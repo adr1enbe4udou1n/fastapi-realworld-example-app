@@ -6,7 +6,6 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from app.crud.crud_user import users
-from app.models.user import User
 from tests.conftest import create_john_user
 
 
