@@ -2,7 +2,7 @@ from typing import Dict
 
 import pytest
 from fastapi.testclient import TestClient
-from requests.sessions import Session
+from sqlalchemy.orm import Session
 from starlette import status
 
 from app.core.security import decode_access_token, get_password_hash

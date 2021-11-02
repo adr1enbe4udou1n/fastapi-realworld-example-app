@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
-from sqlalchemy.orm.session import Session
+from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_db
 from app.crud.crud_user import users
@@ -32,7 +32,7 @@ def update(
     current_user: User = Depends(get_current_user),
     update_user: UpdateUserRequest = Body(...),
 ) -> UserResponse:
-    db_user = users.get_by_email(db, email=update_user.user.email)
+    db_user = users.get_by_email(db, email=str(update_user.user.email))
     if db_user and db_user.id != current_user.id:
         raise HTTPException(status_code=400, detail="Email already registered")
 

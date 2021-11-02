@@ -11,6 +11,9 @@ class UsersRepository:
     def get(self, db: Session, id: Any) -> Optional[User]:
         return db.query(User).filter(User.id == id).first()
 
+    def get_by_name(self, db: Session, *, name: str) -> Optional[User]:
+        return db.query(User).filter(User.name == name).first()
+
     def get_by_email(self, db: Session, *, email: str) -> Optional[User]:
         return db.query(User).filter(User.email == email).first()
 

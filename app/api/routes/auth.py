@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
-from sqlalchemy.orm.session import Session
+from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
 from app.crud.crud_user import users

@@ -1,6 +1,6 @@
-from typing import Generator
+from typing import Generator, Optional
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import APIKeyHeader
 from jose import jwt
 from pydantic import ValidationError
@@ -11,8 +11,6 @@ from app.crud.crud_user import users
 from app.db.session import SessionLocal
 from app.models.user import User
 
-key_scheme = APIKeyHeader(name="Authorization")
-
 
 def get_db() -> Generator:
     db = SessionLocal()
@@ -22,11 +20,8 @@ def get_db() -> Generator:
         db.close()
 
 
-def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(key_scheme)
-) -> User:
+def _get_current_user(db: Session, token: str) -> User:
     try:
-        token_prefix, token = token.split(" ")
         payload = security.decode_access_token(token)
     except (jwt.JWTError, ValidationError):
         raise HTTPException(
@@ -37,3 +32,45 @@ def get_current_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+
+def _get_authorization_header(
+    api_key: str = Security(
+        APIKeyHeader(name="Authorization"),
+    ),
+) -> str:
+    try:
+        token_prefix, token = api_key.split(" ")
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    return token
+
+
+def _get_optional_authorization_header(
+    authorization: Optional[str] = Security(
+        APIKeyHeader(name="Authorization", auto_error=False),
+    ),
+) -> str:
+    if authorization:
+        return _get_authorization_header(authorization)
+
+    return ""
+
+
+def get_current_user(
+    db: Session = Depends(get_db), token: str = Depends(_get_authorization_header)
+) -> User:
+    return _get_current_user(db, token)
+
+
+def get_optional_current_user(
+    db: Session = Depends(get_db),
+    token: str = Depends(_get_optional_authorization_header),
+) -> Optional[User]:
+    if token:
+        return _get_current_user(db, token)
+
+    return None

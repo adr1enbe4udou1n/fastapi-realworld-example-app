@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import Column, DateTime, Integer, String, Text
 from sqlalchemy.orm import relationship
@@ -6,6 +7,7 @@ from sqlalchemy.sql.schema import ForeignKey, Table
 
 from app.core import security
 from app.db.base_class import Base
+from app.schemas.profiles import Profile as ProfileDto
 from app.schemas.users import User as UserDto
 
 follower_user = Table(
@@ -34,6 +36,7 @@ class User(Base):
         primaryjoin=id == follower_user.c.following_id,
         secondaryjoin=id == follower_user.c.follower_id,
         backref="following",
+        uselist=True,
     )
 
     def schema(self) -> UserDto:
@@ -44,3 +47,17 @@ class User(Base):
             image=self.image,
             token=security.create_access_token(self.id),
         )
+
+    def profile(self, user: Optional["User"] = None) -> ProfileDto:
+        profile = ProfileDto(
+            username=self.name,
+            bio=self.bio,
+            image=self.image,
+            following=False,
+        )
+
+        if user:
+            if self.followers.__contains__(user):
+                profile.following = True
+
+        return profile

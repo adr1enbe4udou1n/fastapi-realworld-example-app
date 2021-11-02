@@ -5,14 +5,13 @@ import sqlalchemy
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Transaction
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm.session import Session
+from sqlalchemy.orm import sessionmaker, Session
 
 from app.api.deps import get_db
 from app.core.security import create_access_token
+from app.db.base_class import Base
 from app.main import app
 from app.models.user import User
-from app.db.base_class import Base
 
 engine = create_engine("postgresql://main:main@127.0.0.1:5434", pool_pre_ping=True)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -77,9 +76,13 @@ def create_jane_user(db: Session) -> User:
     return db_obj
 
 
-def acting_as_john(db: Session, client: TestClient) -> User:
-    user = create_john_user(db)
+def acting_as_user(user: User, client: TestClient) -> User:
     token = create_access_token(user.id)
 
     client.headers["Authorization"] = f"Bearer {token}"
     return user
+
+
+def acting_as_john(db: Session, client: TestClient) -> User:
+    user = create_john_user(db)
+    return acting_as_user(user, client)

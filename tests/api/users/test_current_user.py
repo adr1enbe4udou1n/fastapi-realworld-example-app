@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from requests.sessions import Session
+from sqlalchemy.orm import Session
 from starlette import status
 
 from tests.conftest import acting_as_john
