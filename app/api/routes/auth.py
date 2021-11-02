@@ -9,20 +9,20 @@ router = APIRouter()
 
 
 @router.post(
-    "/",
+    "",
     summary="Register a new user",
     description="Register a new user",
     response_model=UserResponse,
 )
 def register(
     db: Session = Depends(get_db),
-    user_new: NewUserRequest = Body(...),
+    new_user: NewUserRequest = Body(...),
 ) -> UserResponse:
-    db_user = users.get_by_email(db, email=user_new.user.email)
+    db_user = users.get_by_email(db, email=new_user.user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    db_user = users.create(db, obj_in=user_new.user)
+    db_user = users.create(db, obj_in=new_user.user)
     return UserResponse(user=db_user.schema())
 
 

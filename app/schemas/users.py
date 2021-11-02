@@ -23,7 +23,7 @@ class NewUserRequest(BaseModel):
 
 
 class UpdateUser(BaseModel):
-    username: Optional[str] = None
+    username: Annotated[Optional[str], Field(min_length=1)] = None
     email: Optional[EmailStr] = None
     bio: Optional[str] = None
     image: Optional[HttpUrl] = None

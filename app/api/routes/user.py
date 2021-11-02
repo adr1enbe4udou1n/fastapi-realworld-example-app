@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.orm.session import Session
 
 from app.api.deps import get_current_user, get_db
@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/",
+    "",
     summary="Get current user",
     description="Gets the currently logged-in user",
     response_model=UserResponse,
@@ -22,7 +22,7 @@ def current(
 
 
 @router.put(
-    "/",
+    "",
     summary="Update current user",
     description="Updated user information for current user",
     response_model=UserResponse,
@@ -30,7 +30,11 @@ def current(
 def update(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-    user_update: UpdateUserRequest = Body(...),
+    update_user: UpdateUserRequest = Body(...),
 ) -> UserResponse:
-    db_user = users.update(db, db_obj=current_user, obj_in=user_update.user)
+    db_user = users.get_by_email(db, email=update_user.user.email)
+    if db_user and db_user.id != current_user.id:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    db_user = users.update(db, db_obj=current_user, obj_in=update_user.user)
     return UserResponse(user=db_user.schema())

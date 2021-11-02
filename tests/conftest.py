@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
 from app.api.deps import get_db
+from app.core.security import create_access_token
 from app.main import app
 from app.models.user import User
 
@@ -47,10 +48,35 @@ def client(db: Session) -> Generator:
     del app.dependency_overrides[get_db]
 
 
-def create_john_user(db: Session) -> None:
+def create_john_user(db: Session) -> User:
     db_obj = User(
         name="John Doe",
         email="john.doe@example.com",
+        bio="John Bio",
+        image="https://randomuser.me/api/portraits/men/1.jpg",
     )
     db.add(db_obj)
     db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+
+def create_jane_user(db: Session) -> User:
+    db_obj = User(
+        name="Jane Doe",
+        email="jane.doe@example.com",
+        bio="Jane Bio",
+        image="https://randomuser.me/api/portraits/women/1.jpg",
+    )
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+
+def acting_as_john(db: Session, client: TestClient) -> User:
+    user = create_john_user(db)
+    token = create_access_token(user.id)
+
+    client.headers["Authorization"] = f"Bearer {token}"
+    return user
