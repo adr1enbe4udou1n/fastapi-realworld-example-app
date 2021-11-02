@@ -1,10 +1,19 @@
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, Integer, String, Text
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql.schema import ForeignKey, Table
 
 from app.core import security
 from app.db.base_class import Base
 from app.schemas.users import User as UserDto
+
+follower_user = Table(
+    "follower_user",
+    Base.metadata,
+    Column("follower_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("following_id", Integer, ForeignKey("users.id"), primary_key=True),
+)
 
 
 class User(Base):
@@ -18,6 +27,14 @@ class User(Base):
     image = Column(String)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+    followers = relationship(
+        "User",
+        secondary=follower_user,
+        primaryjoin=id == follower_user.c.following_id,
+        secondaryjoin=id == follower_user.c.follower_id,
+        backref="following",
+    )
 
     def schema(self) -> UserDto:
         return UserDto(

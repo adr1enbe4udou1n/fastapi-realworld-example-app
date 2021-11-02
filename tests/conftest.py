@@ -12,9 +12,12 @@ from app.api.deps import get_db
 from app.core.security import create_access_token
 from app.main import app
 from app.models.user import User
+from app.db.base_class import Base
 
 engine = create_engine("postgresql://main:main@127.0.0.1:5434", pool_pre_ping=True)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base.metadata.create_all(bind=engine)
 
 
 @pytest.fixture()
