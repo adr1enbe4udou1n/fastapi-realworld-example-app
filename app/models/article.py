@@ -5,9 +5,6 @@ from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String, Table,
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
-from app.models.comment import Comment
-from app.models.tag import Tag
-from app.models.user import User
 
 article_tag = Table(
     "article_tag",
@@ -36,6 +33,15 @@ class Article(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    author = relationship(User, back_populates="articles")
-    comments = relationship(Comment, back_populates="article")
-    tags = relationship(Tag, back_populates="articles")
+    author = relationship("User", back_populates="articles")
+    comments = relationship("Comment", back_populates="article")
+    tags = relationship(
+        "Tag",
+        back_populates="articles",
+        secondary=article_tag,
+    )
+    favoritedBy = relationship(
+        "User",
+        back_populates="favoriteArticles",
+        secondary=article_favorite,
+    )

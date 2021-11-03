@@ -7,8 +7,7 @@ from sqlalchemy.orm import relationship
 
 from app.core import security
 from app.db.base_class import Base
-from app.models.article import Article
-from app.models.comment import Comment
+from app.models.article import article_favorite
 from app.schemas.profiles import Profile as ProfileDto
 from app.schemas.users import User as UserDto
 
@@ -38,11 +37,15 @@ class User(Base):
         primaryjoin=id == follower_user.c.following_id,
         secondaryjoin=id == follower_user.c.follower_id,
         backref="following",
-        uselist=True,
     )
 
-    articles = relationship(Article, back_populates="author")
-    comments = relationship(Comment, back_populates="author")
+    articles = relationship("Article", back_populates="author")
+    comments = relationship("Comment", back_populates="author")
+    favoriteArticles = relationship(
+        "Article",
+        back_populates="favoritedBy",
+        secondary=article_favorite,
+    )
 
     def schema(self) -> UserDto:
         return UserDto(
