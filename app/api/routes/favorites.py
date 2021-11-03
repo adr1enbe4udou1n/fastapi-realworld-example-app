@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, Path
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db
+from app.api.deps import get_current_user, get_db
 from app.models.article import Article
 from app.schemas.articles import SingleArticleResponse
+from app.models.user import User
 
 router = APIRouter()
 
@@ -16,6 +17,7 @@ router = APIRouter()
 )
 def favorite(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
     slug: str = Path(..., title="Slug of the article that you want to favorite"),
 ) -> SingleArticleResponse:
     article = db.query(Article).first()
@@ -30,6 +32,7 @@ def favorite(
 )
 def unfavorite(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
     slug: str = Path(..., title="Slug of the article that you want to unfavorite"),
 ) -> SingleArticleResponse:
     article = db.query(Article).first()

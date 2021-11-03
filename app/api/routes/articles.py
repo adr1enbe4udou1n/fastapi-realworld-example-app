@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, Path, Query
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db
+from app.api.deps import get_current_user, get_db, get_optional_current_user
 from app.models.article import Article
-from app.schemas.articles import (MultipleArticlesResponse,
-                                  SingleArticleResponse)
+from app.schemas.articles import MultipleArticlesResponse, SingleArticleResponse
+from app.models.user import User
 
 router = APIRouter()
 
@@ -18,6 +18,7 @@ router = APIRouter()
 )
 def get_list(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_optional_current_user),
     limit: int = Query(..., title="Limit number of articles returned (default is 20)"),
     offset: int = Query(..., title="Offset/skip number of articles (default is 0)"),
     author: str = Path(..., title="Filter by author (username)"),
@@ -38,6 +39,7 @@ def get_list(
 )
 def get_feed(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
     limit: int = Query(..., title="Limit number of articles returned (default is 20)"),
     offset: int = Query(..., title="Offset/skip number of articles (default is 0)"),
 ) -> MultipleArticlesResponse:
@@ -55,6 +57,7 @@ def get_feed(
 )
 def create(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> SingleArticleResponse:
     article = db.query(Article).first()
     return SingleArticleResponse(article=article)
@@ -68,6 +71,7 @@ def create(
 )
 def get(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_optional_current_user),
     slug: str = Path(..., title="Slug of the article to get"),
 ) -> SingleArticleResponse:
     article = db.query(Article).first()
@@ -82,6 +86,7 @@ def get(
 )
 def update(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
     slug: str = Path(..., title="Slug of the article to update"),
 ) -> SingleArticleResponse:
     article = db.query(Article).first()
@@ -96,6 +101,7 @@ def update(
 )
 def delete(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
     slug: str = Path(..., title="Slug of the article to delete"),
 ) -> SingleArticleResponse:
     article = db.query(Article).first()

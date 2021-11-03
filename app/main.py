@@ -23,11 +23,4 @@ app.openapi_schema = get_openapi(
     },
     routes=router.routes,
     servers=[{"url": "/api"}],
-    tags=[
-        {"name": "Articles"},
-        {"name": "Favorites"},
-        {"name": "Profile"},
-        {"name": "Tags"},
-        {"name": "User and Authentication"},
-    ],
 )
