@@ -1,7 +1,8 @@
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
-from tests.conftest import acting_as_john
 from starlette import status
+
+from tests.conftest import acting_as_john
 
 
 def test_cannot_list_all_comments_of_non_existent_article(

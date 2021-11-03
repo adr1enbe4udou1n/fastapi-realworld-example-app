@@ -1,7 +1,8 @@
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
-from tests.conftest import acting_as_john
 from starlette import status
+
+from tests.conftest import acting_as_john
 
 
 def test_guest_cannot_delete_comment(client: TestClient, db: Session) -> None:

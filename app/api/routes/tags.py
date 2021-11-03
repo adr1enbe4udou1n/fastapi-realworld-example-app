@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
 from app.models.tag import Tag
-from app.schemas.profiles import ProfileResponse
 from app.schemas.tags import TagsResponse
 
 router = APIRouter()
