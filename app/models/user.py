@@ -49,15 +49,9 @@ class User(Base):
         )
 
     def profile(self, user: Optional["User"] = None) -> ProfileDto:
-        profile = ProfileDto(
+        return ProfileDto(
             username=self.name,
             bio=self.bio,
             image=self.image,
-            following=False,
+            following=user is not None and self.followers.__contains__(user),
         )
-
-        if user:
-            if self.followers.__contains__(user):
-                profile.following = True
-
-        return profile

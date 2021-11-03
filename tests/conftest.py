@@ -5,7 +5,7 @@ import sqlalchemy
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Transaction
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from app.api.deps import get_db
 from app.core.security import create_access_token
@@ -85,4 +85,9 @@ def acting_as_user(user: User, client: TestClient) -> User:
 
 def acting_as_john(db: Session, client: TestClient) -> User:
     user = create_john_user(db)
+    return acting_as_user(user, client)
+
+
+def acting_as_jane(db: Session, client: TestClient) -> User:
+    user = create_jane_user(db)
     return acting_as_user(user, client)
