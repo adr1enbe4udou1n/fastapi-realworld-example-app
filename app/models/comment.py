@@ -1,10 +1,11 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, ForeignKey, DateTime, Text
+
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, Text
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
-from app.models.user import User
 from app.models.article import Article
+from app.models.user import User
 
 
 class Comment(Base):

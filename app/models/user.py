@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Column, DateTime, Integer, String, Text, ForeignKey, Table
+from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String, Table,
+                        Text)
 from sqlalchemy.orm import relationship
 
 from app.core import security
