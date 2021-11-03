@@ -1,12 +1,13 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Column, DateTime, Integer, String, Text
+from sqlalchemy import Column, DateTime, Integer, String, Text, ForeignKey, Table
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.schema import ForeignKey, Table
 
 from app.core import security
 from app.db.base_class import Base
+from app.models.article import Article
+from app.models.comment import Comment
 from app.schemas.profiles import Profile as ProfileDto
 from app.schemas.users import User as UserDto
 
@@ -38,6 +39,9 @@ class User(Base):
         backref="following",
         uselist=True,
     )
+
+    articles = relationship(Article, back_populates="author")
+    comments = relationship(Comment, back_populates="author")
 
     def schema(self) -> UserDto:
         return UserDto(
