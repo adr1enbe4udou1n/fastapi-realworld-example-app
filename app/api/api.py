@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.routes import auth, profiles, user
+from app.api.routes import auth, profiles, tags, user
 
 router = APIRouter()
 
@@ -14,4 +14,9 @@ router.include_router(
     profiles.router,
     prefix="/profiles/celeb_{username}",
     tags=["Profiles"],
+)
+router.include_router(
+    tags.router,
+    prefix="/tags",
+    tags=["Tags"],
 )

@@ -59,7 +59,7 @@ def follow(
     description="Unfollow a user by username",
     response_model=ProfileResponse,
 )
-def follow(
+def unfollow(
     username: str = Path(
         ..., description="Username of the profile you want to unfollow"
     ),
