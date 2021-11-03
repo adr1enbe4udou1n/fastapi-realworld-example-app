@@ -1,8 +1,12 @@
+from typing import TYPE_CHECKING
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 from app.models.article import article_tag
+
+if TYPE_CHECKING:
+    from app.models.article import Article
 
 
 class Tag(Base):

@@ -1,19 +1,21 @@
 from datetime import datetime
 
-from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String, Table,
-                        Text)
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
+from app.models.user import User
+from app.models.tag import Tag
+from app.models.comment import Comment
 
-article_tag = Table(
+article_tag: Table = Table(
     "article_tag",
     Base.metadata,
     Column("article_id", Integer, ForeignKey("articles.id"), primary_key=True),
     Column("tag_id", Integer, ForeignKey("tags.id"), primary_key=True),
 )
 
-article_favorite = Table(
+article_favorite: Table = Table(
     "article_favorite",
     Base.metadata,
     Column("article_id", Integer, ForeignKey("articles.id"), primary_key=True),

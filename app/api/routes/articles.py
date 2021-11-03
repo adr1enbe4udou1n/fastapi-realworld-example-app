@@ -4,8 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
 from app.models.article import Article
-from app.schemas.articles import (MultipleArticlesResponse,
-                                  SingleArticleResponse)
+from app.schemas.articles import MultipleArticlesResponse, SingleArticleResponse
 
 router = APIRouter()
 
@@ -26,7 +25,7 @@ def get_list(
 ) -> MultipleArticlesResponse:
     articles = map(lambda a: a, db.query(Article).order_by(desc(Article.id)).all())
     return MultipleArticlesResponse(
-        articles=list(articles), articles_count=len(articles)
+        articles=list(articles), articles_count=len(list(articles))
     )
 
 
@@ -43,7 +42,7 @@ def get_feed(
 ) -> MultipleArticlesResponse:
     articles = map(lambda a: a, db.query(Article).order_by(desc(Article.id)).all())
     return MultipleArticlesResponse(
-        articles=list(articles), articles_count=len(articles)
+        articles=list(articles), articles_count=len(list(articles))
     )
 
 
@@ -66,7 +65,7 @@ def create(
     description="Get an article. Auth not required",
     response_model=MultipleArticlesResponse,
 )
-def update(
+def get(
     db: Session = Depends(get_db),
     slug: str = Path(..., title="Slug of the article to get"),
 ) -> SingleArticleResponse:

@@ -1,8 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String, Table,
-                        Text)
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import relationship
 
 from app.core import security
@@ -10,6 +9,10 @@ from app.db.base_class import Base
 from app.models.article import article_favorite
 from app.schemas.profiles import Profile as ProfileDto
 from app.schemas.users import User as UserDto
+
+from app.models.article import Article
+from app.models.article import Comment
+
 
 follower_user = Table(
     "follower_user",
@@ -37,6 +40,7 @@ class User(Base):
         primaryjoin=id == follower_user.c.following_id,
         secondaryjoin=id == follower_user.c.follower_id,
         backref="following",
+        uselist=True,
     )
 
     articles = relationship("Article", back_populates="author")

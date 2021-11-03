@@ -3,8 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
 from app.models.comment import Comment
-from app.schemas.comments import (MultipleCommentsResponse,
-                                  SingleCommentResponse)
+from app.schemas.comments import MultipleCommentsResponse, SingleCommentResponse
 
 router = APIRouter()
 
