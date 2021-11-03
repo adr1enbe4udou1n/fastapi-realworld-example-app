@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import relationship
@@ -10,8 +10,9 @@ from app.models.article import article_favorite
 from app.schemas.profiles import Profile as ProfileDto
 from app.schemas.users import User as UserDto
 
-from app.models.article import Article
-from app.models.article import Comment
+if TYPE_CHECKING:
+    from app.models.article import Article  # noqa
+    from app.models.comment import Comment  # noqa
 
 
 follower_user = Table(

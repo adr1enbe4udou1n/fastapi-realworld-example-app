@@ -1,12 +1,15 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
-from app.models.user import User
-from app.models.tag import Tag
-from app.models.comment import Comment
+
+if TYPE_CHECKING:
+    from app.models.comment import Comment  # noqa
+    from app.models.tag import Tag  # noqa
+    from app.models.user import User  # noqa
 
 article_tag: Table = Table(
     "article_tag",

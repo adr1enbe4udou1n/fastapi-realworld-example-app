@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
 from app.models.article import Article
-from app.schemas.articles import MultipleArticlesResponse, SingleArticleResponse
+from app.schemas.articles import (MultipleArticlesResponse,
+                                  SingleArticleResponse)
 
 router = APIRouter()
 

@@ -1,11 +1,14 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, Text
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
-from app.models.article import Article
-from app.models.user import User
+
+if TYPE_CHECKING:
+    from app.models.article import Article  # noqa
+    from app.models.user import User  # noqa
 
 
 class Comment(Base):
