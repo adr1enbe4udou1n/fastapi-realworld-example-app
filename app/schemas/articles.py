@@ -1,5 +1,7 @@
 import datetime
-from typing import List
+from typing import Annotated, List, Optional
+
+from pydantic import Field
 
 from app.schemas.base import BaseModel
 from app.schemas.profiles import Profile
@@ -17,11 +19,13 @@ class NewArticleRequest(BaseModel):
 
 
 class UpdateArticle(BaseModel):
-    tags: List[str]
+    title: Annotated[Optional[str], Field(min_length=1)] = None
+    description: Annotated[Optional[str], Field(min_length=1)] = None
+    body: Annotated[Optional[str], Field(min_length=1)] = None
 
 
 class UpdateArticleRequest(BaseModel):
-    tags: UpdateArticle
+    article: UpdateArticle
 
 
 class Article(BaseModel):

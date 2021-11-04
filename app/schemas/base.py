@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel as PBaseModel
 from pydantic.utils import to_camel
 
 
@@ -8,6 +8,6 @@ def to_lower_camel(string: str) -> str:
     return s[0].lower() + s[1:]
 
 
-class BaseModel(BaseModel):
+class BaseModel(PBaseModel):
     class Config:
         alias_generator = to_lower_camel

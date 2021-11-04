@@ -31,7 +31,6 @@ class ArticlesRepository:
     def delete(self, db: Session, *, db_obj: Article) -> None:
         db.delete(db_obj)
         db.commit()
-        return db_obj
 
 
 articles = ArticlesRepository()

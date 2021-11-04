@@ -20,7 +20,6 @@ class CommentsRepository:
     def delete(self, db: Session, *, db_obj: Comment) -> None:
         db.delete(db_obj)
         db.commit()
-        return db_obj
 
 
 comments = CommentsRepository()

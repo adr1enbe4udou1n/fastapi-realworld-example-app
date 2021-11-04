@@ -4,10 +4,14 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_user, get_db, get_optional_current_user
 from app.crud.crud_article import articles
 from app.crud.crud_comment import comments
+from app.models.article import Article
 from app.models.comment import Comment
 from app.models.user import User
-from app.schemas.comments import (MultipleCommentsResponse, NewCommentRequest,
-                                  SingleCommentResponse)
+from app.schemas.comments import (
+    MultipleCommentsResponse,
+    NewCommentRequest,
+    SingleCommentResponse,
+)
 
 router = APIRouter()
 
@@ -15,7 +19,7 @@ router = APIRouter()
 def _get_article_from_slug(
     db: Session,
     slug: str,
-) -> User:
+) -> Article:
     db_article = articles.get_by_slug(db, slug=slug)
     if not db_article:
         raise HTTPException(status_code=404, detail="No article found")
@@ -24,8 +28,8 @@ def _get_article_from_slug(
 
 def _get_comment_from_id(
     db: Session,
-    id: str,
-) -> User:
+    id: int,
+) -> Comment:
     db_comment = comments.get(db, id=id)
     if not db_comment:
         raise HTTPException(status_code=404, detail="No comment found")
@@ -63,12 +67,13 @@ def create(
     ),
     new_comment: NewCommentRequest = Body(...),
 ) -> SingleCommentResponse:
+    _get_article_from_slug(db, slug)
     comment = db.query(Comment).first()
     return SingleCommentResponse(comment=comment)
 
 
 @router.delete(
-    "{commentId}",
+    "/{commentId}",
     summary="Delete a comment for an article",
     description="Delete a comment for an article. Auth is required",
     response_model=SingleCommentResponse,
@@ -83,6 +88,12 @@ def delete(
         ..., title="ID of the comment you want to delete", alias="commentId"
     ),
 ) -> SingleCommentResponse:
-    _get_article_from_slug(slug)
-    comment = _get_comment_from_id(comment_id)
+    article = _get_article_from_slug(db, slug)
+    comment = _get_comment_from_id(db, comment_id)
+
+    if comment.article.id != article.id:
+        raise HTTPException(
+            status_code=400, detail="Comment does not belong to this article"
+        )
+
     return SingleCommentResponse(comment=comment)

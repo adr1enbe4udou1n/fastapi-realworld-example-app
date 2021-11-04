@@ -5,16 +5,15 @@ from starlette import status
 from tests.conftest import acting_as_john
 
 
-def test_guest_cannot_favorite_article(client: TestClient, db: Session) -> None:
-    acting_as_john(db, client)
+def test_guest_cannot_favorite_article(client: TestClient) -> None:
     r = client.post("/api/articles/test-title/favorite")
-    assert r.status_code == status.HTTP_200_OK
+    assert r.status_code == status.HTTP_403_FORBIDDEN
 
 
 def test_cannot_favorite_non_existent_article(client: TestClient, db: Session) -> None:
     acting_as_john(db, client)
     r = client.post("/api/articles/test-title/favorite")
-    assert r.status_code == status.HTTP_200_OK
+    assert r.status_code == status.HTTP_404_NOT_FOUND
 
 
 def test_can_favorite_article(client: TestClient, db: Session) -> None:
