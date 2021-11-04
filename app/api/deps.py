@@ -1,6 +1,6 @@
 from typing import Generator, Optional
 
-from fastapi import Depends, HTTPException, Security, status
+from fastapi import Depends, HTTPException, Security, status, Request
 from fastapi.security import APIKeyHeader
 from jose import jwt
 from pydantic import ValidationError
@@ -49,11 +49,8 @@ def _get_authorization_header(
     return token
 
 
-def _get_optional_authorization_header(
-    authorization: Optional[str] = Security(
-        APIKeyHeader(name="Authorization", auto_error=False),
-    ),
-) -> str:
+def _get_optional_authorization_header(request: Request) -> str:
+    authorization = request.headers.get("Authorization")
     if authorization:
         return _get_authorization_header(authorization)
 
