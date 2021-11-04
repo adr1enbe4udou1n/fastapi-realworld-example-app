@@ -1,6 +1,8 @@
 from typing import Annotated, Optional
 
-from pydantic import BaseModel, EmailStr, Field, HttpUrl
+from pydantic import EmailStr, Field, HttpUrl
+
+from app.schemas.base import BaseModel
 
 
 class LoginUser(BaseModel):

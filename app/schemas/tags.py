@@ -1,6 +1,6 @@
 from typing import List
 
-from pydantic import BaseModel
+from app.schemas.base import BaseModel
 
 
 class TagsResponse(BaseModel):

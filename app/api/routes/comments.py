@@ -1,12 +1,35 @@
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Body, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_db, get_optional_current_user
+from app.crud.crud_article import articles
+from app.crud.crud_comment import comments
 from app.models.comment import Comment
-from app.schemas.comments import MultipleCommentsResponse, SingleCommentResponse
 from app.models.user import User
+from app.schemas.comments import (MultipleCommentsResponse, NewCommentRequest,
+                                  SingleCommentResponse)
 
 router = APIRouter()
+
+
+def _get_article_from_slug(
+    db: Session,
+    slug: str,
+) -> User:
+    db_article = articles.get_by_slug(db, slug=slug)
+    if not db_article:
+        raise HTTPException(status_code=404, detail="No article found")
+    return db_article
+
+
+def _get_comment_from_id(
+    db: Session,
+    id: str,
+) -> User:
+    db_comment = comments.get(db, id=id)
+    if not db_comment:
+        raise HTTPException(status_code=404, detail="No comment found")
+    return db_comment
 
 
 @router.get(
@@ -38,6 +61,7 @@ def create(
     slug: str = Path(
         ..., title="Slug of the article that you want to create a comment for"
     ),
+    new_comment: NewCommentRequest = Body(...),
 ) -> SingleCommentResponse:
     comment = db.query(Comment).first()
     return SingleCommentResponse(comment=comment)
@@ -55,7 +79,10 @@ def delete(
     slug: str = Path(
         ..., title="Slug of the article that you want to delete a comment for"
     ),
-    comment_id: int = Path(..., title="ID of the comment you want to delete"),
+    comment_id: int = Path(
+        ..., title="ID of the comment you want to delete", alias="commentId"
+    ),
 ) -> SingleCommentResponse:
-    comment = db.query(Comment).first()
+    _get_article_from_slug(slug)
+    comment = _get_comment_from_id(comment_id)
     return SingleCommentResponse(comment=comment)

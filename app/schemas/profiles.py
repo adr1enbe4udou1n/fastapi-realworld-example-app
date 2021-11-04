@@ -1,4 +1,6 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import HttpUrl
+
+from app.schemas.base import BaseModel
 
 
 class Profile(BaseModel):

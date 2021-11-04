@@ -9,7 +9,7 @@ from app.schemas.profiles import ProfileResponse
 router = APIRouter()
 
 
-def get_profile_from_username(
+def _get_profile_from_username(
     db: Session,
     username: str,
 ) -> User:
@@ -30,7 +30,7 @@ def get(
     current_user: User = Depends(get_optional_current_user),
     db: Session = Depends(get_db),
 ) -> ProfileResponse:
-    user = get_profile_from_username(db, username)
+    user = _get_profile_from_username(db, username)
     return ProfileResponse(profile=user.profile(current_user))
 
 
@@ -45,7 +45,7 @@ def follow(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> ProfileResponse:
-    user = get_profile_from_username(db, username)
+    user = _get_profile_from_username(db, username)
     user.followers.append(current_user)
     db.merge(user)
     db.commit()
@@ -66,7 +66,7 @@ def unfollow(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> ProfileResponse:
-    user = get_profile_from_username(db, username)
+    user = _get_profile_from_username(db, username)
     user.followers.remove(current_user)
     db.merge(user)
     db.commit()

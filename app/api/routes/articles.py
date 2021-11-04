@@ -1,13 +1,25 @@
-from fastapi import APIRouter, Depends, Path, Query
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_db, get_optional_current_user
+from app.crud.crud_article import articles
 from app.models.article import Article
-from app.schemas.articles import MultipleArticlesResponse, SingleArticleResponse
 from app.models.user import User
+from app.schemas.articles import (MultipleArticlesResponse, NewArticleRequest,
+                                  SingleArticleResponse, UpdateArticleRequest)
 
 router = APIRouter()
+
+
+def _get_article_from_slug(
+    db: Session,
+    slug: str,
+) -> User:
+    db_article = articles.get_by_slug(db, slug=slug)
+    if not db_article:
+        raise HTTPException(status_code=404, detail="No article found")
+    return db_article
 
 
 @router.get(
@@ -58,6 +70,7 @@ def get_feed(
 def create(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
+    new_article: NewArticleRequest = Body(...),
 ) -> SingleArticleResponse:
     article = db.query(Article).first()
     return SingleArticleResponse(article=article)
@@ -74,7 +87,7 @@ def get(
     current_user: User = Depends(get_optional_current_user),
     slug: str = Path(..., title="Slug of the article to get"),
 ) -> SingleArticleResponse:
-    article = db.query(Article).first()
+    article = _get_article_from_slug(slug)
     return SingleArticleResponse(article=article)
 
 
@@ -88,8 +101,9 @@ def update(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
     slug: str = Path(..., title="Slug of the article to update"),
+    update_article: UpdateArticleRequest = Body(...),
 ) -> SingleArticleResponse:
-    article = db.query(Article).first()
+    article = _get_article_from_slug(slug)
     return SingleArticleResponse(article=article)
 
 
@@ -104,5 +118,5 @@ def delete(
     current_user: User = Depends(get_current_user),
     slug: str = Path(..., title="Slug of the article to delete"),
 ) -> SingleArticleResponse:
-    article = db.query(Article).first()
+    article = _get_article_from_slug(slug)
     return SingleArticleResponse(article=article)

@@ -1,8 +1,7 @@
 import datetime
 from typing import List
 
-from pydantic import BaseModel
-
+from app.schemas.base import BaseModel
 from app.schemas.profiles import Profile
 
 

@@ -1,6 +1,6 @@
 from typing import Generator, Optional
 
-from fastapi import Depends, HTTPException, Security, status, Request
+from fastapi import Depends, HTTPException, Request, Security, status
 from fastapi.security import APIKeyHeader
 from jose import jwt
 from pydantic import ValidationError
