@@ -17,5 +17,5 @@ router = APIRouter()
 def get_list(
     db: Session = Depends(get_db),
 ) -> TagsResponse:
-    tags = map(lambda tag: tag.name, db.query(Tag).order_by(Tag.name).all())
-    return TagsResponse(tags=list(tags))
+    tags = db.query(Tag).order_by(Tag.name).all()
+    return TagsResponse(tags=[tag.name for tag in tags])

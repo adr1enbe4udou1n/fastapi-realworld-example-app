@@ -8,10 +8,10 @@ from app.schemas.profiles import Profile
 
 
 class NewArticle(BaseModel):
-    title: str
-    description: str
-    body: str
-    tag_list: List[str]
+    title: Annotated[str, Field(min_length=1)]
+    description: Annotated[str, Field(min_length=1)]
+    body: Annotated[str, Field(min_length=1)]
+    tag_list: List[str] = []
 
 
 class NewArticleRequest(BaseModel):

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query
+from slugify import slugify
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
@@ -37,7 +38,7 @@ def get_list(
     favorited: str = Path(..., title="Filter by favorites of a user (username)"),
     tag: str = Path(..., title="Filter by tag"),
 ) -> MultipleArticlesResponse:
-    articles = map(lambda a: a, db.query(Article).order_by(desc(Article.id)).all())
+    articles = db.query(Article).order_by(desc(Article.id)).all()
     return MultipleArticlesResponse(
         articles=list(articles), articles_count=len(list(articles))
     )
@@ -55,7 +56,7 @@ def get_feed(
     limit: int = Query(..., title="Limit number of articles returned (default is 20)"),
     offset: int = Query(..., title="Offset/skip number of articles (default is 0)"),
 ) -> MultipleArticlesResponse:
-    articles = map(lambda a: a, db.query(Article).order_by(desc(Article.id)).all())
+    articles = db.query(Article).order_by(desc(Article.id)).all()
     return MultipleArticlesResponse(
         articles=list(articles), articles_count=len(list(articles))
     )
@@ -65,22 +66,28 @@ def get_feed(
     "",
     summary="Create an article",
     description="Create an article. Auth is required",
-    response_model=MultipleArticlesResponse,
+    response_model=SingleArticleResponse,
 )
 def create(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
     new_article: NewArticleRequest = Body(...),
 ) -> SingleArticleResponse:
-    article = db.query(Article).first()
-    return SingleArticleResponse(article=article)
+    existing_article = articles.get_by_slug(db, slug=slugify(new_article.article.title))
+    if existing_article:
+        raise HTTPException(
+            status_code=400, detail="Article with this title already exists"
+        )
+
+    article = articles.create(db, obj_in=new_article.article, author=current_user)
+    return SingleArticleResponse(article=article.schema(current_user))
 
 
 @router.get(
     "/{slug}",
     summary="Get an article",
     description="Get an article. Auth not required",
-    response_model=MultipleArticlesResponse,
+    response_model=SingleArticleResponse,
 )
 def get(
     db: Session = Depends(get_db),
@@ -95,7 +102,7 @@ def get(
     "/{slug}",
     summary="Update an article",
     description="Update an article. Auth is required",
-    response_model=MultipleArticlesResponse,
+    response_model=SingleArticleResponse,
 )
 def update(
     db: Session = Depends(get_db),
@@ -111,12 +118,10 @@ def update(
     "/{slug}",
     summary="Delete an article",
     description="Delete an article. Auth is required",
-    response_model=MultipleArticlesResponse,
 )
 def delete(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
     slug: str = Path(..., title="Slug of the article to delete"),
-) -> SingleArticleResponse:
-    article = _get_article_from_slug(db, slug)
-    return SingleArticleResponse(article=article)
+) -> None:
+    _get_article_from_slug(db, slug)

@@ -11,3 +11,4 @@ def to_lower_camel(string: str) -> str:
 class BaseModel(PBaseModel):
     class Config:
         alias_generator = to_lower_camel
+        allow_population_by_field_name = True

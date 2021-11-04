@@ -33,8 +33,10 @@ class User(Base):
     password = Column(String)
     bio = Column(Text)
     image = Column(String)
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at = Column(
+        DateTime, default=datetime.now, nullable=False, onupdate=datetime.now
+    )
 
     followers = relationship(
         "User",

@@ -15,8 +15,8 @@ class LoginUserRequest(BaseModel):
 
 
 class NewUser(BaseModel):
-    email: EmailStr
-    username: str
+    email: Annotated[EmailStr, Field(min_length=1)]
+    username: Annotated[str, Field(min_length=1)]
     password: Annotated[str, Field(min_length=8)]
 
 

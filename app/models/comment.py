@@ -15,11 +15,15 @@ class Comment(Base):
     __tablename__ = "comments"
 
     id = Column(Integer, primary_key=True, index=True)
-    article_id = Column(Integer, ForeignKey("articles.id", ondelete="CASCADE"))
-    author_id = Column(Integer, ForeignKey("users.id"))
+    article_id = Column(
+        Integer, ForeignKey("articles.id", ondelete="CASCADE"), nullable=False
+    )
+    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     body = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at = Column(
+        DateTime, default=datetime.now, nullable=False, onupdate=datetime.now
+    )
 
     article = relationship("Article", back_populates="comments")
     author = relationship("User", back_populates="comments")

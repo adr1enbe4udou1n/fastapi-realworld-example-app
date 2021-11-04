@@ -7,11 +7,8 @@ from app.crud.crud_comment import comments
 from app.models.article import Article
 from app.models.comment import Comment
 from app.models.user import User
-from app.schemas.comments import (
-    MultipleCommentsResponse,
-    NewCommentRequest,
-    SingleCommentResponse,
-)
+from app.schemas.comments import (MultipleCommentsResponse, NewCommentRequest,
+                                  SingleCommentResponse)
 
 router = APIRouter()
 
@@ -49,7 +46,7 @@ def get_list(
         ..., title="Slug of the article that you want to get comments for"
     ),
 ) -> MultipleCommentsResponse:
-    comments = map(lambda c: c, db.query(Comment).all())
+    comments = db.query(Comment).all()
     return MultipleCommentsResponse(comments=list(comments))
 
 
@@ -76,7 +73,6 @@ def create(
     "/{commentId}",
     summary="Delete a comment for an article",
     description="Delete a comment for an article. Auth is required",
-    response_model=SingleCommentResponse,
 )
 def delete(
     db: Session = Depends(get_db),
@@ -87,7 +83,7 @@ def delete(
     comment_id: int = Path(
         ..., title="ID of the comment you want to delete", alias="commentId"
     ),
-) -> SingleCommentResponse:
+) -> None:
     article = _get_article_from_slug(db, slug)
     comment = _get_comment_from_id(db, comment_id)
 
@@ -95,5 +91,3 @@ def delete(
         raise HTTPException(
             status_code=400, detail="Comment does not belong to this article"
         )
-
-    return SingleCommentResponse(comment=comment)
