@@ -2,8 +2,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from starlette import status
 
-from app.models.article import Article
-from tests.conftest import acting_as_john
+from tests.conftest import acting_as_john, generate_article
 
 
 def test_cannot_get_non_existent_article(client: TestClient) -> None:
@@ -14,13 +13,7 @@ def test_cannot_get_non_existent_article(client: TestClient) -> None:
 def test_can_get_article(client: TestClient, db: Session) -> None:
     john = acting_as_john(db, client)
 
-    db_obj = Article(
-        title="Test Title",
-        description="Test Description",
-        body="Test Body",
-        slug="test-title",
-        author=john,
-    )
+    db_obj = generate_article(john)
     db.add(db_obj)
     db.commit()
 

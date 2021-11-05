@@ -1,8 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String, Table,
-                        Text)
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -43,7 +42,7 @@ class Article(Base):
     )
 
     author = relationship("User", back_populates="articles")
-    comments = relationship("Comment", back_populates="article")
+    comments = relationship("Comment", back_populates="article", uselist=True)
     tags = relationship(
         "Tag", back_populates="articles", secondary=article_tag, uselist=True
     )
@@ -51,6 +50,7 @@ class Article(Base):
         "User",
         back_populates="favoriteArticles",
         secondary=article_favorite,
+        uselist=True,
     )
 
     def schema(self, user: Optional["User"] = None) -> ArticleDto:

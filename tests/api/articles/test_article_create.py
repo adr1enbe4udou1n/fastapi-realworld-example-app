@@ -5,9 +5,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from starlette import status
 
-from app.models.article import Article
 from app.models.tag import Tag
-from tests.conftest import acting_as_john
+from tests.conftest import acting_as_john, generate_article
 
 
 def test_guest_cannot_create_article(client: TestClient) -> None:
@@ -46,13 +45,7 @@ def test_cannot_create_article_with_invalid_data(
 def test_cannot_create_article_with_same_title(client: TestClient, db: Session) -> None:
     john = acting_as_john(db, client)
 
-    db_obj = Article(
-        title="Test Title",
-        description="Test Description",
-        body="Test Body",
-        slug="test-title",
-        author_id=john.id,
-    )
+    db_obj = generate_article(john)
     db.add(db_obj)
     db.commit()
 

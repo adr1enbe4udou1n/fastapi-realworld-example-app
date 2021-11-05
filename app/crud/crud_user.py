@@ -47,7 +47,9 @@ class UsersRepository:
             return None
         return user
 
-    def follow(self, db: Session, *, db_obj: User, follower: User, follow=True) -> User:
+    def follow(
+        self, db: Session, *, db_obj: User, follower: User, follow: bool = True
+    ) -> None:
         if follow:
             db_obj.followers.append(follower)
         else:

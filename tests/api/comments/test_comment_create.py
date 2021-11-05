@@ -5,9 +5,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from starlette import status
 
-from app.models.article import Article
 from app.models.comment import Comment
-from tests.conftest import acting_as_john
+from tests.conftest import acting_as_john, generate_article
 
 
 def test_guest_cannot_create_comment(client: TestClient) -> None:
@@ -38,13 +37,7 @@ def test_cannot_create_comment_with_invalid_data(
 ) -> None:
     john = acting_as_john(db, client)
 
-    db_obj = Article(
-        title="Test Title",
-        description="Test Description",
-        body="Test Body",
-        slug="test-title",
-        author=john,
-    )
+    db_obj = generate_article(john)
     db.add(db_obj)
     db.commit()
 
@@ -55,13 +48,7 @@ def test_cannot_create_comment_with_invalid_data(
 def test_can_create_comment(client: TestClient, db: Session) -> None:
     john = acting_as_john(db, client)
 
-    db_obj = Article(
-        title="Test Title",
-        description="Test Description",
-        body="Test Body",
-        slug="test-title",
-        author=john,
-    )
+    db_obj = generate_article(john)
     db.add(db_obj)
     db.commit()
 

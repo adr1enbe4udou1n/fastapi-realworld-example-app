@@ -11,6 +11,7 @@ from app.api.deps import get_db
 from app.core.security import create_access_token
 from app.db.base_class import Base
 from app.main import app
+from app.models.article import Article
 from app.models.user import User
 
 engine = create_engine("postgresql://main:main@127.0.0.1:5434", pool_pre_ping=True)
@@ -91,3 +92,13 @@ def acting_as_john(db: Session, client: TestClient) -> User:
 def acting_as_jane(db: Session, client: TestClient) -> User:
     user = create_jane_user(db)
     return acting_as_user(user, client)
+
+
+def generate_article(author: User, slug: str = "test-title") -> Article:
+    return Article(
+        title="Test Title",
+        description="Test Description",
+        body="Test Body",
+        slug=slug,
+        author=author,
+    )

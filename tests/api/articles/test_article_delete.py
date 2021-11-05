@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from app.models.article import Article
-from tests.conftest import acting_as_john, create_jane_user
+from tests.conftest import acting_as_john, create_jane_user, generate_article
 
 
 def test_guest_cannot_delete_article(client: TestClient, db: Session) -> None:
@@ -20,13 +20,7 @@ def test_cannot_delete_non_existent_article(client: TestClient, db: Session) -> 
 def test_cannot_delete_article_of_other_author(client: TestClient, db: Session) -> None:
     jane = create_jane_user(db)
 
-    db_obj = Article(
-        title="Test Title",
-        description="Test Description",
-        body="Test Body",
-        slug="test-title",
-        author=jane,
-    )
+    db_obj = generate_article(jane)
     db.add(db_obj)
     db.commit()
 
@@ -41,13 +35,7 @@ def test_can_delete_own_article_with_all_comments(
 ) -> None:
     john = acting_as_john(db, client)
 
-    db_obj = Article(
-        title="Test Title",
-        description="Test Description",
-        body="Test Body",
-        slug="test-title",
-        author=john,
-    )
+    db_obj = generate_article(john)
     db.add(db_obj)
     db.commit()
 

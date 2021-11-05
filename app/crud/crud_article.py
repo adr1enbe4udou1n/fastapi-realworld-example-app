@@ -50,8 +50,8 @@ class ArticlesRepository:
         db.commit()
 
     def favorite(
-        self, db: Session, *, db_obj: Article, user: User, favorite=True
-    ) -> Article:
+        self, db: Session, *, db_obj: Article, user: User, favorite: bool = True
+    ) -> None:
         if favorite:
             db_obj.favoritedBy.append(user)
         else:
