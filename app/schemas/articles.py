@@ -1,5 +1,5 @@
 import datetime
-from typing import Annotated, List, Optional
+from typing import List, Optional
 
 from pydantic import Field
 
@@ -8,9 +8,9 @@ from app.schemas.profiles import Profile
 
 
 class NewArticle(BaseModel):
-    title: Annotated[str, Field(min_length=1)]
-    description: Annotated[str, Field(min_length=1)]
-    body: Annotated[str, Field(min_length=1)]
+    title: str = Field(min_length=1)
+    description: str = Field(min_length=1)
+    body: str = Field(min_length=1)
     tag_list: List[str] = []
 
 
@@ -19,9 +19,9 @@ class NewArticleRequest(BaseModel):
 
 
 class UpdateArticle(BaseModel):
-    title: Annotated[Optional[str], Field(min_length=1)] = None
-    description: Annotated[Optional[str], Field(min_length=1)] = None
-    body: Annotated[Optional[str], Field(min_length=1)] = None
+    title: Optional[str] = Field(min_length=1)
+    description: Optional[str] = Field(min_length=1)
+    body: Optional[str] = Field(min_length=1)
 
 
 class UpdateArticleRequest(BaseModel):

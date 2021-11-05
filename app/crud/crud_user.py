@@ -9,13 +9,13 @@ from app.schemas.users import NewUser, UpdateUser
 
 class UsersRepository:
     def get(self, db: Session, id: Any) -> Optional[User]:
-        return db.query(User).filter(User.id == id).first()
+        return db.query(User).filter_by(id=id).first()
 
     def get_by_name(self, db: Session, *, name: str) -> Optional[User]:
-        return db.query(User).filter(User.name == name).first()
+        return db.query(User).filter_by(name=name).first()
 
     def get_by_email(self, db: Session, *, email: str) -> Optional[User]:
-        return db.query(User).filter(User.email == email).first()
+        return db.query(User).filter_by(email=email).first()
 
     def create(self, db: Session, *, obj_in: NewUser) -> User:
         db_obj = User(

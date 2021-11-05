@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Optional
 
 from pydantic import EmailStr, Field, HttpUrl
 
@@ -15,9 +15,9 @@ class LoginUserRequest(BaseModel):
 
 
 class NewUser(BaseModel):
-    email: Annotated[EmailStr, Field(min_length=1)]
-    username: Annotated[str, Field(min_length=1)]
-    password: Annotated[str, Field(min_length=8)]
+    email: EmailStr
+    username: str = Field(min_length=1)
+    password: str = Field(min_length=8)
 
 
 class NewUserRequest(BaseModel):
@@ -25,10 +25,10 @@ class NewUserRequest(BaseModel):
 
 
 class UpdateUser(BaseModel):
-    username: Annotated[Optional[str], Field(min_length=1)] = None
-    email: Optional[EmailStr] = None
-    bio: Optional[str] = None
-    image: Optional[HttpUrl] = None
+    username: Optional[str] = Field(min_length=1)
+    email: Optional[EmailStr]
+    bio: Optional[str]
+    image: Optional[HttpUrl]
 
 
 class UpdateUserRequest(BaseModel):

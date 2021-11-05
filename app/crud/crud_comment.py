@@ -8,7 +8,7 @@ from app.schemas.comments import NewComment
 
 class CommentsRepository:
     def get(self, db: Session, id: Any) -> Optional[Comment]:
-        return db.query(Comment).filter(Comment.id == id).first()
+        return db.query(Comment).filter_by(id=id).first()
 
     def create(self, db: Session, *, obj_in: NewComment) -> Comment:
         db_obj = Comment()

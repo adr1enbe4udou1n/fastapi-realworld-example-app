@@ -32,7 +32,7 @@ def favorite(
     slug: str = Path(..., title="Slug of the article that you want to favorite"),
 ) -> SingleArticleResponse:
     article = _get_article_from_slug(db, slug)
-    return SingleArticleResponse(article=article)
+    return SingleArticleResponse(article=article.schema(current_user))
 
 
 @router.delete(
@@ -47,4 +47,4 @@ def unfavorite(
     slug: str = Path(..., title="Slug of the article that you want to unfavorite"),
 ) -> SingleArticleResponse:
     article = _get_article_from_slug(db, slug)
-    return SingleArticleResponse(article=article)
+    return SingleArticleResponse(article=article.schema(current_user))

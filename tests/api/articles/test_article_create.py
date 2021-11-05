@@ -82,7 +82,6 @@ def test_can_create_article(client: TestClient, db: Session) -> None:
                 "title": "Test Title",
                 "description": "Test Description",
                 "body": "Test Body",
-                "tagList": ["Tag 1", "Tag 2", "Existing Tag"],
             }
         },
     )
@@ -97,10 +96,7 @@ def test_can_create_article(client: TestClient, db: Session) -> None:
             "image": "https://randomuser.me/api/portraits/men/1.jpg",
             "following": False,
         },
-        "tagList": ["Existing Tag", "Tag 1", "Tag 2"],
+        "tagList": [],
         "favorited": False,
         "favoritesCount": 0,
     }.items() <= r.json()["article"].items()
-
-    assert db.query(Article).count() == 1
-    assert db.query(Tag).count() == 3

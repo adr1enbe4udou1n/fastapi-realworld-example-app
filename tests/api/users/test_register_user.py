@@ -25,6 +25,16 @@ from tests.conftest import create_john_user
             "email": "john.doe@example.com",
             "password": "pass",
         },
+        {
+            "username": "",
+            "email": "john.doe@example.com",
+            "password": "password",
+        },
+        {
+            "username": "John Doe",
+            "email": "john.doe@example.com",
+            "password": "",
+        },
     ),
 )
 def test_cannot_register_with_invalid_data(

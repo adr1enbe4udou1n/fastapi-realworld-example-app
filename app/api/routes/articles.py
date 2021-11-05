@@ -95,7 +95,7 @@ def get(
     slug: str = Path(..., title="Slug of the article to get"),
 ) -> SingleArticleResponse:
     article = _get_article_from_slug(db, slug)
-    return SingleArticleResponse(article=article)
+    return SingleArticleResponse(article=article.schema(current_user))
 
 
 @router.put(
@@ -111,7 +111,13 @@ def update(
     update_article: UpdateArticleRequest = Body(...),
 ) -> SingleArticleResponse:
     article = _get_article_from_slug(db, slug)
-    return SingleArticleResponse(article=article)
+
+    if article.author != current_user:
+        raise HTTPException(
+            status_code=400, detail="You are not the author of this article"
+        )
+    article = articles.update(db, db_obj=article, obj_in=update_article.article)
+    return SingleArticleResponse(article=article.schema(current_user))
 
 
 @router.delete(

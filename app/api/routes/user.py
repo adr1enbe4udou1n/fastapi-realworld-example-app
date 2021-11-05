@@ -33,7 +33,7 @@ def update(
     update_user: UpdateUserRequest = Body(...),
 ) -> UserResponse:
     db_user = users.get_by_email(db, email=str(update_user.user.email))
-    if db_user and db_user.id != current_user.id:
+    if db_user and db_user != current_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
     db_user = users.update(db, db_obj=current_user, obj_in=update_user.user)

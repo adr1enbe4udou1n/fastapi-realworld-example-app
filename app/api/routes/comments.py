@@ -7,8 +7,11 @@ from app.crud.crud_comment import comments
 from app.models.article import Article
 from app.models.comment import Comment
 from app.models.user import User
-from app.schemas.comments import (MultipleCommentsResponse, NewCommentRequest,
-                                  SingleCommentResponse)
+from app.schemas.comments import (
+    MultipleCommentsResponse,
+    NewCommentRequest,
+    SingleCommentResponse,
+)
 
 router = APIRouter()
 
@@ -65,8 +68,8 @@ def create(
     new_comment: NewCommentRequest = Body(...),
 ) -> SingleCommentResponse:
     _get_article_from_slug(db, slug)
-    comment = db.query(Comment).first()
-    return SingleCommentResponse(comment=comment)
+    comment = db.query(Comment).first() or Comment()
+    return SingleCommentResponse(comment=comment.schema(current_user))
 
 
 @router.delete(
@@ -87,7 +90,7 @@ def delete(
     article = _get_article_from_slug(db, slug)
     comment = _get_comment_from_id(db, comment_id)
 
-    if comment.article.id != article.id:
+    if comment.article != article:
         raise HTTPException(
             status_code=400, detail="Comment does not belong to this article"
         )
