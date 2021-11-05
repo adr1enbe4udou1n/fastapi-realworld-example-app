@@ -3,12 +3,8 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from app.models.user import follower_user
-from tests.conftest import (
-    acting_as_jane,
-    acting_as_user,
-    create_jane_user,
-    create_john_user,
-)
+from tests.conftest import (acting_as_jane, acting_as_user, create_jane_user,
+                            create_john_user)
 
 
 def test_cannot_follow_profile(client: TestClient, db: Session) -> None:

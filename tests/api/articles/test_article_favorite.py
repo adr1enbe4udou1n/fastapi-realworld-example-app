@@ -2,8 +2,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from starlette import status
 
-from tests.conftest import acting_as_john, create_jane_user
 from app.models.article import Article, article_favorite
+from tests.conftest import acting_as_john, create_jane_user
 
 
 def test_guest_cannot_favorite_article(client: TestClient) -> None:
