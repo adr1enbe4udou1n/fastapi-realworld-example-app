@@ -46,8 +46,12 @@ def get_list(
         ..., title="Slug of the article that you want to get comments for"
     ),
 ) -> MultipleCommentsResponse:
-    comments = db.query(Comment).all()
-    return MultipleCommentsResponse(comments=list(comments))
+    article = _get_article_from_slug(db, slug)
+    result = [
+        comment.schema(current_user)
+        for comment in comments.get_list(db, article=article)
+    ]
+    return MultipleCommentsResponse(comments=result)
 
 
 @router.post(
