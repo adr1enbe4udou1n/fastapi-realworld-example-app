@@ -1,12 +1,14 @@
 import datetime
 from typing import List
 
+from pydantic import Field
+
 from app.schemas.base import BaseModel
 from app.schemas.profiles import Profile
 
 
 class NewComment(BaseModel):
-    body: str
+    body: str = Field(min_length=1)
 
 
 class NewCommentRequest(BaseModel):

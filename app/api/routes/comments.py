@@ -64,8 +64,10 @@ def create(
     ),
     new_comment: NewCommentRequest = Body(...),
 ) -> SingleCommentResponse:
-    _get_article_from_slug(db, slug)
-    comment = db.query(Comment).first() or Comment()
+    article = _get_article_from_slug(db, slug)
+    comment = comments.create(
+        db, obj_in=new_comment.comment, article=article, author=current_user
+    )
     return SingleCommentResponse(comment=comment.schema(current_user))
 
 
@@ -91,3 +93,10 @@ def delete(
         raise HTTPException(
             status_code=400, detail="Comment does not belong to this article"
         )
+
+    if comment.author != current_user and article.author != current_user:
+        raise HTTPException(
+            status_code=400, detail="Comment does not belong to this user"
+        )
+
+    comments.delete(db, db_obj=comment)
