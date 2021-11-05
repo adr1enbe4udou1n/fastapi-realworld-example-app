@@ -1,8 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String, Table,
-                        Text)
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -66,6 +65,6 @@ class Article(Base):
             updated_at=self.updated_at,
             tag_list=tags,
             author=self.author.profile(user),
-            favorited=False,
-            favorites_count=0,
+            favorited=user is not None and self.favoritedBy.__contains__(user),
+            favorites_count=len(self.favoritedBy),
         )

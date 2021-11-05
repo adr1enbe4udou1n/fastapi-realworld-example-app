@@ -47,5 +47,14 @@ class UsersRepository:
             return None
         return user
 
+    def follow(self, db: Session, *, db_obj: User, follower: User, follow=True) -> User:
+        if follow:
+            db_obj.followers.append(follower)
+        else:
+            db_obj.followers.remove(follower)
+
+        db.merge(db_obj)
+        db.commit()
+
 
 users = UsersRepository()

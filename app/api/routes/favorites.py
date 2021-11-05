@@ -32,6 +32,7 @@ def favorite(
     slug: str = Path(..., title="Slug of the article that you want to favorite"),
 ) -> SingleArticleResponse:
     article = _get_article_from_slug(db, slug)
+    articles.favorite(db, db_obj=article, user=current_user)
     return SingleArticleResponse(article=article.schema(current_user))
 
 
@@ -47,4 +48,5 @@ def unfavorite(
     slug: str = Path(..., title="Slug of the article that you want to unfavorite"),
 ) -> SingleArticleResponse:
     article = _get_article_from_slug(db, slug)
+    articles.favorite(db, db_obj=article, user=current_user, favorite=False)
     return SingleArticleResponse(article=article.schema(current_user))

@@ -49,5 +49,16 @@ class ArticlesRepository:
         db.delete(db_obj)
         db.commit()
 
+    def favorite(
+        self, db: Session, *, db_obj: Article, user: User, favorite=True
+    ) -> Article:
+        if favorite:
+            db_obj.favoritedBy.append(user)
+        else:
+            db_obj.favoritedBy.remove(user)
+
+        db.merge(db_obj)
+        db.commit()
+
 
 articles = ArticlesRepository()

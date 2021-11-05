@@ -46,10 +46,7 @@ def follow(
     db: Session = Depends(get_db),
 ) -> ProfileResponse:
     user = _get_profile_from_username(db, username)
-    user.followers.append(current_user)
-    db.merge(user)
-    db.commit()
-
+    users.follow(db, db_obj=user, follower=current_user)
     return ProfileResponse(profile=user.profile(current_user))
 
 
@@ -67,8 +64,5 @@ def unfollow(
     db: Session = Depends(get_db),
 ) -> ProfileResponse:
     user = _get_profile_from_username(db, username)
-    user.followers.remove(current_user)
-    db.merge(user)
-    db.commit()
-
+    users.follow(db, db_obj=user, follower=current_user, follow=False)
     return ProfileResponse(profile=user.profile(current_user))
