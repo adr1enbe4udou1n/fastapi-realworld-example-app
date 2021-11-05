@@ -14,7 +14,7 @@ def test_can_list_all_tags(client: TestClient, db: Session) -> None:
     r = client.get("/api/tags")
 
     assert r.status_code == status.HTTP_200_OK
-    assert r.json().get("tags") == [
+    assert r.json()["tags"] == [
         "Tag 1",
         "Tag 2",
         "Tag 3",

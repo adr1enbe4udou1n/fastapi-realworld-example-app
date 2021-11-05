@@ -57,7 +57,7 @@ def test_can_login(client: TestClient, db: Session) -> None:
     assert {
         "username": "John Doe",
         "email": "john.doe@example.com",
-    }.items() <= r.json().get("user").items()
+    }.items() <= r.json()["user"].items()
 
-    payload = decode_access_token(r.json().get("user")["token"])
+    payload = decode_access_token(r.json()["user"]["token"])
     assert int(payload["sub"]) == db_obj.id

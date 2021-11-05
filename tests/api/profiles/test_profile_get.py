@@ -18,7 +18,7 @@ def test_can_get_profile(client: TestClient, db: Session) -> None:
 
     assert r.status_code == status.HTTP_200_OK
 
-    assert r.json().get("profile") == {
+    assert r.json()["profile"] == {
         "username": "John Doe",
         "bio": "John Bio",
         "image": "https://randomuser.me/api/portraits/men/1.jpg",
@@ -40,7 +40,7 @@ def test_can_get_followed_profile(client: TestClient, db: Session) -> None:
 
     assert r.status_code == status.HTTP_200_OK
 
-    assert r.json().get("profile") == {
+    assert r.json()["profile"] == {
         "username": "John Doe",
         "bio": "John Bio",
         "image": "https://randomuser.me/api/portraits/men/1.jpg",

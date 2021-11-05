@@ -3,8 +3,12 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from app.models.user import follower_user
-from tests.conftest import (acting_as_jane, acting_as_user, create_jane_user,
-                            create_john_user)
+from tests.conftest import (
+    acting_as_jane,
+    acting_as_user,
+    create_jane_user,
+    create_john_user,
+)
 
 
 def test_cannot_follow_profile(client: TestClient, db: Session) -> None:
@@ -30,7 +34,7 @@ def test_can_follow_profile(client: TestClient, db: Session) -> None:
     r = client.post("/api/profiles/celeb_John Doe/follow")
 
     assert r.status_code == status.HTTP_200_OK
-    assert r.json().get("profile") == {
+    assert r.json()["profile"] == {
         "username": "John Doe",
         "bio": "John Bio",
         "image": "https://randomuser.me/api/portraits/men/1.jpg",
@@ -53,7 +57,7 @@ def test_can_unfollow_profile(client: TestClient, db: Session) -> None:
     r = client.delete("/api/profiles/celeb_John Doe/follow")
 
     assert r.status_code == status.HTTP_200_OK
-    assert r.json().get("profile") == {
+    assert r.json()["profile"] == {
         "username": "John Doe",
         "bio": "John Bio",
         "image": "https://randomuser.me/api/portraits/men/1.jpg",

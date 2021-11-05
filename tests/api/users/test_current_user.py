@@ -20,4 +20,4 @@ def test_user_can_fetch_infos(client: TestClient, db: Session) -> None:
     assert {
         "username": "John Doe",
         "email": "john.doe@example.com",
-    }.items() <= r.json().get("user").items()
+    }.items() <= r.json()["user"].items()

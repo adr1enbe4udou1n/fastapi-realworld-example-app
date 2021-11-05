@@ -72,7 +72,7 @@ def test_user_can_update_infos(client: TestClient, db: Session) -> None:
         "email": "jane.doe@example.com",
         "bio": "My Bio",
         "image": "https://randomuser.me/api/portraits/men/2.jpg",
-    }.items() <= r.json().get("user").items()
+    }.items() <= r.json()["user"].items()
 
     db_user = users.get_by_email(db, email="jane.doe@example.com")
     assert db_user
