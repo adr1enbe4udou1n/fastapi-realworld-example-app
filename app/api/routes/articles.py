@@ -1,18 +1,13 @@
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query
 from slugify import slugify
-from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_db, get_optional_current_user
 from app.crud.crud_article import articles
 from app.models.article import Article
 from app.models.user import User
-from app.schemas.articles import (
-    MultipleArticlesResponse,
-    NewArticleRequest,
-    SingleArticleResponse,
-    UpdateArticleRequest,
-)
+from app.schemas.articles import (MultipleArticlesResponse, NewArticleRequest,
+                                  SingleArticleResponse, UpdateArticleRequest)
 
 router = APIRouter()
 
@@ -46,9 +41,17 @@ def get_list(
     favorited: str = Query(None, title="Filter by favorites of a user (username)"),
     tag: str = Query(None, title="Filter by tag"),
 ) -> MultipleArticlesResponse:
-    articles = db.query(Article).order_by(desc(Article.id)).all()
+    result, count = articles.get_list(
+        db,
+        limit=min(limit, max_limit),
+        offset=offset,
+        author=author,
+        favorited=favorited,
+        tag=tag,
+    )
     return MultipleArticlesResponse(
-        articles=list(articles), articles_count=len(list(articles))
+        articles=[article.schema(current_user) for article in result],
+        articles_count=count,
     )
 
 
@@ -64,9 +67,10 @@ def get_feed(
     limit: int = Query(20, title="Limit number of articles returned (default is 20)"),
     offset: int = Query(0, title="Offset/skip number of articles (default is 0)"),
 ) -> MultipleArticlesResponse:
-    articles = db.query(Article).order_by(desc(Article.id)).all()
+    result, count = articles.get_feed(db, limit=min(limit, max_limit), offset=offset)
     return MultipleArticlesResponse(
-        articles=list(articles), articles_count=len(list(articles))
+        articles=[article.schema(current_user) for article in result],
+        articles_count=count,
     )
 
 

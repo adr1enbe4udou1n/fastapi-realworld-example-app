@@ -1,7 +1,8 @@
-from typing import Any, Optional
+from typing import Any, List, Optional, Tuple
 
 from slugify import slugify
 from sqlalchemy.orm import Session
+from sqlalchemy.sql.expression import desc
 
 from app.models.article import Article
 from app.models.tag import Tag
@@ -15,6 +16,31 @@ class ArticlesRepository:
 
     def get_by_slug(self, db: Session, *, slug: str) -> Optional[Article]:
         return db.query(Article).filter_by(slug=slug).first()
+
+    def get_list(
+        self,
+        db: Session,
+        *,
+        limit: int,
+        offset: int,
+        author: str,
+        favorited: str,
+        tag: str
+    ) -> Tuple[List[Article], int]:
+        query = db.query(Article)
+        return (
+            query.order_by(desc(Article.id)).limit(limit).offset(offset).all(),
+            query.count(),
+        )
+
+    def get_feed(
+        self, db: Session, *, limit: int, offset: int
+    ) -> Tuple[List[Article], int]:
+        query = db.query(Article)
+        return (
+            query.order_by(desc(Article.id)).limit(limit).offset(offset).all(),
+            query.count(),
+        )
 
     def create(self, db: Session, *, obj_in: NewArticle, author: User) -> Article:
         db_obj = Article(

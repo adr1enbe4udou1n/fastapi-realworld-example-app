@@ -5,9 +5,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from starlette import status
 
+from app.models.article import Article
 from app.models.tag import Tag
 from tests.conftest import acting_as_john, generate_article
-from app.models.article import Article
 
 
 def test_guest_cannot_create_article(client: TestClient) -> None:

@@ -7,11 +7,8 @@ from app.crud.crud_comment import comments
 from app.models.article import Article
 from app.models.comment import Comment
 from app.models.user import User
-from app.schemas.comments import (
-    MultipleCommentsResponse,
-    NewCommentRequest,
-    SingleCommentResponse,
-)
+from app.schemas.comments import (MultipleCommentsResponse, NewCommentRequest,
+                                  SingleCommentResponse)
 
 router = APIRouter()
 
@@ -50,11 +47,12 @@ def get_list(
     ),
 ) -> MultipleCommentsResponse:
     article = _get_article_from_slug(db, slug)
-    result = [
-        comment.schema(current_user)
-        for comment in comments.get_list(db, article=article)
-    ]
-    return MultipleCommentsResponse(comments=result)
+    return MultipleCommentsResponse(
+        comments=[
+            comment.schema(current_user)
+            for comment in comments.get_list(db, article=article)
+        ]
+    )
 
 
 @router.post(
