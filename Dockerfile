@@ -1,4 +1,4 @@
-FROM python:3.9-alpine
+FROM python:3.9-slim
 
 ENV PYTHONUNBUFFERED 1
 
@@ -7,7 +7,7 @@ WORKDIR /app
 
 COPY Pipfile.lock Pipfile ./
 RUN pip install pipenv && \
-    pipenv install
+    pipenv install --dev
 
 COPY . ./
 
