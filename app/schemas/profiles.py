@@ -1,4 +1,5 @@
 from typing import Optional
+
 from pydantic import HttpUrl
 
 from app.schemas.base import BaseModel
