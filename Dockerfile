@@ -7,7 +7,7 @@ WORKDIR /app
 
 COPY Pipfile.lock Pipfile ./
 RUN pip install pipenv && \
-    pipenv install --dev
+    pipenv install --dev --deploy --system
 
 COPY . ./
 
