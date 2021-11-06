@@ -1,3 +1,4 @@
+import os
 from typing import Generator
 
 import pytest
@@ -7,14 +8,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Transaction
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.api.deps import get_db
-from app.core.security import create_access_token
-from app.db.base_class import Base
-from app.main import app
-from app.models.article import Article
-from app.models.user import User
+os.environ["PYTHON_ENVIRONNEMENT"] = "testing"
 
-engine = create_engine("postgresql://main:main@127.0.0.1:5434", pool_pre_ping=True)
+from app.api.deps import get_db  # noqa: E402
+from app.core.config import settings  # noqa: E402
+from app.core.security import create_access_token  # noqa: E402
+from app.db.base_class import Base  # noqa: E402
+from app.main import app  # noqa: E402
+from app.models.article import Article  # noqa: E402
+from app.models.user import User  # noqa: E402
+
+engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base.metadata.create_all(bind=engine)
