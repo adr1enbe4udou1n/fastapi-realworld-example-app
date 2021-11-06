@@ -15,9 +15,12 @@ steps:
   commands:
     - sleep 10 # Wait for PostgreSQL service starting
     - rm .env.testing
-    - apt install -y build-essential
     - pip install pipenv && pipenv install --deploy --system
-    - make lint
+    - flake8 app tests
+    - autoflake --remove-all-unused-imports --remove-unused-variables --recursive app tests
+    - black --check --diff app tests
+    - isort --check-only app tests
+    - mypy app tests
     - pytest
 
 - name: image
