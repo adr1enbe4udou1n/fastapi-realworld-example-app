@@ -24,6 +24,7 @@ pytest = "*"
 pytest-cov = "*"
 sqlalchemy-stubs = "*"
 faker = "*"
+types-python-slugify = "*"
 
 [requires]
 python_version = "3.9"
