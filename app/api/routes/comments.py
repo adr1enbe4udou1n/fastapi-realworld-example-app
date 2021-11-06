@@ -7,8 +7,11 @@ from app.crud.crud_comment import comments
 from app.models.article import Article
 from app.models.comment import Comment
 from app.models.user import User
-from app.schemas.comments import (MultipleCommentsResponse, NewCommentRequest,
-                                  SingleCommentResponse)
+from app.schemas.comments import (
+    MultipleCommentsResponse,
+    NewCommentRequest,
+    SingleCommentResponse,
+)
 
 router = APIRouter()
 

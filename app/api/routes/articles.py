@@ -7,10 +7,16 @@ from app.api.deps import get_current_user, get_db, get_optional_current_user
 from app.crud.crud_article import articles
 from app.models.article import Article
 from app.models.user import User
-from app.schemas.articles import (MultipleArticlesResponse, NewArticleRequest,
-                                  SingleArticleResponse, UpdateArticleRequest)
+from app.schemas.articles import (
+    MultipleArticlesResponse,
+    NewArticleRequest,
+    SingleArticleResponse,
+    UpdateArticleRequest,
+)
 
 router = APIRouter()
+
+max_limit: int = 20
 
 
 def _get_article_from_slug(
@@ -32,11 +38,13 @@ def _get_article_from_slug(
 def get_list(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_optional_current_user),
-    limit: int = Query(..., title="Limit number of articles returned (default is 20)"),
-    offset: int = Query(..., title="Offset/skip number of articles (default is 0)"),
-    author: str = Path(..., title="Filter by author (username)"),
-    favorited: str = Path(..., title="Filter by favorites of a user (username)"),
-    tag: str = Path(..., title="Filter by tag"),
+    limit: int = Query(
+        max_limit, title="Limit number of articles returned (default is 20)"
+    ),
+    offset: int = Query(0, title="Offset/skip number of articles (default is 0)"),
+    author: str = Query(None, title="Filter by author (username)"),
+    favorited: str = Query(None, title="Filter by favorites of a user (username)"),
+    tag: str = Query(None, title="Filter by tag"),
 ) -> MultipleArticlesResponse:
     articles = db.query(Article).order_by(desc(Article.id)).all()
     return MultipleArticlesResponse(
@@ -53,8 +61,8 @@ def get_list(
 def get_feed(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-    limit: int = Query(..., title="Limit number of articles returned (default is 20)"),
-    offset: int = Query(..., title="Offset/skip number of articles (default is 0)"),
+    limit: int = Query(20, title="Limit number of articles returned (default is 20)"),
+    offset: int = Query(0, title="Offset/skip number of articles (default is 0)"),
 ) -> MultipleArticlesResponse:
     articles = db.query(Article).order_by(desc(Article.id)).all()
     return MultipleArticlesResponse(

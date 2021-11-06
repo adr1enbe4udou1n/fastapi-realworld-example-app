@@ -7,6 +7,7 @@ from starlette import status
 
 from app.models.tag import Tag
 from tests.conftest import acting_as_john, generate_article
+from app.models.article import Article
 
 
 def test_guest_cannot_create_article(client: TestClient) -> None:
@@ -75,12 +76,14 @@ def test_can_create_article(client: TestClient, db: Session) -> None:
                 "title": "Test Title",
                 "description": "Test Description",
                 "body": "Test Body",
+                "tagList": ["Tag 1", "Tag 2", "Existing Tag"],
             }
         },
     )
     assert r.status_code == status.HTTP_200_OK
     assert {
         "title": "Test Title",
+        "slug": "test-title",
         "description": "Test Description",
         "body": "Test Body",
         "author": {
@@ -89,7 +92,9 @@ def test_can_create_article(client: TestClient, db: Session) -> None:
             "image": "https://randomuser.me/api/portraits/men/1.jpg",
             "following": False,
         },
-        "tagList": [],
+        "tagList": ["Existing Tag", "Tag 1", "Tag 2"],
         "favorited": False,
         "favoritesCount": 0,
     }.items() <= r.json()["article"].items()
+    assert db.query(Article).filter_by(slug="test-title").count() == 1
+    assert db.query(Tag).count() == 3
