@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.routes import (articles, auth, comments, favorites, profiles,
-                            tags, user)
+from app.api.routes import articles, auth, comments, favorites, profiles, tags, user
 
 router = APIRouter()
 

@@ -7,12 +7,12 @@ rollback:
 migrations:
 	alembic revision --autogenerate -m "$(name)"
 format:
-	autoflake --remove-all-unused-imports --remove-unused-variables --recursive --in-place app tests
-	black app tests
-	isort app tests
+	autoflake --remove-all-unused-imports --remove-unused-variables --recursive --in-place app tests alembic
+	black app tests alembic
+	isort app tests alembic
 lint:
 	flake8 app tests
-	autoflake --remove-all-unused-imports --remove-unused-variables --recursive app tests
-	black --check --diff app tests
-	isort --check-only app tests
-	mypy app tests
+	autoflake --remove-all-unused-imports --remove-unused-variables --recursive app tests alembic
+	black --check --diff app tests alembic
+	isort --check-only app tests alembic
+	mypy app tests alembic

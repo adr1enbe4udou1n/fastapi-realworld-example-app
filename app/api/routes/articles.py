@@ -6,8 +6,12 @@ from app.api.deps import get_current_user, get_db, get_optional_current_user
 from app.crud.crud_article import articles
 from app.models.article import Article
 from app.models.user import User
-from app.schemas.articles import (MultipleArticlesResponse, NewArticleRequest,
-                                  SingleArticleResponse, UpdateArticleRequest)
+from app.schemas.articles import (
+    MultipleArticlesResponse,
+    NewArticleRequest,
+    SingleArticleResponse,
+    UpdateArticleRequest,
+)
 
 router = APIRouter()
 
