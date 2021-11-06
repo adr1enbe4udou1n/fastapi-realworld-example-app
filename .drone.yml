@@ -15,7 +15,7 @@ steps:
   commands:
     - sleep 10 # Wait for PostgreSQL service starting
     - rm .env.testing
-    - apt install -y make
+    - apt install -y build-essential
     - pip install pipenv && pipenv install --deploy --system
     - make lint
     - pytest
