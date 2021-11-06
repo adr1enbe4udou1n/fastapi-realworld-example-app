@@ -1,8 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String, Table,
-                        Text)
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import relationship
 
 from app.core import security
@@ -49,9 +48,9 @@ class User(Base):
 
     articles = relationship("Article", back_populates="author")
     comments = relationship("Comment", back_populates="author")
-    favoriteArticles = relationship(
+    favorite_articles = relationship(
         "Article",
-        back_populates="favoritedBy",
+        back_populates="favorited_by",
         secondary=article_favorite,
     )
 

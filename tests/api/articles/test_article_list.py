@@ -59,7 +59,7 @@ def generate_articles(db: Session) -> None:
         article.tags.append(tagJane)
 
         if article.slug in john_favorited_articles:
-            article.favoritedBy.append(john)
+            article.favorited_by.append(john)
 
         db.add(article)
 

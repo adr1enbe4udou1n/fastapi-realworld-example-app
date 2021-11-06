@@ -53,9 +53,9 @@ class ArticlesRepository:
         self, db: Session, *, db_obj: Article, user: User, favorite: bool = True
     ) -> None:
         if favorite:
-            db_obj.favoritedBy.append(user)
+            db_obj.favorited_by.append(user)
         else:
-            db_obj.favoritedBy.remove(user)
+            db_obj.favorited_by.remove(user)
 
         db.merge(db_obj)
         db.commit()

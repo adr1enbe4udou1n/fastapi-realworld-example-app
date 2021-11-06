@@ -40,7 +40,7 @@ def test_can_unfavorite_article(client: TestClient, db: Session) -> None:
     jane = create_jane_user(db)
 
     db_obj = generate_article(jane)
-    db_obj.favoritedBy.append(john)
+    db_obj.favorited_by.append(john)
     db.add(db_obj)
     db.commit()
 
