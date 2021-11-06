@@ -41,3 +41,7 @@ npx newman run postman.json --global-var "APIURL=http://localhost:8000/api" --gl
 ### Full test suite
 
 This project is fully tested via pytest, just run `pytest` for launching it.
+
+## License
+
+This project is open-sourced software licensed under the [MIT license](https://adr1enbe4udou1n.mit-license.org).

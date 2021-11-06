@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import HttpUrl
 
 from app.schemas.base import BaseModel
@@ -5,8 +6,8 @@ from app.schemas.base import BaseModel
 
 class Profile(BaseModel):
     username: str
-    bio: str
-    image: HttpUrl
+    bio: Optional[str] = None
+    image: Optional[HttpUrl] = None
     following: bool
 
 
