@@ -15,4 +15,4 @@ lint:
 	autoflake --remove-all-unused-imports --remove-unused-variables --recursive app tests alembic
 	black --check --diff app tests alembic
 	isort --check-only app tests alembic
-	mypy app tests alembic
+	mypy app tests
