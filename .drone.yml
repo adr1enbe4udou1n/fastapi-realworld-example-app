@@ -16,12 +16,12 @@ steps:
     - sleep 10 # Wait for PostgreSQL service starting
     - rm .env.testing
     - pip install pipenv && pipenv install --deploy --system
-    - flake8 app tests
-    - autoflake --remove-all-unused-imports --remove-unused-variables --recursive app tests
-    - black --check --diff app tests
-    - isort --check-only app tests
-    - mypy app tests
-    - pytest
+    - pipenv run flake8 app tests
+    - pipenv run autoflake --remove-all-unused-imports --remove-unused-variables --recursive app tests
+    - pipenv run black --check --diff app tests
+    - pipenv run isort --check-only app tests
+    - pipenv run mypy app tests
+    - pipenv run pytest
 
 - name: image
   image: plugins/docker
