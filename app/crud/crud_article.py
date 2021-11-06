@@ -20,23 +20,36 @@ class ArticlesRepository:
     def get_list(
         self,
         db: Session,
-        *,
         limit: int,
         offset: int,
-        author: str,
-        favorited: str,
-        tag: str
+        *,
+        author: str = None,
+        tag: str = None,
+        favorited: str = None,
     ) -> Tuple[List[Article], int]:
         query = db.query(Article)
+
+        if author:
+            query = query.filter(Article.author.has(User.name.ilike(f"%{author}%")))
+        if tag:
+            query = query.filter(Article.tags.any(Tag.name.ilike(f"%{tag}%")))
+        if favorited:
+            query = query.filter(
+                Article.favorited_by.any(User.name.ilike(f"%{favorited}%"))
+            )
+
         return (
             query.order_by(desc(Article.id)).limit(limit).offset(offset).all(),
             query.count(),
         )
 
     def get_feed(
-        self, db: Session, *, limit: int, offset: int
+        self, db: Session, limit: int, offset: int, *, user: User
     ) -> Tuple[List[Article], int]:
-        query = db.query(Article)
+        query = db.query(Article).filter(
+            Article.author.has(User.followers.any(id=user.id))
+        )
+
         return (
             query.order_by(desc(Article.id)).limit(limit).offset(offset).all(),
             query.count(),

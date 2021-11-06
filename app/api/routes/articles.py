@@ -38,13 +38,13 @@ def get_list(
     ),
     offset: int = Query(0, title="Offset/skip number of articles (default is 0)"),
     author: str = Query(None, title="Filter by author (username)"),
-    favorited: str = Query(None, title="Filter by favorites of a user (username)"),
     tag: str = Query(None, title="Filter by tag"),
+    favorited: str = Query(None, title="Filter by favorites of a user (username)"),
 ) -> MultipleArticlesResponse:
     result, count = articles.get_list(
         db,
-        limit=min(limit, max_limit),
-        offset=offset,
+        min(limit, max_limit),
+        offset,
         author=author,
         favorited=favorited,
         tag=tag,
@@ -67,7 +67,9 @@ def get_feed(
     limit: int = Query(20, title="Limit number of articles returned (default is 20)"),
     offset: int = Query(0, title="Offset/skip number of articles (default is 0)"),
 ) -> MultipleArticlesResponse:
-    result, count = articles.get_feed(db, limit=min(limit, max_limit), offset=offset)
+    result, count = articles.get_feed(
+        db, min(limit, max_limit), offset, user=current_user
+    )
     return MultipleArticlesResponse(
         articles=[article.schema(current_user) for article in result],
         articles_count=count,
