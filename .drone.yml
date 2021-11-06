@@ -1,0 +1,52 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+- name: build
+  image: mcr.microsoft.com/dotnet/sdk:5.0
+  environment:
+    ConnectionStrings__DefaultConnection: "Server=db; Port=5432; User Id=main; Password=main; Database=main"
+    Jwt__SecretKey: "super secret key"
+  commands:
+    - sleep 10 # Wait for PostgreSQL service starting
+    - dotnet run -p targets
+
+- name: image
+  image: plugins/docker
+  settings:
+    registry: registry.okami101.io
+    repo: registry.okami101.io/adr1enbe4udou1n/aspnet-realworld
+    tags: latest
+    username:
+      from_secret: registry_username
+    password:
+      from_secret: registry_password
+  depends_on:
+    - build
+
+- name: deploy
+  image: appleboy/drone-ssh
+  settings:
+    host: front.okami101.io
+    port: 2222
+    username: okami
+    key:
+      from_secret: swarm_ssh_key
+    script:
+      - docker service update --image registry.okami101.io/adr1enbe4udou1n/aspnet-realworld:latest aspnetrealworld_app --with-registry-auth
+  depends_on:
+    - image
+
+services:
+- name: db
+  image: postgres:13
+  environment:
+    POSTGRES_USER: main
+    POSTGRES_PASSWORD: main
+    POSTGRES_DB: main
+
+trigger:
+  event:
+  - push
+  - pull_request
