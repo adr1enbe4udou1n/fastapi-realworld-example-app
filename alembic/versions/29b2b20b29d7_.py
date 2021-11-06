@@ -1,8 +1,8 @@
-"""initialize
+"""
 
-Revision ID: ad17d7c49200
+Revision ID: 29b2b20b29d7
 Revises: 
-Create Date: 2021-11-06 15:58:32.049779
+Create Date: 2021-11-06 18:46:15.778811
 
 """
 import sqlalchemy as sa
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "ad17d7c49200"
+revision = "29b2b20b29d7"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -62,42 +62,24 @@ def upgrade():
         "follower_user",
         sa.Column("follower_id", sa.Integer(), nullable=False),
         sa.Column("following_id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["follower_id"],
-            ["users.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["following_id"],
-            ["users.id"],
-        ),
+        sa.ForeignKeyConstraint(["follower_id"], ["users.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["following_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("follower_id", "following_id"),
     )
     op.create_table(
         "article_favorite",
         sa.Column("article_id", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["article_id"],
-            ["articles.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["user_id"],
-            ["users.id"],
-        ),
+        sa.ForeignKeyConstraint(["article_id"], ["articles.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("article_id", "user_id"),
     )
     op.create_table(
         "article_tag",
         sa.Column("article_id", sa.Integer(), nullable=False),
         sa.Column("tag_id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["article_id"],
-            ["articles.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["tag_id"],
-            ["tags.id"],
-        ),
+        sa.ForeignKeyConstraint(["article_id"], ["articles.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["tag_id"], ["tags.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("article_id", "tag_id"),
     )
     op.create_table(

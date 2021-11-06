@@ -18,8 +18,18 @@ if TYPE_CHECKING:
 follower_user = Table(
     "follower_user",
     Base.metadata,
-    Column("follower_id", Integer, ForeignKey("users.id"), primary_key=True),
-    Column("following_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column(
+        "follower_id",
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "following_id",
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
 )
 
 

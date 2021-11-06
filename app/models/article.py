@@ -15,15 +15,32 @@ if TYPE_CHECKING:
 article_tag: Table = Table(
     "article_tag",
     Base.metadata,
-    Column("article_id", Integer, ForeignKey("articles.id"), primary_key=True),
-    Column("tag_id", Integer, ForeignKey("tags.id"), primary_key=True),
+    Column(
+        "article_id",
+        Integer,
+        ForeignKey(
+            "articles.id",
+            ondelete="CASCADE",
+        ),
+        primary_key=True,
+    ),
+    Column(
+        "tag_id", Integer, ForeignKey("tags.id", ondelete="CASCADE"), primary_key=True
+    ),
 )
 
 article_favorite: Table = Table(
     "article_favorite",
     Base.metadata,
-    Column("article_id", Integer, ForeignKey("articles.id"), primary_key=True),
-    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column(
+        "article_id",
+        Integer,
+        ForeignKey("articles.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "user_id", Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    ),
 )
 
 

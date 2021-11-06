@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
-typer = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
 alembic = "*"
@@ -24,6 +23,7 @@ black = "*"
 pytest = "*"
 pytest-cov = "*"
 sqlalchemy-stubs = "*"
+faker = "*"
 
 [requires]
 python_version = "3.9"
