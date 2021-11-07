@@ -35,18 +35,18 @@ steps:
   depends_on:
     - build
 
-# - name: deploy
-#   image: appleboy/drone-ssh
-#   settings:
-#     host: front.okami101.io
-#     port: 2222
-#     username: okami
-#     key:
-#       from_secret: swarm_ssh_key
-#     script:
-#       - docker service update --image registry.okami101.io/adr1enbe4udou1n/fastapi-realworld:latest fastapirealworld_app --with-registry-auth
-#   depends_on:
-#     - image
+- name: deploy
+  image: appleboy/drone-ssh
+  settings:
+    host: front.okami101.io
+    port: 2222
+    username: okami
+    key:
+      from_secret: swarm_ssh_key
+    script:
+      - docker service update --image registry.okami101.io/adr1enbe4udou1n/fastapi-realworld:latest fastapirealworld_app --with-registry-auth
+  depends_on:
+    - image
 
 services:
 - name: db
