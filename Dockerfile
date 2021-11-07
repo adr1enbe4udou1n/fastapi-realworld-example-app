@@ -4,15 +4,14 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
 
-COPY Pipfile.lock Pipfile ./
-RUN pip install pipenv && \
-    pipenv install --dev --deploy --system
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
 
 COPY alembic alembic/
 COPY app app/
-COPY alembic.ini Pipfile Pipfile.lock ./
+COPY alembic.ini ./
 
 EXPOSE 8000
 
-CMD pipenv run alembic upgrade head && \
-    pipenv run uvicorn --host=0.0.0.0 app.main:app
+CMD alembic upgrade head && \
+    uvicorn --host=0.0.0.0 app.main:app

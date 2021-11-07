@@ -21,6 +21,7 @@ steps:
     - pipenv run isort --check-only app tests
     - pipenv run mypy app tests
     - pipenv run pytest
+    - pip freeze > requirements.txt
 
 - name: image
   image: plugins/docker
