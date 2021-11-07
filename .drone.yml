@@ -14,7 +14,6 @@ steps:
     JWT_SECRET_KEY: "super secret key"
   commands:
     - sleep 10 # Wait for PostgreSQL service starting
-    - rm .env.testing
     - pip install pipenv && pipenv install --dev --deploy --system
     - pipenv run flake8 app tests
     - pipenv run autoflake --remove-all-unused-imports --remove-unused-variables --recursive app tests
