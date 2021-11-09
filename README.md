@@ -21,6 +21,7 @@ Two databases will spin up, one for normal development and one dedicated for int
 ### Run app
 
 ```sh
+pipenv install # install dependencies
 cp .env.example .env # access for above container
 make migrate # alembic migrattion
 make seed # fake data with faker
