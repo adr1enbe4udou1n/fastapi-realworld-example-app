@@ -1,7 +1,7 @@
 from typing import Any, List, Optional, Tuple
 
 from slugify import slugify
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.expression import desc
 
 from app.models.article import Article
@@ -27,7 +27,11 @@ class ArticlesRepository:
         tag: str = None,
         favorited: str = None,
     ) -> Tuple[List[Article], int]:
-        query = db.query(Article)
+        query = db.query(Article).options(
+            joinedload(Article.author),
+            joinedload(Article.tags),
+            joinedload(Article.favorited_by),
+        )
 
         if author:
             query = query.filter(Article.author.has(User.name.ilike(f"%{author}%")))
@@ -46,8 +50,14 @@ class ArticlesRepository:
     def get_feed(
         self, db: Session, limit: int, offset: int, *, user: User
     ) -> Tuple[List[Article], int]:
-        query = db.query(Article).filter(
-            Article.author.has(User.followers.any(id=user.id))
+        query = (
+            db.query(Article)
+            .options(
+                joinedload(Article.author),
+                joinedload(Article.tags),
+                joinedload(Article.favorited_by),
+            )
+            .filter(Article.author.has(User.followers.any(id=user.id)))
         )
 
         return (

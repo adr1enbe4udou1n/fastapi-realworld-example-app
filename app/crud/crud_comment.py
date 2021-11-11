@@ -1,6 +1,6 @@
 from typing import Any, List, Optional
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.expression import desc
 
 from app.models.article import Article
@@ -16,6 +16,7 @@ class CommentsRepository:
     def get_list(self, db: Session, article: Article) -> List[Comment]:
         return (
             db.query(Comment)
+            .options(joinedload(Comment.author))
             .filter_by(article=article)
             .order_by(desc(Comment.id))
             .all()
