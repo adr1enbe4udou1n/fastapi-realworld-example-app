@@ -14,4 +14,4 @@ COPY alembic.ini ./
 EXPOSE 8000
 
 CMD alembic upgrade head && \
-    uvicorn --host=0.0.0.0 app.main:app --log-level critical
+    uvicorn --host=0.0.0.0 app.main:app
