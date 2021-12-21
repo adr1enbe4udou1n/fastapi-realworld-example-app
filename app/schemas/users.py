@@ -42,9 +42,6 @@ class User(BaseModel):
     image: Optional[HttpUrl] = None
     token: str
 
-    class Config:
-        orm_mode = True
-
 
 class UserResponse(BaseModel):
     user: User
