@@ -10,7 +10,7 @@ python-jose = { extras = ["cryptography"], version = "*" }
 passlib = { extras = ["bcrypt"], version = "*" }
 alembic = "*"
 python-slugify = "*"
-pydantic = { extras = ["email"], version = "<1.9" }
+pydantic = { extras = ["email"], version = "*" }
 psycopg2-binary = "*"
 requests = "*"
 
