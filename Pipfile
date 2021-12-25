@@ -5,12 +5,12 @@ name = "pypi"
 
 [packages]
 fastapi = "*"
-uvicorn = {extras = ["standard"], version = "*"}
-python-jose = {extras = ["cryptography"], version = "*"}
-passlib = {extras = ["bcrypt"], version = "*"}
+uvicorn = { extras = ["standard"], version = "*" }
+python-jose = { extras = ["cryptography"], version = "*" }
+passlib = { extras = ["bcrypt"], version = "*" }
 alembic = "*"
 python-slugify = "*"
-pydantic = {extras = ["email"], version = "*"}
+pydantic = { extras = ["email"], version = "<1.9" }
 psycopg2-binary = "*"
 requests = "*"
 
