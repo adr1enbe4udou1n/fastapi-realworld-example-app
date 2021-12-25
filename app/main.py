@@ -4,7 +4,7 @@ from fastapi.openapi.utils import get_openapi
 from app.api.api import router
 from app.core.config import settings
 
-app = FastAPI(debug=settings.DEBUG, openapi_url="/api/docs.json", docs_url="/api")
+app = FastAPI(debug=settings.DEBUG)
 
 app.include_router(
     router,
