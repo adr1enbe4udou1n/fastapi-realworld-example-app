@@ -9,7 +9,7 @@ app = FastAPI(debug=settings.DEBUG, openapi_url="/api/docs.json", docs_url="/api
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex="http://localhost:\d+",
+    allow_origin_regex=r"http://localhost:\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
