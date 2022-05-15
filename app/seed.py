@@ -1,5 +1,6 @@
 import logging
 import os
+from random import choice
 import sys
 
 from faker import Faker
@@ -41,7 +42,7 @@ def main() -> None:
             email=fake.email(),
             password=password,
             bio=fake.paragraph(),
-            image=f"https://randomuser.me/api/portraits/men/{fake.random_int(min=1, max=99)}.jpg",
+            image=f"https://randomuser.me/api/portraits/{choice(['men', 'women'])}/{fake.random_int(min=1, max=99)}.jpg",
         )
         db.add(user)
 
@@ -51,7 +52,7 @@ def main() -> None:
 
     for user in users:
         for _ in range(fake.random_int(min=0, max=3)):
-            follower = users[fake.random_int(min=0, max=49)]
+            follower = choice(users)
             if follower not in user.followers:
                 user.followers.append(follower)
 
@@ -80,23 +81,23 @@ def main() -> None:
             description=fake.paragraph(),
             body=" ".join(fake.paragraphs(3)),
         )
-        article.author = users[fake.random_int(min=0, max=49)]
+        article.author = choice(users)
 
-        for _ in range(fake.random_int(min=1, max=3)):
-            tag = tags[fake.random_int(min=0, max=29)]
+        for _ in range(fake.random_int(min=0, max=3)):
+            tag = choice(tags)
             if tag not in article.tags:
                 article.tags.append(tag)
 
-        for _ in range(fake.random_int(min=0, max=10)):
-            user = users[fake.random_int(min=0, max=49)]
+        for _ in range(fake.random_int(min=0, max=5)):
+            user = choice(users)
             if user not in article.favorited_by:
                 article.favorited_by.append(user)
 
-        for _ in range(10):
+        for _ in range(fake.random_int(min=0, max=10)):
             article.comments.append(
                 Comment(
                     body=fake.paragraph(),
-                    author=users[fake.random_int(min=0, max=49)],
+                    author=choice(users),
                 )
             )
 
