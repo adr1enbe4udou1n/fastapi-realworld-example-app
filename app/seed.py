@@ -1,7 +1,7 @@
 import logging
 import os
-from random import choice
 import sys
+from random import choice
 
 from faker import Faker
 from slugify import slugify
