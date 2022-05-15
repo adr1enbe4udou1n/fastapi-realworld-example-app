@@ -42,7 +42,8 @@ def main() -> None:
             email=fake.email(),
             password=password,
             bio=fake.paragraph(),
-            image=f"https://randomuser.me/api/portraits/{choice(['men', 'women'])}/{fake.random_int(min=1, max=99)}.jpg",
+            image=f"https://randomuser.me/api/portraits/{choice(['men', 'women'])}/"
+            + f"{fake.random_int(min=1, max=99)}.jpg",
         )
         db.add(user)
 
