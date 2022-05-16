@@ -22,6 +22,7 @@ def _get_article_from_slug(
 
 @router.post(
     "",
+    operation_id="CreateArticleFavorite",
     summary="Favorite an article",
     description="Favorite an article. Auth is required",
     response_model=SingleArticleResponse,
@@ -38,6 +39,7 @@ def favorite(
 
 @router.delete(
     "",
+    operation_id="DeleteArticleFavorite",
     summary="Unfavorite an article",
     description="Unfavorite an article. Auth is required",
     response_model=SingleArticleResponse,

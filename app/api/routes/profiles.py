@@ -21,6 +21,7 @@ def _get_profile_from_username(
 
 @router.get(
     "",
+    operation_id="GetProfileByUsername",
     summary="Get a profile",
     description="Get a profile of a user of the system. Auth is optional",
     response_model=ProfileResponse,
@@ -36,6 +37,7 @@ def get(
 
 @router.post(
     "/follow",
+    operation_id="FollowUserByUsername",
     summary="Follow a user",
     description="Follow a user by username",
     response_model=ProfileResponse,
@@ -52,6 +54,7 @@ def follow(
 
 @router.delete(
     "/follow",
+    operation_id="UnfollowUserByUsername",
     summary="Unfollow a user",
     description="Unfollow a user by username",
     response_model=ProfileResponse,

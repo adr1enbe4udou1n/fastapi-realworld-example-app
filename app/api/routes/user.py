@@ -11,6 +11,7 @@ router = APIRouter()
 
 @router.get(
     "",
+    operation_id="GetCurrentUser",
     summary="Get current user",
     description="Gets the currently logged-in user",
     response_model=UserResponse,
@@ -23,6 +24,7 @@ def current(
 
 @router.put(
     "",
+    operation_id="UpdateCurrentUser",
     summary="Update current user",
     description="Updated user information for current user",
     response_model=UserResponse,

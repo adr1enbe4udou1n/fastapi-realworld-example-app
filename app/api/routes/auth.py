@@ -10,6 +10,7 @@ router = APIRouter()
 
 @router.post(
     "",
+    operation_id="CreateUser",
     summary="Register a new user",
     description="Register a new user",
     response_model=UserResponse,
@@ -28,6 +29,7 @@ def register(
 
 @router.post(
     "/login",
+    operation_id="Login",
     summary="Existing user login",
     description="Login for existing user",
     response_model=UserResponse,

@@ -30,6 +30,7 @@ def _get_article_from_slug(
 
 @router.get(
     "",
+    operation_id="GetArticles",
     summary="Get recent articles globally",
     description="Get most recent articles globally. Use query parameters to filter results. Auth is optional",
     response_model=MultipleArticlesResponse,
@@ -61,6 +62,7 @@ def get_list(
 
 @router.get(
     "/feed",
+    operation_id="GetArticlesFeed",
     summary="Get recent articles from users you follow",
     description="Get most recent articles from users you follow. Use query parameters to limit. Auth is required",
     response_model=MultipleArticlesResponse,
@@ -82,6 +84,7 @@ def get_feed(
 
 @router.post(
     "",
+    operation_id="CreateArticle",
     summary="Create an article",
     description="Create an article. Auth is required",
     response_model=SingleArticleResponse,
@@ -103,6 +106,7 @@ def create(
 
 @router.get(
     "/{slug}",
+    operation_id="GetArticle",
     summary="Get an article",
     description="Get an article. Auth not required",
     response_model=SingleArticleResponse,
@@ -118,6 +122,7 @@ def get(
 
 @router.put(
     "/{slug}",
+    operation_id="UpdateArticle",
     summary="Update an article",
     description="Update an article. Auth is required",
     response_model=SingleArticleResponse,
@@ -140,6 +145,7 @@ def update(
 
 @router.delete(
     "/{slug}",
+    operation_id="DeleteArticle",
     summary="Delete an article",
     description="Delete an article. Auth is required",
 )

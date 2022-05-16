@@ -38,6 +38,7 @@ def _get_comment_from_id(
 
 @router.get(
     "",
+    operation_id="GetArticleComments",
     summary="Get comments for an article",
     description="Get the comments for an article. Auth is optional",
     response_model=MultipleCommentsResponse,
@@ -60,6 +61,7 @@ def get_list(
 
 @router.post(
     "",
+    operation_id="CreateArticleComment",
     summary="Create a comment for an article",
     description="Create a comment for an article. Auth is required",
     response_model=SingleCommentResponse,
@@ -81,6 +83,7 @@ def create(
 
 @router.delete(
     "/{commentId}",
+    operation_id="DeleteArticleComment",
     summary="Delete a comment for an article",
     description="Delete a comment for an article. Auth is required",
 )

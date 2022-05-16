@@ -10,6 +10,7 @@ router = APIRouter()
 
 @router.get(
     "",
+    operation_id="GetTags",
     summary="Get tags",
     description="Get tags. Auth not required",
     response_model=TagsResponse,
