@@ -2,6 +2,8 @@
 
 FastAPI codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
 
+[![Build Status](https://drone.okami101.io/api/badges/adr1enbe4udou1n/fastapi-realworld-example-app/status.svg)](https://drone.okami101.io/adr1enbe4udou1n/fastapi-realworld-example-app)
+
 ## [RealWorld](https://github.com/gothinkster/realworld)
 
 This codebase was created to demonstrate a fully fledged fullstack application built with FastAPI including CRUD operations, authentication, routing, pagination, and more.
