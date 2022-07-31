@@ -58,7 +58,7 @@ class SettingsReadOnly(BaseSettings):
             scheme="postgresql",
             user=values.get("DB_USERNAME"),
             password=values.get("DB_PASSWORD"),
-            host=f"/{values.get('DB_RO_HOST') or values.get('DB_HOST')}",
+            host=values.get("DB_RO_HOST") or values.get("DB_HOST"),
             port=str(values.get("DB_PORT")),
             path=f"/{values.get('DB_DATABASE') or ''}",
         )
