@@ -36,7 +36,7 @@ def _get_article_from_slug(
     response_model=MultipleArticlesResponse,
 )
 def get_list(
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db_ro),
     current_user: User = Depends(get_optional_current_user),
     limit: int = Query(
         max_limit, title="Limit number of articles returned (default is 20)"
