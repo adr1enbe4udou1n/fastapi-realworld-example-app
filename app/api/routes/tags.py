@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db, get_db_ro
+from app.api.deps import get_db_ro
 from app.models.tag import Tag
 from app.schemas.tags import TagsResponse
 

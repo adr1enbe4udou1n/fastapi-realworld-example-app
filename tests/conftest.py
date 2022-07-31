@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 os.environ["PYTHON_ENVIRONNEMENT"] = "testing"
 
-from app.api.deps import get_db  # noqa: E402
+from app.api.deps import get_db, get_db_ro  # noqa: E402
 from app.core.config import settings  # noqa: E402
 from app.core.security import create_access_token  # noqa: E402
 from app.db.base_class import Base  # noqa: E402
@@ -51,8 +51,10 @@ def client(db: Session) -> Generator:
         yield db
 
     app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_db_ro] = override_get_db
     yield TestClient(app)
     del app.dependency_overrides[get_db]
+    del app.dependency_overrides[get_db_ro]
 
 
 def create_john_user(db: Session) -> User:
