@@ -19,8 +19,9 @@ class Settings(BaseSettings):
     DB_USERNAME: str
     DB_PASSWORD: str
     DATABASE_URL: Optional[PostgresDsn] = None
+    DATABASE_RO_URL: Optional[PostgresDsn] = None
 
-    @validator("DATABASE_URL", pre=True)
+    @validator("DATABASE_URL", "DATABASE_RO_URL", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
             return v
@@ -31,6 +32,16 @@ class Settings(BaseSettings):
             host=values.get("DB_HOST"),
             port=str(values.get("DB_PORT")),
             path=f"/{values.get('DB_DATABASE') or ''}",
+        )
+
+    def get_ro_db_connection(self) -> PostgresDsn:
+        return PostgresDsn.build(
+            scheme="postgresql",
+            user=os.getenv("DB_USERNAME"),
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_RO_HOST", os.getenv("DB_HOST")),
+            port=str(os.getenv("DB_PORT")),
+            path=f"/{os.getenv('DB_DATABASE') or ''}",
         )
 
     class Config:

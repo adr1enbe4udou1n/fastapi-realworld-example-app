@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query
 from slugify import slugify
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db, get_optional_current_user
+from app.api.deps import get_current_user, get_db, get_db_ro, get_optional_current_user
 from app.crud.crud_article import articles
 from app.models.article import Article
 from app.models.user import User
@@ -68,7 +68,7 @@ def get_list(
     response_model=MultipleArticlesResponse,
 )
 def get_feed(
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db_ro),
     current_user: User = Depends(get_current_user),
     limit: int = Query(20, title="Limit number of articles returned (default is 20)"),
     offset: int = Query(0, title="Offset/skip number of articles (default is 0)"),
@@ -112,7 +112,7 @@ def create(
     response_model=SingleArticleResponse,
 )
 def get(
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db_ro),
     current_user: User = Depends(get_optional_current_user),
     slug: str = Path(..., title="Slug of the article to get"),
 ) -> SingleArticleResponse:

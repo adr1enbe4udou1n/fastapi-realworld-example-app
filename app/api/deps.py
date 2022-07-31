@@ -8,12 +8,20 @@ from sqlalchemy.orm import Session
 
 from app.core import security
 from app.crud.crud_user import users
-from app.db.session import SessionLocal
+from app.db.session import SessionLocal, SessionLocalRo
 from app.models.user import User
 
 
 def get_db() -> Generator:
     db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+def get_db_ro() -> Generator:
+    db = SessionLocalRo()
     try:
         yield db
     finally:
@@ -58,7 +66,7 @@ def _get_optional_authorization_header(request: Request) -> str:
 
 
 def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(_get_authorization_header)
+    db: Session = Depends(get_db_ro), token: str = Depends(_get_authorization_header)
 ) -> User:
     return _get_current_user(db, token)
 

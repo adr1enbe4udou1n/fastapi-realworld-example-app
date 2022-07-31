@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db, get_optional_current_user
+from app.api.deps import get_current_user, get_db, get_db_ro, get_optional_current_user
 from app.crud.crud_article import articles
 from app.crud.crud_comment import comments
 from app.models.article import Article
@@ -44,7 +44,7 @@ def _get_comment_from_id(
     response_model=MultipleCommentsResponse,
 )
 def get_list(
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db_ro),
     current_user: User = Depends(get_optional_current_user),
     slug: str = Path(
         ..., title="Slug of the article that you want to get comments for"

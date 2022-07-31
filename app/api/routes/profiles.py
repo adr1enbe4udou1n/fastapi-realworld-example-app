@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db, get_optional_current_user
+from app.api.deps import get_current_user, get_db, get_db_ro, get_optional_current_user
 from app.crud.crud_user import users
 from app.models.user import User
 from app.schemas.profiles import ProfileResponse
@@ -29,7 +29,7 @@ def _get_profile_from_username(
 def get(
     username: str = Path(..., description="Username of the profile to get"),
     current_user: User = Depends(get_optional_current_user),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db_ro),
 ) -> ProfileResponse:
     user = _get_profile_from_username(db, username)
     return ProfileResponse(profile=user.profile(current_user))

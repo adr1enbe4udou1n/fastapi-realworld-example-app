@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db
+from app.api.deps import get_db, get_db_ro
 from app.models.tag import Tag
 from app.schemas.tags import TagsResponse
 
@@ -16,7 +16,7 @@ router = APIRouter()
     response_model=TagsResponse,
 )
 def get_list(
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db_ro),
 ) -> TagsResponse:
     tags = db.query(Tag).order_by(Tag.name).all()
     return TagsResponse(tags=[tag.name for tag in tags])
