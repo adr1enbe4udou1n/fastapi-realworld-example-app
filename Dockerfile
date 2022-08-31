@@ -4,12 +4,12 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
 
-COPY .venv .venv/
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+
 COPY alembic alembic/
 COPY app app/
 COPY alembic.ini ./
-
-ENV PATH="/app/.venv/bin:$PATH"
 
 EXPOSE 8000
 
