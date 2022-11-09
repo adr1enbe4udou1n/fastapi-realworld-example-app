@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{ include = "app" }]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 fastapi = "^0.81.0"
 uvicorn = { extras = ["standard"], version = "^0.18.3" }
 python-jose = { extras = ["cryptography"], version = "^3.3.0" }
@@ -15,8 +15,8 @@ passlib = { extras = ["bcrypt"], version = "^1.7.4" }
 alembic = "^1.8.1"
 python-slugify = "^6.1.2"
 pydantic = { extras = ["email"], version = "^1.10.1" }
-psycopg2-binary = "^2.9.5"
 requests = "^2.28.1"
+psycopg2 = {extras = ["binary"], version = "^2.9.5"}
 
 
 [tool.poetry.group.dev.dependencies]
