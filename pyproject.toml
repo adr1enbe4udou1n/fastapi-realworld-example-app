@@ -16,8 +16,8 @@ alembic = "^1.8.1"
 python-slugify = "^6.1.2"
 pydantic = { extras = ["email"], version = "^1.10.1" }
 requests = "^2.28.1"
-psycopg2 = {extras = ["binary"], version = "^2.9.5"}
-
+psycopg2 = {extras = ["binary"], version = "^2.9.5", platform = "windows"}
+psycopg2-binary = {version = "^2.9.5", platform = "linux"}
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "^1.5.2"
