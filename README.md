@@ -6,11 +6,13 @@ FastAPI codebase containing real world examples (CRUD, auth, advanced patterns, 
 
 ## [RealWorld](https://github.com/gothinkster/realworld)
 
-This codebase was created to demonstrate a fully fledged fullstack application built with FastAPI including CRUD operations, authentication, routing, pagination, and more.
+This codebase was created to demonstrate a fully fledged fullstack application built with FastAPI including CRUD operations, authentication, routing, pagination, and more. Using the very last SQL Alchemy 2.0 !
 
-We've gone to great lengths to adhere to the Python community styleguides & best practices.
+I'm gone to great lengths to adhere to the Python community styleguides & best practices.
 
 For more information on how to this works with other frontends/backends, head over to the [RealWorld](https://github.com/gothinkster/realworld) repo.
+
+See <https://blog.okami101.io/works/> for my personal Backend & Frontend RealWorld apps collection.
 
 ## Usage
 
