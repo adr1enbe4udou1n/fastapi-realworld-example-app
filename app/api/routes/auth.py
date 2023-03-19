@@ -1,15 +1,10 @@
-from typing import Annotated
+from fastapi import APIRouter, Body, HTTPException
 
-from fastapi import APIRouter, Body, Depends, HTTPException
-from sqlalchemy.orm import Session
-
-from app.api.deps import get_db
+from app.api.deps import DatabaseSession
 from app.crud.crud_user import users
 from app.schemas.users import LoginUserRequest, NewUserRequest, UserResponse
 
 router = APIRouter()
-
-DatabaseSession = Annotated[Session, Depends(get_db)]
 
 
 @router.post(

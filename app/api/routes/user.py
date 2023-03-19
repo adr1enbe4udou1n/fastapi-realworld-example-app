@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db
+from app.api.deps import _get_current_user, _get_db
 from app.crud.crud_user import users
 from app.models.user import User
 from app.schemas.users import UpdateUserRequest, UserResponse
@@ -17,7 +17,7 @@ router = APIRouter()
     response_model=UserResponse,
 )
 def current(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(_get_current_user),
 ) -> UserResponse:
     return UserResponse(user=current_user.schema())
 
@@ -30,8 +30,8 @@ def current(
     response_model=UserResponse,
 )
 def update(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: Session = Depends(_get_db),
+    current_user: User = Depends(_get_current_user),
     update_user: UpdateUserRequest = Body(...),
 ) -> UserResponse:
     db_user = users.get_by_email(db, email=str(update_user.user.email))

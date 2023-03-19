@@ -1,9 +1,12 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db, get_db_ro, get_optional_current_user
+from app.api.deps import (
+    CurrentUser,
+    DatabaseRoSession,
+    DatabaseSession,
+    OptionalCurrentUser,
+)
 from app.crud.crud_user import users
 from app.models.user import User
 from app.schemas.profiles import ProfileResponse
@@ -19,12 +22,6 @@ def _get_profile_from_username(
     if not db_user:
         raise HTTPException(status_code=404, detail="No user found")
     return db_user
-
-
-DatabaseRoSession = Annotated[Session, Depends(get_db_ro)]
-DatabaseSession = Annotated[Session, Depends(get_db)]
-CurrentUser = Annotated[User, Depends(get_current_user)]
-OptionalCurrentUser = Annotated[User, Depends(get_optional_current_user)]
 
 
 @router.get(

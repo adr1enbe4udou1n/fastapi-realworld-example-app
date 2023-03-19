@@ -1,15 +1,10 @@
-from typing import Annotated
+from fastapi import APIRouter
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-
-from app.api.deps import get_db_ro
+from app.api.deps import DatabaseRoSession
 from app.models.tag import Tag
 from app.schemas.tags import TagsResponse
 
 router = APIRouter()
-
-DatabaseRoSession = Annotated[Session, Depends(get_db_ro)]
 
 
 @router.get(

@@ -1,4 +1,4 @@
-from typing import Generator, Optional
+from typing import Annotated, Generator, Optional
 
 from fastapi import Depends, HTTPException, Request, Security, status
 from fastapi.security import APIKeyHeader
@@ -12,7 +12,7 @@ from app.db.session import SessionLocal, SessionLocalRo
 from app.models.user import User
 
 
-def get_db() -> Generator:
+def _get_db() -> Generator:
     db = SessionLocal()
     try:
         yield db
@@ -20,7 +20,7 @@ def get_db() -> Generator:
         db.close()
 
 
-def get_db_ro() -> Generator:
+def _get_db_ro() -> Generator:
     db = SessionLocalRo()
     try:
         yield db
@@ -28,7 +28,7 @@ def get_db_ro() -> Generator:
         db.close()
 
 
-def _get_current_user(db: Session, token: str) -> User:
+def _get_current_user_from_token(db: Session, token: str) -> User:
     try:
         payload = security.decode_access_token(token)
     except (jwt.JWTError, ValidationError):
@@ -65,17 +65,23 @@ def _get_optional_authorization_header(request: Request) -> str:
     return ""
 
 
-def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(_get_authorization_header)
+def _get_current_user(
+    db: Session = Depends(_get_db), token: str = Depends(_get_authorization_header)
 ) -> User:
-    return _get_current_user(db, token)
+    return _get_current_user_from_token(db, token)
 
 
-def get_optional_current_user(
-    db: Session = Depends(get_db),
+def _get_optional_current_user(
+    db: Session = Depends(_get_db),
     token: str = Depends(_get_optional_authorization_header),
 ) -> Optional[User]:
     if token:
-        return _get_current_user(db, token)
+        return _get_current_user_from_token(db, token)
 
     return None
+
+
+DatabaseRoSession = Annotated[Session, Depends(_get_db_ro)]
+DatabaseSession = Annotated[Session, Depends(_get_db)]
+CurrentUser = Annotated[User, Depends(_get_current_user)]
+OptionalCurrentUser = Annotated[User, Depends(_get_optional_current_user)]

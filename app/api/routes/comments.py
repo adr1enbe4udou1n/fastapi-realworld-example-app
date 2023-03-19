@@ -1,14 +1,16 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Body, Depends, HTTPException, Path
+from fastapi import APIRouter, Body, HTTPException, Path
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db, get_db_ro, get_optional_current_user
+from app.api.deps import (
+    CurrentUser,
+    DatabaseRoSession,
+    DatabaseSession,
+    OptionalCurrentUser,
+)
 from app.crud.crud_article import articles
 from app.crud.crud_comment import comments
 from app.models.article import Article
 from app.models.comment import Comment
-from app.models.user import User
 from app.schemas.comments import (
     MultipleCommentsResponse,
     NewCommentRequest,
@@ -36,12 +38,6 @@ def _get_comment_from_id(
     if not db_comment:
         raise HTTPException(status_code=404, detail="No comment found")
     return db_comment
-
-
-DatabaseRoSession = Annotated[Session, Depends(get_db_ro)]
-DatabaseSession = Annotated[Session, Depends(get_db)]
-CurrentUser = Annotated[User, Depends(get_current_user)]
-OptionalCurrentUser = Annotated[User, Depends(get_optional_current_user)]
 
 
 @router.get(

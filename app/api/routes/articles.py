@@ -1,13 +1,15 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query
+from fastapi import APIRouter, Body, HTTPException, Path, Query
 from slugify import slugify
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db, get_db_ro, get_optional_current_user
+from app.api.deps import (
+    CurrentUser,
+    DatabaseRoSession,
+    DatabaseSession,
+    OptionalCurrentUser,
+)
 from app.crud.crud_article import articles
 from app.models.article import Article
-from app.models.user import User
 from app.schemas.articles import (
     MultipleArticlesResponse,
     NewArticleRequest,
@@ -28,12 +30,6 @@ def _get_article_from_slug(
     if not db_article:
         raise HTTPException(status_code=404, detail="No article found")
     return db_article
-
-
-DatabaseRoSession = Annotated[Session, Depends(get_db_ro)]
-DatabaseSession = Annotated[Session, Depends(get_db)]
-CurrentUser = Annotated[User, Depends(get_current_user)]
-OptionalCurrentUser = Annotated[User, Depends(get_optional_current_user)]
 
 
 @router.get(

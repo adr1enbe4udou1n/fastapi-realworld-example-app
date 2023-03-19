@@ -1,12 +1,9 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db
+from app.api.deps import CurrentUser, DatabaseSession
 from app.crud.crud_article import articles
 from app.models.article import Article
-from app.models.user import User
 from app.schemas.articles import SingleArticleResponse
 
 router = APIRouter()
@@ -20,10 +17,6 @@ def _get_article_from_slug(
     if not db_article:
         raise HTTPException(status_code=404, detail="No article found")
     return db_article
-
-
-DatabaseSession = Annotated[Session, Depends(get_db)]
-CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 @router.post(
