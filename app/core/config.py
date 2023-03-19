@@ -41,7 +41,6 @@ class Settings(BaseSettings):
 
 
 class SettingsReadOnly(BaseSettings):
-
     DB_HOST: str
     DB_RO_HOST: Optional[str] = None
     DB_PORT: int
