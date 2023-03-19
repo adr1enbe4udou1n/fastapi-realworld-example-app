@@ -68,5 +68,18 @@ class SettingsReadOnly(BaseSettings):
         )
 
 
-settings = Settings()
-settingsReadOnly = SettingsReadOnly()
+settings = Settings(
+    DB_HOST=os.getenv("DB_HOST") or "localhost",
+    DB_PORT=int(os.getenv("DB_PORT") or "5433"),
+    DB_DATABASE=os.getenv("DB_DATABASE") or "main",
+    DB_USERNAME=os.getenv("DB_USERNAME") or "main",
+    DB_PASSWORD=os.getenv("DB_PASSWORD") or "main",
+)
+settingsReadOnly = SettingsReadOnly(
+    DB_HOST=os.getenv("DB_HOST") or "localhost",
+    DB_RO_HOST=os.getenv("DB_RO_HOST") or "localhost",
+    DB_PORT=int(os.getenv("DB_PORT") or "5434"),
+    DB_DATABASE=os.getenv("DB_DATABASE") or "main",
+    DB_USERNAME=os.getenv("DB_USERNAME") or "main",
+    DB_PASSWORD=os.getenv("DB_PASSWORD") or "main",
+)

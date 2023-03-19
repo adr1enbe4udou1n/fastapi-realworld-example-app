@@ -1,7 +1,7 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped
 
 from app.db.base_class import Base
 from app.models.article import article_tag
@@ -13,10 +13,10 @@ if TYPE_CHECKING:
 class Tag(Base):
     __tablename__ = "tags"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False, unique=True, index=True)
+    id: Mapped[int] = Column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = Column(String, nullable=False, unique=True, index=True)
 
-    articles = relationship(
+    articles: Mapped[List["Article"]] = relationship(
         "Article",
         back_populates="tags",
         secondary=article_tag,

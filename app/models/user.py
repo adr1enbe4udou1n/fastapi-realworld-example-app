@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, List
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped
 
 from app.core import security
 from app.db.base_class import Base
@@ -36,18 +36,18 @@ follower_user = Table(
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=False)
-    password = Column(String)
-    bio = Column(Text)
-    image = Column(String)
+    id: Mapped[int] = Column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = Column(String, nullable=False)
+    email: Mapped[str] = Column(String, unique=True, index=True, nullable=False)
+    password: Mapped[str] = Column(String)
+    bio: Mapped[str] = Column(Text)
+    image: Mapped[str] = Column(String)
     created_at = Column(DateTime, default=datetime.now, nullable=False)
     updated_at = Column(
         DateTime, default=datetime.now, nullable=False, onupdate=datetime.now
     )
 
-    followers = relationship(
+    followers: Mapped[List["User"]] = relationship(
         "User",
         secondary=follower_user,
         primaryjoin=id == follower_user.c.following_id,
@@ -56,9 +56,9 @@ class User(Base):
         uselist=True,
     )
 
-    articles = relationship("Article", back_populates="author")
-    comments = relationship("Comment", back_populates="author")
-    favorite_articles = relationship(
+    articles: Mapped[List["Article"]] = relationship("Article", back_populates="author")
+    comments: Mapped[List["Comment"]] = relationship("Comment", back_populates="author")
+    favorite_articles: Mapped[List["Article"]] = relationship(
         "Article",
         back_populates="favorited_by",
         secondary=article_favorite,

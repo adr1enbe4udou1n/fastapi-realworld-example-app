@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, List
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped
 
 from app.db.base_class import Base
 from app.schemas.articles import Article as ArticleDto
@@ -47,23 +47,25 @@ article_favorite: Table = Table(
 class Article(Base):
     __tablename__ = "articles"
 
-    id = Column(Integer, primary_key=True, index=True)
-    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    title = Column(String, nullable=False)
-    slug = Column(String, unique=True, nullable=False, index=True)
-    description = Column(Text, nullable=False)
-    body = Column(Text, nullable=False)
+    id: Mapped[int] = Column(Integer, primary_key=True, index=True)
+    author_id: Mapped[int] = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title: Mapped[str] = Column(String, nullable=False)
+    slug: Mapped[str] = Column(String, unique=True, nullable=False, index=True)
+    description: Mapped[str] = Column(Text, nullable=False)
+    body: Mapped[str] = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.now, nullable=False)
     updated_at = Column(
         DateTime, default=datetime.now, nullable=False, onupdate=datetime.now
     )
 
-    author = relationship("User", back_populates="articles")
-    comments = relationship("Comment", back_populates="article", uselist=True)
-    tags = relationship(
+    author: Mapped["User"] = relationship("User", back_populates="articles")
+    comments: Mapped[List["Comment"]] = relationship(
+        "Comment", back_populates="article", uselist=True
+    )
+    tags: Mapped[List["Tag"]] = relationship(
         "Tag", back_populates="articles", secondary=article_tag, uselist=True
     )
-    favorited_by = relationship(
+    favorited_by: Mapped[List["User"]] = relationship(
         "User",
         back_populates="favorite_articles",
         secondary=article_favorite,
