@@ -23,9 +23,9 @@ class ArticlesRepository:
         limit: int,
         offset: int,
         *,
-        author: str = None,
-        tag: str = None,
-        favorited: str = None,
+        author: Optional[str] = None,
+        tag: Optional[str] = None,
+        favorited: Optional[str] = None,
     ) -> Tuple[List[Article], int]:
         query = db.query(Article).options(
             joinedload(Article.author),

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import EmailStr, Field, HttpUrl
+from pydantic import EmailStr, Field
 
 from app.schemas.base import BaseModel
 
@@ -28,7 +28,7 @@ class UpdateUser(BaseModel):
     username: Optional[str] = Field(min_length=1)
     email: Optional[EmailStr]
     bio: Optional[str]
-    image: Optional[HttpUrl]
+    image: Optional[str]
 
 
 class UpdateUserRequest(BaseModel):
@@ -39,7 +39,7 @@ class User(BaseModel):
     username: str
     email: str
     bio: Optional[str] = None
-    image: Optional[HttpUrl] = None
+    image: Optional[str] = None
     token: str
 
 

@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, List
 
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy.orm import Mapped, relationship
 
 from app.db.base_class import Base
 from app.models.article import article_tag

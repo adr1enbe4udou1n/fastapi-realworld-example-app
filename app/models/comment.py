@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, Text
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy.orm import Mapped, relationship
 
 from app.db.base_class import Base
 from app.schemas.comments import Comment as CommentDto
@@ -21,8 +21,10 @@ class Comment(Base):
     )
     author_id: Mapped[int] = Column(Integer, ForeignKey("users.id"), nullable=False)
     body: Mapped[str] = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.now, nullable=False)
-    updated_at = Column(
+    created_at: Mapped[datetime] = Column(
+        DateTime, default=datetime.now, nullable=False
+    )
+    updated_at: Mapped[datetime] = Column(
         DateTime, default=datetime.now, nullable=False, onupdate=datetime.now
     )
 
