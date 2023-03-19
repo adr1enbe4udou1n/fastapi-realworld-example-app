@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 
@@ -20,6 +22,10 @@ def _get_article_from_slug(
     return db_article
 
 
+DatabaseSession = Annotated[Session, Depends(get_db)]
+CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
 @router.post(
     "",
     operation_id="CreateArticleFavorite",
@@ -28,8 +34,8 @@ def _get_article_from_slug(
     response_model=SingleArticleResponse,
 )
 def favorite(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DatabaseSession,
+    current_user: CurrentUser,
     slug: str = Path(..., title="Slug of the article that you want to favorite"),
 ) -> SingleArticleResponse:
     article = _get_article_from_slug(db, slug)
@@ -45,8 +51,8 @@ def favorite(
     response_model=SingleArticleResponse,
 )
 def unfavorite(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DatabaseSession,
+    current_user: CurrentUser,
     slug: str = Path(..., title="Slug of the article that you want to unfavorite"),
 ) -> SingleArticleResponse:
     article = _get_article_from_slug(db, slug)

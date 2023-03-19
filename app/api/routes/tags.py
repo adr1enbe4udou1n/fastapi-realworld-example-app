@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -6,6 +8,8 @@ from app.models.tag import Tag
 from app.schemas.tags import TagsResponse
 
 router = APIRouter()
+
+DatabaseRoSession = Annotated[Session, Depends(get_db_ro)]
 
 
 @router.get(
@@ -16,7 +20,7 @@ router = APIRouter()
     response_model=TagsResponse,
 )
 def get_list(
-    db: Session = Depends(get_db_ro),
+    db: DatabaseRoSession,
 ) -> TagsResponse:
     tags = db.query(Tag).order_by(Tag.name).all()
     return TagsResponse(tags=[tag.name for tag in tags])

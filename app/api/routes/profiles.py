@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 
@@ -19,6 +21,12 @@ def _get_profile_from_username(
     return db_user
 
 
+DatabaseRoSession = Annotated[Session, Depends(get_db_ro)]
+DatabaseSession = Annotated[Session, Depends(get_db)]
+CurrentUser = Annotated[User, Depends(get_current_user)]
+OptionalCurrentUser = Annotated[User, Depends(get_optional_current_user)]
+
+
 @router.get(
     "",
     operation_id="GetProfileByUsername",
@@ -27,9 +35,9 @@ def _get_profile_from_username(
     response_model=ProfileResponse,
 )
 def get(
+    current_user: OptionalCurrentUser,
+    db: DatabaseRoSession,
     username: str = Path(..., description="Username of the profile to get"),
-    current_user: User = Depends(get_optional_current_user),
-    db: Session = Depends(get_db_ro),
 ) -> ProfileResponse:
     user = _get_profile_from_username(db, username)
     return ProfileResponse(profile=user.profile(current_user))
@@ -43,9 +51,9 @@ def get(
     response_model=ProfileResponse,
 )
 def follow(
+    current_user: CurrentUser,
+    db: DatabaseSession,
     username: str = Path(..., description="Username of the profile you want to follow"),
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
 ) -> ProfileResponse:
     user = _get_profile_from_username(db, username)
     users.follow(db, db_obj=user, follower=current_user)
@@ -60,11 +68,11 @@ def follow(
     response_model=ProfileResponse,
 )
 def unfollow(
+    current_user: CurrentUser,
+    db: DatabaseSession,
     username: str = Path(
         ..., description="Username of the profile you want to unfollow"
     ),
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
 ) -> ProfileResponse:
     user = _get_profile_from_username(db, username)
     users.follow(db, db_obj=user, follower=current_user, follow=False)

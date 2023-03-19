@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query
 from slugify import slugify
 from sqlalchemy.orm import Session
@@ -28,6 +30,12 @@ def _get_article_from_slug(
     return db_article
 
 
+DatabaseRoSession = Annotated[Session, Depends(get_db_ro)]
+DatabaseSession = Annotated[Session, Depends(get_db)]
+CurrentUser = Annotated[User, Depends(get_current_user)]
+OptionalCurrentUser = Annotated[User, Depends(get_optional_current_user)]
+
+
 @router.get(
     "",
     operation_id="GetArticles",
@@ -36,8 +44,8 @@ def _get_article_from_slug(
     response_model=MultipleArticlesResponse,
 )
 def get_list(
-    db: Session = Depends(get_db_ro),
-    current_user: User = Depends(get_optional_current_user),
+    db: DatabaseRoSession,
+    current_user: OptionalCurrentUser,
     limit: int = Query(
         max_limit, title="Limit number of articles returned (default is 20)"
     ),
@@ -68,8 +76,8 @@ def get_list(
     response_model=MultipleArticlesResponse,
 )
 def get_feed(
-    db: Session = Depends(get_db_ro),
-    current_user: User = Depends(get_current_user),
+    db: DatabaseRoSession,
+    current_user: CurrentUser,
     limit: int = Query(20, title="Limit number of articles returned (default is 20)"),
     offset: int = Query(0, title="Offset/skip number of articles (default is 0)"),
 ) -> MultipleArticlesResponse:
@@ -90,8 +98,8 @@ def get_feed(
     response_model=SingleArticleResponse,
 )
 def create(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DatabaseSession,
+    current_user: CurrentUser,
     new_article: NewArticleRequest = Body(...),
 ) -> SingleArticleResponse:
     existing_article = articles.get_by_slug(db, slug=slugify(new_article.article.title))
@@ -112,8 +120,8 @@ def create(
     response_model=SingleArticleResponse,
 )
 def get(
-    db: Session = Depends(get_db_ro),
-    current_user: User = Depends(get_optional_current_user),
+    db: DatabaseRoSession,
+    current_user: OptionalCurrentUser,
     slug: str = Path(..., title="Slug of the article to get"),
 ) -> SingleArticleResponse:
     article = _get_article_from_slug(db, slug)
@@ -128,8 +136,8 @@ def get(
     response_model=SingleArticleResponse,
 )
 def update(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DatabaseSession,
+    current_user: CurrentUser,
     slug: str = Path(..., title="Slug of the article to update"),
     update_article: UpdateArticleRequest = Body(...),
 ) -> SingleArticleResponse:
@@ -150,8 +158,8 @@ def update(
     description="Delete an article. Auth is required",
 )
 def delete(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DatabaseSession,
+    current_user: CurrentUser,
     slug: str = Path(..., title="Slug of the article to delete"),
 ) -> None:
     article = _get_article_from_slug(db, slug)

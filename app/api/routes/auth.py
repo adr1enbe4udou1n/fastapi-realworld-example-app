@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -6,6 +8,8 @@ from app.crud.crud_user import users
 from app.schemas.users import LoginUserRequest, NewUserRequest, UserResponse
 
 router = APIRouter()
+
+DatabaseSession = Annotated[Session, Depends(get_db)]
 
 
 @router.post(
@@ -16,7 +20,7 @@ router = APIRouter()
     response_model=UserResponse,
 )
 def register(
-    db: Session = Depends(get_db),
+    db: DatabaseSession,
     new_user: NewUserRequest = Body(...),
 ) -> UserResponse:
     db_user = users.get_by_email(db, email=new_user.user.email)
@@ -35,7 +39,7 @@ def register(
     response_model=UserResponse,
 )
 def login(
-    db: Session = Depends(get_db),
+    db: DatabaseSession,
     user_credentials: LoginUserRequest = Body(...),
 ) -> UserResponse:
     db_user = users.authenticate(

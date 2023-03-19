@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Body, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 
@@ -36,6 +38,12 @@ def _get_comment_from_id(
     return db_comment
 
 
+DatabaseRoSession = Annotated[Session, Depends(get_db_ro)]
+DatabaseSession = Annotated[Session, Depends(get_db)]
+CurrentUser = Annotated[User, Depends(get_current_user)]
+OptionalCurrentUser = Annotated[User, Depends(get_optional_current_user)]
+
+
 @router.get(
     "",
     operation_id="GetArticleComments",
@@ -44,8 +52,8 @@ def _get_comment_from_id(
     response_model=MultipleCommentsResponse,
 )
 def get_list(
-    db: Session = Depends(get_db_ro),
-    current_user: User = Depends(get_optional_current_user),
+    db: DatabaseRoSession,
+    current_user: OptionalCurrentUser,
     slug: str = Path(
         ..., title="Slug of the article that you want to get comments for"
     ),
@@ -67,8 +75,8 @@ def get_list(
     response_model=SingleCommentResponse,
 )
 def create(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DatabaseSession,
+    current_user: CurrentUser,
     slug: str = Path(
         ..., title="Slug of the article that you want to create a comment for"
     ),
@@ -88,8 +96,8 @@ def create(
     description="Delete a comment for an article. Auth is required",
 )
 def delete(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DatabaseSession,
+    current_user: CurrentUser,
     slug: str = Path(
         ..., title="Slug of the article that you want to delete a comment for"
     ),
