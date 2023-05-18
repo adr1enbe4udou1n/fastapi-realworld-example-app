@@ -21,7 +21,7 @@ router.include_router(
 )
 router.include_router(
     profiles.router,
-    prefix="/profiles/celeb_{username}",
+    prefix="/profiles/{username}",
     tags=["Profile"],
 )
 router.include_router(

@@ -6,7 +6,7 @@ from tests.conftest import acting_as_user, create_jane_user, create_john_user
 
 
 def test_cannot_get_non_existent_profile(client: TestClient) -> None:
-    r = client.get("/api/profiles/celeb_John Doe")
+    r = client.get("/api/profiles/John Doe")
 
     assert r.status_code == status.HTTP_404_NOT_FOUND
 
@@ -14,7 +14,7 @@ def test_cannot_get_non_existent_profile(client: TestClient) -> None:
 def test_can_get_profile(client: TestClient, db: Session) -> None:
     create_john_user(db)
 
-    r = client.get("/api/profiles/celeb_John Doe")
+    r = client.get("/api/profiles/John Doe")
 
     assert r.status_code == status.HTTP_200_OK
 
@@ -36,7 +36,7 @@ def test_can_get_followed_profile(client: TestClient, db: Session) -> None:
 
     acting_as_user(jane, client)
 
-    r = client.get("/api/profiles/celeb_John Doe")
+    r = client.get("/api/profiles/John Doe")
 
     assert r.status_code == status.HTTP_200_OK
 

@@ -14,7 +14,7 @@ from tests.conftest import (
 def test_cannot_follow_profile(client: TestClient, db: Session) -> None:
     create_john_user(db)
 
-    r = client.post("/api/profiles/celeb_John Doe/follow")
+    r = client.post("/api/profiles/John Doe/follow")
 
     assert r.status_code == status.HTTP_403_FORBIDDEN
 
@@ -22,7 +22,7 @@ def test_cannot_follow_profile(client: TestClient, db: Session) -> None:
 def test_cannot_follow_non_existent_profile(client: TestClient, db: Session) -> None:
     acting_as_jane(db, client)
 
-    r = client.post("/api/profiles/celeb_John Doe/follow")
+    r = client.post("/api/profiles/John Doe/follow")
 
     assert r.status_code == status.HTTP_404_NOT_FOUND
 
@@ -31,7 +31,7 @@ def test_can_follow_profile(client: TestClient, db: Session) -> None:
     create_john_user(db)
     acting_as_jane(db, client)
 
-    r = client.post("/api/profiles/celeb_John Doe/follow")
+    r = client.post("/api/profiles/John Doe/follow")
 
     assert r.status_code == status.HTTP_200_OK
     assert r.json()["profile"] == {
@@ -54,7 +54,7 @@ def test_can_unfollow_profile(client: TestClient, db: Session) -> None:
 
     acting_as_user(jane, client)
 
-    r = client.delete("/api/profiles/celeb_John Doe/follow")
+    r = client.delete("/api/profiles/John Doe/follow")
 
     assert r.status_code == status.HTTP_200_OK
     assert r.json()["profile"] == {
