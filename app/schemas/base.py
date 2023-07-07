@@ -1,7 +1,6 @@
 import datetime
 
-from pydantic import BaseModel as PBaseModel
-from pydantic.main import BaseConfig
+from pydantic import BaseModel as PBaseModel, ConfigDict
 from pydantic.utils import to_camel
 
 
@@ -16,7 +15,4 @@ def convert_datetime_to_realworld(dt: datetime.datetime) -> str:
 
 
 class BaseModel(PBaseModel):
-    class Config(BaseConfig):
-        alias_generator = to_lower_camel
-        allow_population_by_field_name = True
-        json_encoders = {datetime.datetime: convert_datetime_to_realworld}
+    model_config = ConfigDict(alias_generator=to_lower_camel, populate_by_name=True)

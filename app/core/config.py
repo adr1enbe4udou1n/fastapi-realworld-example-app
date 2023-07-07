@@ -2,14 +2,15 @@ import os
 import secrets
 from typing import Any, Dict, Optional
 
-from pydantic import BaseSettings, validator
+from pydantic import ConfigDict, FieldValidationInfo, field_validator
 from pydantic.networks import PostgresDsn
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     DEBUG: bool = False
 
-    API_PREFIX = "/api"
+    API_PREFIX: str = "/api"
     JWT_SECRET_KEY: str = secrets.token_urlsafe(32)
     JWT_EXPIRE: int = 60 * 24 * 8
 
@@ -21,23 +22,20 @@ class Settings(BaseSettings):
     DATABASE_URL: Optional[PostgresDsn] = None
     DATABASE_RO_URL: Optional[PostgresDsn] = None
 
-    @validator("DATABASE_URL", pre=True)
-    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
+    @field_validator("DATABASE_URL")
+    def assemble_db_connection(cls, v: Optional[str], info: FieldValidationInfo) -> Any:
         if isinstance(v, str):
             return v
-        return PostgresDsn.build(
-            scheme="postgresql",
-            user=values.get("DB_USERNAME"),
-            password=values.get("DB_PASSWORD"),
-            host=values.get("DB_HOST"),
-            port=str(values.get("DB_PORT")),
-            path=f"/{values.get('DB_DATABASE') or ''}",
+
+        return PostgresDsn(
+            f"postgresql://{info.data['DB_USERNAME']}:{info.data['DB_PASSWORD']}@{info.data['DB_HOST']}:{info.data['DB_PORT']}/{info.data['DB_DATABASE']}"
         )
 
-    class Config:
-        env_file = (
+    model_config = SettingsConfigDict(
+        env_file=(
             ".env.testing" if os.getenv("PYTHON_ENVIRONNEMENT") == "testing" else ".env"
         )
+    )
 
 
 class SettingsReadOnly(BaseSettings):
@@ -49,23 +47,21 @@ class SettingsReadOnly(BaseSettings):
     DB_PASSWORD: str = "main"
     DATABASE_RO_URL: Optional[PostgresDsn] = None
 
-    @validator("DATABASE_RO_URL", pre=True)
-    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
+    @field_validator("DATABASE_RO_URL")
+    def assemble_db_connection(cls, v: Optional[str], info: FieldValidationInfo) -> Any:
         if isinstance(v, str):
             return v
-        return PostgresDsn.build(
-            scheme="postgresql",
-            user=values.get("DB_USERNAME"),
-            password=values.get("DB_PASSWORD"),
-            host=values.get("DB_RO_HOST") or values.get("DB_HOST"),
-            port=str(values.get("DB_PORT")),
-            path=f"/{values.get('DB_DATABASE') or ''}",
+
+        return PostgresDsn(
+            f"postgresql://{info.data['DB_USERNAME']}:{info.data['DB_PASSWORD']}@{info.data['DB_HOST'] or info.data['DB_RO_HOST']}:{info.data['DB_PORT']}/{info.data['DB_DATABASE']}"
         )
 
-    class Config:
-        env_file = (
+    model_config = SettingsConfigDict(
+        env_file=(
             ".env.testing" if os.getenv("PYTHON_ENVIRONNEMENT") == "testing" else ".env"
-        )
+        ),
+        extra="allow",
+    )
 
 
 settings = Settings()
