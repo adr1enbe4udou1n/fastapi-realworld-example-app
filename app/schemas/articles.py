@@ -33,8 +33,8 @@ class Article(BaseModel):
     slug: str
     description: str
     body: str
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
+    created_at: str
+    updated_at: str
     tag_list: List[str]
     author: Profile
     favorited: bool

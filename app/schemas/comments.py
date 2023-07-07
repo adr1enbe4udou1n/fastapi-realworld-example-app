@@ -1,4 +1,3 @@
-import datetime
 from typing import List
 
 from pydantic import Field
@@ -18,8 +17,8 @@ class NewCommentRequest(BaseModel):
 class Comment(BaseModel):
     id: int
     body: str
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
+    created_at: str
+    updated_at: str
     author: Profile
 
 

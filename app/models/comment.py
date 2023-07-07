@@ -5,6 +5,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer, Text
 from sqlalchemy.orm import Mapped, relationship
 
 from app.db.base_class import Base
+from app.schemas.base import convert_datetime_to_realworld
 from app.schemas.comments import Comment as CommentDto
 
 if TYPE_CHECKING:
@@ -35,7 +36,7 @@ class Comment(Base):
         return CommentDto(
             id=self.id,
             body=self.body,
-            created_at=self.created_at,
-            updated_at=self.updated_at,
+            created_at=convert_datetime_to_realworld(self.created_at),
+            updated_at=convert_datetime_to_realworld(self.updated_at),
             author=self.author.profile(user),
         )

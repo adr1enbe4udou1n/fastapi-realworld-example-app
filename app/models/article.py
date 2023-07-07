@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, List, Optional
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped, relationship
 
 from app.db.base_class import Base
 from app.schemas.articles import Article as ArticleDto
+from app.schemas.base import convert_datetime_to_realworld
 
 if TYPE_CHECKING:
     from app.models.comment import Comment  # noqa
@@ -83,8 +84,8 @@ class Article(Base):
             slug=self.slug,
             description=self.description,
             body=self.body,
-            created_at=self.created_at,
-            updated_at=self.updated_at,
+            created_at=convert_datetime_to_realworld(self.created_at),
+            updated_at=convert_datetime_to_realworld(self.updated_at),
             tag_list=tags,
             author=self.author.profile(user),
             favorited=user is not None and self.favorited_by.__contains__(user),
