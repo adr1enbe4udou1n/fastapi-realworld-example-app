@@ -1,6 +1,7 @@
 import datetime
 
-from pydantic import BaseModel as PBaseModel, ConfigDict
+from pydantic import BaseModel as PBaseModel
+from pydantic import ConfigDict
 from pydantic.alias_generators import to_camel
 
 

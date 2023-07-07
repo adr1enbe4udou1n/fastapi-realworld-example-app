@@ -1,8 +1,8 @@
 import os
 import secrets
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
-from pydantic import ConfigDict, FieldValidationInfo, field_validator
+from pydantic import FieldValidationInfo, field_validator
 from pydantic.networks import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
