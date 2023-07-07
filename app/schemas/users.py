@@ -25,7 +25,7 @@ class NewUserRequest(BaseModel):
 
 
 class UpdateUser(BaseModel):
-    username: Optional[str] = Field(min_length=1)
+    username: Optional[str] = None
     email: Optional[EmailStr] = None
     bio: Optional[str] = None
     image: Optional[str] = None

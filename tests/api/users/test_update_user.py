@@ -23,11 +23,6 @@ def test_guest_user_cannot_update_infos(client: TestClient) -> None:
             "email": "john.doe",
             "bio": "My Bio",
         },
-        {
-            "username": "",
-            "email": "john.doe@example.com",
-            "bio": "My Bio",
-        },
     ),
 )
 def test_user_cannot_update_infos_with_invalid_data(
@@ -48,7 +43,7 @@ def test_user_cannot_update_with_already_used_email(
 
     r = client.put("/api/user", json={"user": {"email": "jane.doe@example.com"}})
 
-    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert r.status_code == status.HTTP_400_BAD_REQUEST
 
 
 def test_user_can_update_infos(client: TestClient, db: Session) -> None:

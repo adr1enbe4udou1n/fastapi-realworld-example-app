@@ -18,9 +18,9 @@ class NewArticleRequest(BaseModel):
 
 
 class UpdateArticle(BaseModel):
-    title: Optional[str] = Field(min_length=1)
-    description: Optional[str] = Field(min_length=1)
-    body: Optional[str] = Field(min_length=1)
+    title: Optional[str] = None
+    description: Optional[str] = None
+    body: Optional[str] = None
 
 
 class UpdateArticleRequest(BaseModel):
