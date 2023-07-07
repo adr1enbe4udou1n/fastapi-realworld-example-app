@@ -21,6 +21,8 @@ def test_cannot_update_non_existant_article(client: TestClient, db: Session) -> 
         json={
             "article": {
                 "title": "Test Title",
+                "description": "Test Description",
+                "body": "Test Body",
             }
         },
     )
@@ -64,7 +66,7 @@ def test_cannot_update_article_of_other_author(client: TestClient, db: Session) 
 
     acting_as_john(db, client)
     r = client.put("/api/articles/test-title", json={"article": {"title": "New Title"}})
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def test_can_update_own_article(client: TestClient, db: Session) -> None:
@@ -74,7 +76,16 @@ def test_can_update_own_article(client: TestClient, db: Session) -> None:
     db.add(db_obj)
     db.commit()
 
-    r = client.put("/api/articles/test-title", json={"article": {"title": "New Title"}})
+    r = client.put(
+        "/api/articles/test-title",
+        json={
+            "article": {
+                "title": "New Title",
+                "description": "Test Description",
+                "body": "Test Body",
+            }
+        },
+    )
     assert r.status_code == status.HTTP_200_OK
     assert r.json()["article"]["title"] == "New Title"
     assert db.query(Article).filter_by(title="New Title").count() == 1

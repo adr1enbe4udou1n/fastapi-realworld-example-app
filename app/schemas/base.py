@@ -1,7 +1,7 @@
 import datetime
 
 from pydantic import BaseModel as PBaseModel, ConfigDict
-from pydantic.utils import to_camel
+from pydantic.alias_generators import to_camel
 
 
 def to_lower_camel(string: str) -> str:
