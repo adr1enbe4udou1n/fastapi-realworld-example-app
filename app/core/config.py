@@ -2,7 +2,7 @@ import os
 import secrets
 from typing import Any, Optional
 
-from pydantic import FieldValidationInfo, field_validator
+from pydantic import ValidationInfo, field_validator
 from pydantic.networks import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     DATABASE_RO_URL: Optional[PostgresDsn] = None
 
     @field_validator("DATABASE_URL")
-    def assemble_db_connection(cls, v: Optional[str], info: FieldValidationInfo) -> Any:
+    def assemble_db_connection(cls, v: Optional[str], info: ValidationInfo) -> Any:
         if isinstance(v, str):
             return v
 
@@ -49,7 +49,7 @@ class SettingsReadOnly(BaseSettings):
     DATABASE_RO_URL: Optional[PostgresDsn] = None
 
     @field_validator("DATABASE_RO_URL")
-    def assemble_db_connection(cls, v: Optional[str], info: FieldValidationInfo) -> Any:
+    def assemble_db_connection(cls, v: Optional[str], info: ValidationInfo) -> Any:
         if isinstance(v, str):
             return v
 
