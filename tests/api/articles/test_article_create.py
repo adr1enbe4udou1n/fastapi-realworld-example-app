@@ -33,9 +33,7 @@ def test_guest_cannot_create_article(client: TestClient) -> None:
         },
     ),
 )
-def test_cannot_create_article_with_invalid_data(
-    client: TestClient, db: Session, data: dict[str, str]
-) -> None:
+def test_cannot_create_article_with_invalid_data(client: TestClient, db: Session, data: dict[str, str]) -> None:
     acting_as_john(db, client)
     r = client.post("/api/articles", json={"article": data})
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
