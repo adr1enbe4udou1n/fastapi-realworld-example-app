@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from pydantic import Field
 
 from app.schemas.base import BaseModel
@@ -10,7 +8,7 @@ class NewArticle(BaseModel):
     title: str = Field(min_length=1)
     description: str = Field(min_length=1)
     body: str = Field(min_length=1)
-    tag_list: List[str] = []
+    tag_list: list[str]
 
 
 class NewArticleRequest(BaseModel):
@@ -18,9 +16,9 @@ class NewArticleRequest(BaseModel):
 
 
 class UpdateArticle(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    body: Optional[str] = None
+    title: str | None = None
+    description: str | None = None
+    body: str | None = None
 
 
 class UpdateArticleRequest(BaseModel):
@@ -34,7 +32,7 @@ class Article(BaseModel):
     body: str
     created_at: str
     updated_at: str
-    tag_list: List[str]
+    tag_list: list[str]
     author: Profile
     favorited: bool
     favorites_count: int
@@ -45,5 +43,5 @@ class SingleArticleResponse(BaseModel):
 
 
 class MultipleArticlesResponse(BaseModel):
-    articles: List[Article]
+    articles: list[Article]
     articles_count: int

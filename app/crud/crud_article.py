@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
 from slugify import slugify
 from sqlalchemy.orm import Session, joinedload
@@ -11,10 +11,10 @@ from app.schemas.articles import NewArticle, UpdateArticle
 
 
 class ArticlesRepository:
-    def get(self, db: Session, id: Any) -> Optional[Article]:
+    def get(self, db: Session, id: Any) -> Article | None:
         return db.query(Article).filter_by(id=id).first()
 
-    def get_by_slug(self, db: Session, *, slug: str) -> Optional[Article]:
+    def get_by_slug(self, db: Session, *, slug: str) -> Article | None:
         return db.query(Article).filter_by(slug=slug).first()
 
     def get_list(
@@ -23,10 +23,10 @@ class ArticlesRepository:
         limit: int,
         offset: int,
         *,
-        author: Optional[str] = None,
-        tag: Optional[str] = None,
-        favorited: Optional[str] = None,
-    ) -> Tuple[List[Article], int]:
+        author: str | None = None,
+        tag: str | None = None,
+        favorited: str | None = None,
+    ) -> tuple[list[Article], int]:
         query = db.query(Article).options(
             joinedload(Article.author),
             joinedload(Article.tags),
@@ -38,18 +38,14 @@ class ArticlesRepository:
         if tag:
             query = query.filter(Article.tags.any(Tag.name.ilike(f"%{tag}%")))
         if favorited:
-            query = query.filter(
-                Article.favorited_by.any(User.name.ilike(f"%{favorited}%"))
-            )
+            query = query.filter(Article.favorited_by.any(User.name.ilike(f"%{favorited}%")))
 
         return (
             query.order_by(desc(Article.id)).limit(limit).offset(offset).all(),
             query.count(),
         )
 
-    def get_feed(
-        self, db: Session, limit: int, offset: int, *, user: User
-    ) -> Tuple[List[Article], int]:
+    def get_feed(self, db: Session, limit: int, offset: int, *, user: User) -> tuple[list[Article], int]:
         query = (
             db.query(Article)
             .options(
@@ -75,9 +71,7 @@ class ArticlesRepository:
         )
 
         for tag in obj_in.tag_list:
-            db_obj.tags.append(
-                db.query(Tag).filter_by(name=tag).first() or Tag(name=tag)
-            )
+            db_obj.tags.append(db.query(Tag).filter_by(name=tag).first() or Tag(name=tag))
 
         db.add(db_obj)
         db.commit()
@@ -98,9 +92,7 @@ class ArticlesRepository:
         db.delete(db_obj)
         db.commit()
 
-    def favorite(
-        self, db: Session, *, db_obj: Article, user: User, favorite: bool = True
-    ) -> None:
+    def favorite(self, db: Session, *, db_obj: Article, user: User, favorite: bool = True) -> None:
         if favorite:
             db_obj.favorited_by.append(user)
         else:

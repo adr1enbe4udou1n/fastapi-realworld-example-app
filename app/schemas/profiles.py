@@ -1,12 +1,10 @@
-from typing import Optional
-
 from app.schemas.base import BaseModel
 
 
 class Profile(BaseModel):
     username: str
-    bio: Optional[str] = None
-    image: Optional[str] = None
+    bio: str | None = None
+    image: str | None = None
     following: bool
 
 

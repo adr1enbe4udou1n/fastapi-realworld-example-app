@@ -1,5 +1,3 @@
-from typing import Dict
-
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
@@ -37,9 +35,7 @@ from tests.conftest import create_john_user
         },
     ),
 )
-def test_cannot_register_with_invalid_data(
-    client: TestClient, data: Dict[str, str]
-) -> None:
+def test_cannot_register_with_invalid_data(client: TestClient, data: dict[str, str]) -> None:
     r = client.post("/api/users", json={"user": data})
 
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

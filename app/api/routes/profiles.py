@@ -67,9 +67,7 @@ def follow(
 def unfollow(
     current_user: CurrentUser,
     db: DatabaseSession,
-    username: str = Path(
-        ..., description="Username of the profile you want to unfollow"
-    ),
+    username: str = Path(..., description="Username of the profile you want to unfollow"),
 ) -> ProfileResponse:
     user = _get_profile_from_username(db, username)
     users.follow(db, db_obj=user, follower=current_user, follow=False)

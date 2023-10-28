@@ -1,5 +1,3 @@
-from typing import Dict
-
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
@@ -25,9 +23,7 @@ def test_guest_user_cannot_update_infos(client: TestClient) -> None:
         },
     ),
 )
-def test_user_cannot_update_infos_with_invalid_data(
-    client: TestClient, db: Session, data: Dict[str, str]
-) -> None:
+def test_user_cannot_update_infos_with_invalid_data(client: TestClient, db: Session, data: dict[str, str]) -> None:
     acting_as_john(db, client)
 
     r = client.put("/api/user", json={"user": data})
@@ -35,9 +31,7 @@ def test_user_cannot_update_infos_with_invalid_data(
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-def test_user_cannot_update_with_already_used_email(
-    client: TestClient, db: Session
-) -> None:
+def test_user_cannot_update_with_already_used_email(client: TestClient, db: Session) -> None:
     create_jane_user(db)
     acting_as_john(db, client)
 

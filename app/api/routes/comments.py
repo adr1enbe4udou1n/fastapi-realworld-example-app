@@ -50,16 +50,11 @@ def _get_comment_from_id(
 def get_list(
     db: DatabaseRoSession,
     current_user: OptionalCurrentUser,
-    slug: str = Path(
-        ..., title="Slug of the article that you want to get comments for"
-    ),
+    slug: str = Path(..., title="Slug of the article that you want to get comments for"),
 ) -> MultipleCommentsResponse:
     article = _get_article_from_slug(db, slug)
     return MultipleCommentsResponse(
-        comments=[
-            comment.schema(current_user)
-            for comment in comments.get_list(db, article=article)
-        ]
+        comments=[comment.schema(current_user) for comment in comments.get_list(db, article=article)]
     )
 
 
@@ -73,15 +68,11 @@ def get_list(
 def create(
     db: DatabaseSession,
     current_user: CurrentUser,
-    slug: str = Path(
-        ..., title="Slug of the article that you want to create a comment for"
-    ),
+    slug: str = Path(..., title="Slug of the article that you want to create a comment for"),
     new_comment: NewCommentRequest = Body(...),
 ) -> SingleCommentResponse:
     article = _get_article_from_slug(db, slug)
-    comment = comments.create(
-        db, obj_in=new_comment.comment, article=article, author=current_user
-    )
+    comment = comments.create(db, obj_in=new_comment.comment, article=article, author=current_user)
     return SingleCommentResponse(comment=comment.schema(current_user))
 
 
@@ -94,24 +85,16 @@ def create(
 def delete(
     db: DatabaseSession,
     current_user: CurrentUser,
-    slug: str = Path(
-        ..., title="Slug of the article that you want to delete a comment for"
-    ),
-    comment_id: int = Path(
-        ..., title="ID of the comment you want to delete", alias="commentId"
-    ),
+    slug: str = Path(..., title="Slug of the article that you want to delete a comment for"),
+    comment_id: int = Path(..., title="ID of the comment you want to delete", alias="commentId"),
 ) -> None:
     article = _get_article_from_slug(db, slug)
     comment = _get_comment_from_id(db, comment_id)
 
     if comment.article != article:
-        raise HTTPException(
-            status_code=400, detail="Comment does not belong to this article"
-        )
+        raise HTTPException(status_code=400, detail="Comment does not belong to this article")
 
     if comment.author != current_user and article.author != current_user:
-        raise HTTPException(
-            status_code=400, detail="Comment does not belong to this user"
-        )
+        raise HTTPException(status_code=400, detail="Comment does not belong to this user")
 
     comments.delete(db, db_obj=comment)

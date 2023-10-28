@@ -1,5 +1,5 @@
 import os
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 import sqlalchemy
@@ -19,9 +19,7 @@ from app.models.article import Article  # noqa: E402
 from app.models.user import User  # noqa: E402
 
 engine = create_engine(settings.DATABASE_URL.__str__(), pool_pre_ping=True)
-TestingSessionLocal = sessionmaker(
-    autocommit=False, autoflush=False, bind=engine, future=True
-)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, future=True)
 
 Base.metadata.create_all(bind=engine)
 

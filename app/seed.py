@@ -6,9 +6,7 @@ from random import choice
 from faker import Faker
 from slugify import slugify
 
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
-)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
 from app.core.security import get_password_hash  # noqa
 from app.db.session import SessionLocal  # noqa

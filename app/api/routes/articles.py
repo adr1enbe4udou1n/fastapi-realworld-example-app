@@ -42,9 +42,7 @@ def _get_article_from_slug(
 def get_list(
     db: DatabaseRoSession,
     current_user: OptionalCurrentUser,
-    limit: int = Query(
-        max_limit, title="Limit number of articles returned (default is 20)"
-    ),
+    limit: int = Query(max_limit, title="Limit number of articles returned (default is 20)"),
     offset: int = Query(0, title="Offset/skip number of articles (default is 0)"),
     author: str = Query(None, title="Filter by author (username)"),
     tag: str = Query(None, title="Filter by tag"),
@@ -77,9 +75,7 @@ def get_feed(
     limit: int = Query(20, title="Limit number of articles returned (default is 20)"),
     offset: int = Query(0, title="Offset/skip number of articles (default is 0)"),
 ) -> MultipleArticlesResponse:
-    result, count = articles.get_feed(
-        db, min(limit, max_limit), offset, user=current_user
-    )
+    result, count = articles.get_feed(db, min(limit, max_limit), offset, user=current_user)
     return MultipleArticlesResponse(
         articles=[article.schema(current_user) for article in result],
         articles_count=count,
@@ -100,9 +96,7 @@ def create(
 ) -> SingleArticleResponse:
     existing_article = articles.get_by_slug(db, slug=slugify(new_article.article.title))
     if existing_article:
-        raise HTTPException(
-            status_code=400, detail="Article with this title already exists"
-        )
+        raise HTTPException(status_code=400, detail="Article with this title already exists")
 
     article = articles.create(db, obj_in=new_article.article, author=current_user)
     return SingleArticleResponse(article=article.schema(current_user))
@@ -140,9 +134,7 @@ def update(
     article = _get_article_from_slug(db, slug)
 
     if article.author != current_user:
-        raise HTTPException(
-            status_code=400, detail="You are not the author of this article"
-        )
+        raise HTTPException(status_code=400, detail="You are not the author of this article")
     article = articles.update(db, db_obj=article, obj_in=update_article.article)
     return SingleArticleResponse(article=article.schema(current_user))
 
@@ -161,7 +153,5 @@ def delete(
     article = _get_article_from_slug(db, slug)
 
     if article.author != current_user:
-        raise HTTPException(
-            status_code=400, detail="You are not the author of this article"
-        )
+        raise HTTPException(status_code=400, detail="You are not the author of this article")
     articles.delete(db, db_obj=article)

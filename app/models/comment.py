@@ -9,25 +9,19 @@ from app.schemas.base import convert_datetime_to_realworld
 from app.schemas.comments import Comment as CommentDto
 
 if TYPE_CHECKING:
-    from app.models.article import Article  # noqa
-    from app.models.user import User  # noqa
+    from app.models.article import Article
+    from app.models.user import User
 
 
 class Comment(Base):
     __tablename__ = "comments"
 
     id: Mapped[int] = Column(Integer, primary_key=True, index=True)
-    article_id: Mapped[int] = Column(
-        Integer, ForeignKey("articles.id", ondelete="CASCADE"), nullable=False
-    )
+    article_id: Mapped[int] = Column(Integer, ForeignKey("articles.id", ondelete="CASCADE"), nullable=False)
     author_id: Mapped[int] = Column(Integer, ForeignKey("users.id"), nullable=False)
     body: Mapped[str] = Column(Text, nullable=False)
-    created_at: Mapped[datetime] = Column(
-        DateTime, default=datetime.now, nullable=False
-    )
-    updated_at: Mapped[datetime] = Column(
-        DateTime, default=datetime.now, nullable=False, onupdate=datetime.now
-    )
+    created_at: Mapped[datetime] = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at: Mapped[datetime] = Column(DateTime, default=datetime.now, nullable=False, onupdate=datetime.now)
 
     article: Mapped["Article"] = relationship("Article", back_populates="comments")
     author: Mapped["User"] = relationship("User", back_populates="comments")

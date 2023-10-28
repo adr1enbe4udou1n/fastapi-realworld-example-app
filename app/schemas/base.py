@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from pydantic import BaseModel as PBaseModel
 from pydantic import ConfigDict
@@ -12,7 +12,7 @@ def to_lower_camel(string: str) -> str:
 
 
 def convert_datetime_to_realworld(dt: datetime) -> str:
-    return dt.replace(tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
+    return dt.replace(tzinfo=UTC).isoformat().replace("+00:00", "Z")
 
 
 class BaseModel(PBaseModel):

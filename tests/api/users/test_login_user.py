@@ -1,5 +1,3 @@
-from typing import Dict
-
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
@@ -23,9 +21,7 @@ from tests.conftest import create_john_user
         },
     ),
 )
-def test_cannot_register_with_invalid_data(
-    client: TestClient, db: Session, data: Dict[str, str]
-) -> None:
+def test_cannot_register_with_invalid_data(client: TestClient, db: Session, data: dict[str, str]) -> None:
     create_john_user(db)
 
     r = client.post("/api/users/login", json={"user": data})

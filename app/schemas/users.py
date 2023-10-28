@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import EmailStr, Field
 
 from app.schemas.base import BaseModel
@@ -25,10 +23,10 @@ class NewUserRequest(BaseModel):
 
 
 class UpdateUser(BaseModel):
-    username: Optional[str] = None
-    email: Optional[EmailStr] = None
-    bio: Optional[str] = None
-    image: Optional[str] = None
+    username: str | None = None
+    email: EmailStr | None = None
+    bio: str | None = None
+    image: str | None = None
 
 
 class UpdateUserRequest(BaseModel):
@@ -38,8 +36,8 @@ class UpdateUserRequest(BaseModel):
 class User(BaseModel):
     username: str
     email: str
-    bio: Optional[str] = None
-    image: Optional[str] = None
+    bio: str | None = None
+    image: str | None = None
     token: str
 
 

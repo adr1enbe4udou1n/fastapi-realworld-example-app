@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import Mapped, relationship
@@ -11,8 +11,8 @@ from app.schemas.profiles import Profile as ProfileDto
 from app.schemas.users import User as UserDto
 
 if TYPE_CHECKING:
-    from app.models.article import Article  # noqa
-    from app.models.comment import Comment  # noqa
+    from app.models.article import Article
+    from app.models.comment import Comment
 
 
 follower_user = Table(
@@ -43,11 +43,9 @@ class User(Base):
     bio: Mapped[str] = Column(Text)
     image: Mapped[str] = Column(String)
     created_at = Column(DateTime, default=datetime.now, nullable=False)
-    updated_at = Column(
-        DateTime, default=datetime.now, nullable=False, onupdate=datetime.now
-    )
+    updated_at = Column(DateTime, default=datetime.now, nullable=False, onupdate=datetime.now)
 
-    followers: Mapped[List["User"]] = relationship(
+    followers: Mapped[list["User"]] = relationship(
         "User",
         secondary=follower_user,
         primaryjoin=id == follower_user.c.following_id,
@@ -56,9 +54,9 @@ class User(Base):
         uselist=True,
     )
 
-    articles: Mapped[List["Article"]] = relationship("Article", back_populates="author")
-    comments: Mapped[List["Comment"]] = relationship("Comment", back_populates="author")
-    favorite_articles: Mapped[List["Article"]] = relationship(
+    articles: Mapped[list["Article"]] = relationship("Article", back_populates="author")
+    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="author")
+    favorite_articles: Mapped[list["Article"]] = relationship(
         "Article",
         back_populates="favorited_by",
         secondary=article_favorite,

@@ -1,5 +1,3 @@
-from typing import Dict
-
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
@@ -36,7 +34,7 @@ def test_guest_cannot_create_article(client: TestClient) -> None:
     ),
 )
 def test_cannot_create_article_with_invalid_data(
-    client: TestClient, db: Session, data: Dict[str, str]
+    client: TestClient, db: Session, data: dict[str, str]
 ) -> None:
     acting_as_john(db, client)
     r = client.post("/api/articles", json={"article": data})
@@ -60,7 +58,7 @@ def test_cannot_create_article_with_same_title(client: TestClient, db: Session) 
             }
         },
     )
-    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def test_can_create_article(client: TestClient, db: Session) -> None:

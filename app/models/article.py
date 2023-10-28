@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import Mapped, relationship
@@ -9,9 +9,9 @@ from app.schemas.articles import Article as ArticleDto
 from app.schemas.base import convert_datetime_to_realworld
 
 if TYPE_CHECKING:
-    from app.models.comment import Comment  # noqa
-    from app.models.tag import Tag  # noqa
-    from app.models.user import User  # noqa
+    from app.models.comment import Comment
+    from app.models.tag import Tag
+    from app.models.user import User
 
 article_tag: Table = Table(
     "article_tag",
@@ -25,9 +25,7 @@ article_tag: Table = Table(
         ),
         primary_key=True,
     ),
-    Column(
-        "tag_id", Integer, ForeignKey("tags.id", ondelete="CASCADE"), primary_key=True
-    ),
+    Column("tag_id", Integer, ForeignKey("tags.id", ondelete="CASCADE"), primary_key=True),
 )
 
 article_favorite: Table = Table(
@@ -39,9 +37,7 @@ article_favorite: Table = Table(
         ForeignKey("articles.id", ondelete="CASCADE"),
         primary_key=True,
     ),
-    Column(
-        "user_id", Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
-    ),
+    Column("user_id", Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
 )
 
 
@@ -54,21 +50,13 @@ class Article(Base):
     slug: Mapped[str] = Column(String, unique=True, nullable=False, index=True)
     description: Mapped[str] = Column(Text, nullable=False)
     body: Mapped[str] = Column(Text, nullable=False)
-    created_at: Mapped[datetime] = Column(
-        DateTime, default=datetime.now, nullable=False
-    )
-    updated_at: Mapped[datetime] = Column(
-        DateTime, default=datetime.now, nullable=False, onupdate=datetime.now
-    )
+    created_at: Mapped[datetime] = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at: Mapped[datetime] = Column(DateTime, default=datetime.now, nullable=False, onupdate=datetime.now)
 
     author: Mapped["User"] = relationship("User", back_populates="articles")
-    comments: Mapped[List["Comment"]] = relationship(
-        "Comment", back_populates="article", uselist=True
-    )
-    tags: Mapped[List["Tag"]] = relationship(
-        "Tag", back_populates="articles", secondary=article_tag, uselist=True
-    )
-    favorited_by: Mapped[List["User"]] = relationship(
+    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="article", uselist=True)
+    tags: Mapped[list["Tag"]] = relationship("Tag", back_populates="articles", secondary=article_tag, uselist=True)
+    favorited_by: Mapped[list["User"]] = relationship(
         "User",
         back_populates="favorite_articles",
         secondary=article_favorite,

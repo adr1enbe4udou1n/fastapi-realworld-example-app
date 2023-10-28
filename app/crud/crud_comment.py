@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any
 
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.expression import desc
@@ -10,10 +10,10 @@ from app.schemas.comments import NewComment
 
 
 class CommentsRepository:
-    def get(self, db: Session, id: Any) -> Optional[Comment]:
+    def get(self, db: Session, id: Any) -> Comment | None:
         return db.query(Comment).filter_by(id=id).first()
 
-    def get_list(self, db: Session, article: Article) -> List[Comment]:
+    def get_list(self, db: Session, article: Article) -> list[Comment]:
         return (
             db.query(Comment)
             .options(joinedload(Comment.author))
@@ -22,9 +22,7 @@ class CommentsRepository:
             .all()
         )
 
-    def create(
-        self, db: Session, *, obj_in: NewComment, article: Article, author: User
-    ) -> Comment:
+    def create(self, db: Session, *, obj_in: NewComment, article: Article, author: User) -> Comment:
         db_obj = Comment(
             article=article,
             author=author,

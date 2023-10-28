@@ -1,6 +1,6 @@
 import os
 import secrets
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import ValidationInfo, field_validator
 from pydantic.networks import PostgresDsn
@@ -19,11 +19,11 @@ class Settings(BaseSettings):
     DB_DATABASE: str = "main"
     DB_USERNAME: str = "main"
     DB_PASSWORD: str = "main"
-    DATABASE_URL: Optional[PostgresDsn] = None
-    DATABASE_RO_URL: Optional[PostgresDsn] = None
+    DATABASE_URL: PostgresDsn | None = None
+    DATABASE_RO_URL: PostgresDsn | None = None
 
     @field_validator("DATABASE_URL")
-    def assemble_db_connection(cls, v: Optional[str], info: ValidationInfo) -> Any:
+    def assemble_db_connection(cls, v: str | None, info: ValidationInfo) -> Any:
         if isinstance(v, str):
             return v
 
@@ -33,23 +33,21 @@ class Settings(BaseSettings):
         )
 
     model_config = SettingsConfigDict(
-        env_file=(
-            ".env.testing" if os.getenv("PYTHON_ENVIRONNEMENT") == "testing" else ".env"
-        )
+        env_file=(".env.testing" if os.getenv("PYTHON_ENVIRONNEMENT") == "testing" else ".env")
     )
 
 
 class SettingsReadOnly(BaseSettings):
     DB_HOST: str = "localhost"
-    DB_RO_HOST: Optional[str] = None
+    DB_RO_HOST: str | None = None
     DB_PORT: int = 5433
     DB_DATABASE: str = "main"
     DB_USERNAME: str = "main"
     DB_PASSWORD: str = "main"
-    DATABASE_RO_URL: Optional[PostgresDsn] = None
+    DATABASE_RO_URL: PostgresDsn | None = None
 
     @field_validator("DATABASE_RO_URL")
-    def assemble_db_connection(cls, v: Optional[str], info: ValidationInfo) -> Any:
+    def assemble_db_connection(cls, v: str | None, info: ValidationInfo) -> Any:
         if isinstance(v, str):
             return v
 
@@ -59,9 +57,7 @@ class SettingsReadOnly(BaseSettings):
         )
 
     model_config = SettingsConfigDict(
-        env_file=(
-            ".env.testing" if os.getenv("PYTHON_ENVIRONNEMENT") == "testing" else ".env"
-        ),
+        env_file=(".env.testing" if os.getenv("PYTHON_ENVIRONNEMENT") == "testing" else ".env"),
         extra="allow",
     )
 

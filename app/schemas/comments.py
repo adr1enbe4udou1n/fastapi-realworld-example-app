@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import Field
 
 from app.schemas.base import BaseModel
@@ -27,4 +25,4 @@ class SingleCommentResponse(BaseModel):
 
 
 class MultipleCommentsResponse(BaseModel):
-    comments: List[Comment]
+    comments: list[Comment]

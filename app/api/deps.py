@@ -1,4 +1,5 @@
-from typing import Annotated, Generator, Optional
+from collections.abc import Generator
+from typing import Annotated
 
 from fastapi import Depends, HTTPException, Request, Security, status
 from fastapi.security import APIKeyHeader
@@ -65,16 +66,14 @@ def _get_optional_authorization_header(request: Request) -> str:
     return ""
 
 
-def _get_current_user(
-    db: Session = Depends(_get_db), token: str = Depends(_get_authorization_header)
-) -> User:
+def _get_current_user(db: Session = Depends(_get_db), token: str = Depends(_get_authorization_header)) -> User:
     return _get_current_user_from_token(db, token)
 
 
 def _get_optional_current_user(
     db: Session = Depends(_get_db),
     token: str = Depends(_get_optional_authorization_header),
-) -> Optional[User]:
+) -> User | None:
     if token:
         return _get_current_user_from_token(db, token)
 
