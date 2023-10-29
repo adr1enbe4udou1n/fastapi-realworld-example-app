@@ -1,5 +1,3 @@
-from typing import Any
-
 from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash, verify_password
@@ -8,7 +6,7 @@ from app.schemas.users import NewUser, UpdateUser
 
 
 class UsersRepository:
-    def get(self, db: Session, id: Any) -> User | None:
+    def get(self, db: Session, id: int) -> User | None:
         return db.query(User).filter_by(id=id).first()
 
     def get_by_name(self, db: Session, *, name: str) -> User | None:

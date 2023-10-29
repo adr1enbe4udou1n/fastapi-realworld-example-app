@@ -37,7 +37,7 @@ def _get_current_user_from_token(db: Session, token: str) -> User:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = users.get(db, id=payload["sub"])
+    user = users.get(db, id=int(payload["sub"]))
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
