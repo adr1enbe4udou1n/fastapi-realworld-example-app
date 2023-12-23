@@ -67,7 +67,7 @@ def main() -> None:
 
     db.commit()
 
-    logger.info("Generate 500 articles with few comments")
+    logger.info("Generate 500 articles")
 
     tags = db.query(Tag).all()
 
@@ -92,15 +92,22 @@ def main() -> None:
             if user not in article.favorited_by:
                 article.favorited_by.append(user)
 
-        for _ in range(fake.random_int(min=0, max=10)):
-            article.comments.append(
-                Comment(
-                    body=fake.paragraph(),
-                    author=choice(users),
-                )
-            )
-
         db.add(article)
+    
+    db.commit()
+
+    logger.info("Generate 5000 comments")
+
+    articles = db.query(Article).all()
+
+    for _ in range(5000):
+        comment = Comment(
+            body=fake.paragraph(),
+            author=choice(users),
+            article=choice(articles)
+        )
+
+        db.add(comment)
 
     db.commit()
 
