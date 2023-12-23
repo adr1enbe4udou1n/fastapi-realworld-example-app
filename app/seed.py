@@ -93,7 +93,7 @@ def main() -> None:
                 article.favorited_by.append(user)
 
         db.add(article)
-    
+
     db.commit()
 
     logger.info("Generate 5000 comments")
@@ -101,11 +101,7 @@ def main() -> None:
     articles = db.query(Article).all()
 
     for _ in range(5000):
-        comment = Comment(
-            body=fake.paragraph(),
-            author=choice(users),
-            article=choice(articles)
-        )
+        comment = Comment(body=fake.paragraph(), author=choice(users), article=choice(articles))
 
         db.add(comment)
 
