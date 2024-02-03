@@ -8,12 +8,12 @@ from slugify import slugify
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
-from app.core.security import get_password_hash  # noqa
-from app.db.session import SessionLocal  # noqa
-from app.models.article import Article  # noqa
-from app.models.comment import Comment  # noqa
-from app.models.tag import Tag  # noqa
-from app.models.user import User  # noqa
+from app.core.security import get_password_hash
+from app.db.session import SessionLocal
+from app.models.article import Article
+from app.models.comment import Comment
+from app.models.tag import Tag
+from app.models.user import User
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
