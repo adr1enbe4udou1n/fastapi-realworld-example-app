@@ -14,7 +14,7 @@ tasks:
       - poetry run mypy app tests
   build:
     cmds:
-      - alembic upgrade head
+      - poetry run alembic upgrade head
       - poetry export --output requirements.txt
   test:
     cmds:
