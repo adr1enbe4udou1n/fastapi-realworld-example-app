@@ -18,4 +18,4 @@ tasks:
       - poetry export --output requirements.txt
   test:
     cmds:
-      - poetry run pytest --cov=app --cov-report=term --cov-report=xml
+      - poetry run pytest --cov --cov-report=term --cov-report=xml
