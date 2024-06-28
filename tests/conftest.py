@@ -10,13 +10,13 @@ from sqlalchemy.orm import Session, sessionmaker
 
 os.environ["PYTHON_ENVIRONNEMENT"] = "testing"
 
-from app.api.deps import _get_db, _get_db_ro  # noqa: E402
-from app.core.config import settings  # noqa: E402
-from app.core.security import create_access_token  # noqa: E402
-from app.db.base_class import Base  # noqa: E402
-from app.main import app  # noqa: E402
-from app.models.article import Article  # noqa: E402
-from app.models.user import User  # noqa: E402
+from app.api.deps import _get_db, _get_db_ro
+from app.core.config import settings
+from app.core.security import create_access_token
+from app.db.base_class import Base
+from app.main import app
+from app.models.article import Article
+from app.models.user import User
 
 engine = create_engine(settings.DATABASE_URL.__str__(), pool_pre_ping=True)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, future=True)
