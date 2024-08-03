@@ -1,0 +1,35 @@
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DB_HOST: ${{ vars.POSTGRESQL_HOST }}
+      DB_PORT: 5432
+      DB_DATABASE: conduit_fastapi_test
+      DB_USERNAME: test
+      DB_PASSWORD: test
+      JWT_SECRET_KEY: "super secret key"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - uses: https://gitea.okami101.io/okami101/actions/task@main
+      - uses: sonarsource/sonarqube-scan-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+      - uses: https://gitea.okami101.io/okami101/actions/docker@main
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
