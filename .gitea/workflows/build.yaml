@@ -8,13 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      DB_HOST: ${{ vars.POSTGRESQL_HOST }}
-      DB_PORT: 5432
-      DB_DATABASE: conduit_fastapi_test
-      DB_USERNAME: test
-      DB_PASSWORD: test
-      JWT_SECRET_KEY: "super secret key"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,6 +22,13 @@ jobs:
           path: .venv
           key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
       - uses: https://gitea.okami101.io/okami101/actions/task@main
+        env:
+          DB_HOST: ${{ vars.POSTGRESQL_HOST }}
+          DB_PORT: 5432
+          DB_DATABASE: conduit_fastapi_test
+          DB_USERNAME: test
+          DB_PASSWORD: test
+          JWT_SECRET_KEY: "super secret key"
       - uses: sonarsource/sonarqube-scan-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
