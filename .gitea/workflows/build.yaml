@@ -29,6 +29,11 @@ jobs:
           DB_USERNAME: test
           DB_PASSWORD: test
           JWT_SECRET_KEY: "super secret key"
+      - name: Cache sonar
+        uses: actions/cache@v4
+        with:
+          path: /opt/sonar-scanner/.sonar/cache
+          key: ${{ runner.os }}-sonar
       - uses: sonarsource/sonarqube-scan-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
