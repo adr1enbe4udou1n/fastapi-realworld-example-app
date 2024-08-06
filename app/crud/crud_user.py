@@ -39,7 +39,7 @@ class UsersRepository:
 
     def authenticate(self, db: Session, *, email: str, password: str) -> User | None:
         user = self.get_by_email(db, email=email)
-        if not user:
+        if not user or not user.password:
             return None
         if not verify_password(password, user.password):
             return None

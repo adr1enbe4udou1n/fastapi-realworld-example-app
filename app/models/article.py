@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
-from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base_class import Base
 from app.schemas.articles import Article as ArticleDto
@@ -44,14 +44,14 @@ article_favorite: Table = Table(
 class Article(Base):
     __tablename__ = "articles"
 
-    id: Mapped[int] = Column(Integer, primary_key=True, index=True)
-    author_id: Mapped[int] = Column(Integer, ForeignKey("users.id"), nullable=False)
-    title: Mapped[str] = Column(String, nullable=False)
-    slug: Mapped[str] = Column(String, unique=True, nullable=False, index=True)
-    description: Mapped[str] = Column(Text, nullable=False)
-    body: Mapped[str] = Column(Text, nullable=False)
-    created_at: Mapped[datetime] = Column(DateTime, default=datetime.now, nullable=False)
-    updated_at: Mapped[datetime] = Column(DateTime, default=datetime.now, nullable=False, onupdate=datetime.now)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    author_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    slug: Mapped[str] = mapped_column(String, unique=True, nullable=False, index=True)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False, onupdate=datetime.now)
 
     author: Mapped["User"] = relationship("User", back_populates="articles")
     comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="article", uselist=True)

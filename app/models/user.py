@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
-from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core import security
 from app.db.base_class import Base
@@ -36,14 +36,14 @@ follower_user = Table(
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = Column(Integer, primary_key=True, index=True)
-    name: Mapped[str] = Column(String, nullable=False)
-    email: Mapped[str] = Column(String, unique=True, index=True, nullable=False)
-    password: Mapped[str] = Column(String)
-    bio: Mapped[str] = Column(Text)
-    image: Mapped[str] = Column(String)
-    created_at = Column(DateTime, default=datetime.now, nullable=False)
-    updated_at = Column(DateTime, default=datetime.now, nullable=False, onupdate=datetime.now)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    email: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
+    password: Mapped[str | None] = mapped_column(String)
+    bio: Mapped[str | None] = mapped_column(Text)
+    image: Mapped[str | None] = mapped_column(String)
+    created_at = mapped_column(DateTime, default=datetime.now, nullable=False)
+    updated_at = mapped_column(DateTime, default=datetime.now, nullable=False, onupdate=datetime.now)
 
     followers: Mapped[list["User"]] = relationship(
         "User",

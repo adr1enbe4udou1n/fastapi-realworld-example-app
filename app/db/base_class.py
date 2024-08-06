@@ -1,8 +1,7 @@
 from typing import Any
 
-from sqlalchemy.orm import as_declarative
+from sqlalchemy.orm import DeclarativeBase
 
 
-@as_declarative()
-class Base:
+class Base(DeclarativeBase):
     id: Any

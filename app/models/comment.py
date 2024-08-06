@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, Text
-from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy import DateTime, ForeignKey, Integer, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base_class import Base
 from app.schemas.base import convert_datetime_to_realworld
@@ -16,12 +16,12 @@ if TYPE_CHECKING:
 class Comment(Base):
     __tablename__ = "comments"
 
-    id: Mapped[int] = Column(Integer, primary_key=True, index=True)
-    article_id: Mapped[int] = Column(Integer, ForeignKey("articles.id", ondelete="CASCADE"), nullable=False)
-    author_id: Mapped[int] = Column(Integer, ForeignKey("users.id"), nullable=False)
-    body: Mapped[str] = Column(Text, nullable=False)
-    created_at: Mapped[datetime] = Column(DateTime, default=datetime.now, nullable=False)
-    updated_at: Mapped[datetime] = Column(DateTime, default=datetime.now, nullable=False, onupdate=datetime.now)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    article_id: Mapped[int] = mapped_column(Integer, ForeignKey("articles.id", ondelete="CASCADE"), nullable=False)
+    author_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False, onupdate=datetime.now)
 
     article: Mapped["Article"] = relationship("Article", back_populates="comments")
     author: Mapped["User"] = relationship("User", back_populates="comments")
