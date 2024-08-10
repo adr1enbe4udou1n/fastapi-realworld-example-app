@@ -2,8 +2,6 @@
 
 FastAPI codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
 
-[![CI](https://concourse.okami101.io/api/v1/teams/main/pipelines/conduit-fastapi/badge)](https://concourse.okami101.io/teams/main/pipelines/conduit-fastapi)
-
 ## [RealWorld](https://github.com/gothinkster/realworld)
 
 This codebase was created to demonstrate a fully fledged fullstack application built with FastAPI including CRUD operations, authentication, routing, pagination, and more. Using the very last SQL Alchemy 2.0 !
