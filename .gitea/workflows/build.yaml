@@ -1,11 +1,14 @@
 on:
   push:
+    branches:
+      - main
     tags:
       - "v*"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: ${{ !startsWith(gitea.ref, 'refs/tags/v') }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -37,6 +40,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
       - uses: https://gitea.okami101.io/okami101/actions/docker@main
-        if: startsWith(github.ref, 'refs/tags/v')
         with:
           password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
+
+  deploy:
+    uses: https://gitea.okami101.io/okami101/actions/.gitea/workflows/release.yaml@main
+    secrets:
+      password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
