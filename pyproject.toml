@@ -27,7 +27,7 @@ mypy = "^1.11.0"
 pytest = "^8.0.0"
 pytest-cov = "^5.0.0"
 types-python-slugify = "^8.0.0"
-ruff = "^0.5.0"
+ruff = "^0.6.0"
 
 [build-system]
 requires = ["poetry-core"]
