@@ -42,8 +42,5 @@ jobs:
       - uses: https://gitea.okami101.io/okami101/actions/docker@main
         with:
           password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
-
-  deploy:
-    uses: https://gitea.okami101.io/okami101/actions/.gitea/workflows/release.yaml@main
-    secrets:
-      password: ${{ secrets.CONTAINER_REGISTRY_PASSWORD }}
+          gitea-token: ${{ secrets.RELEASE_TOKEN }}
+          release: true
