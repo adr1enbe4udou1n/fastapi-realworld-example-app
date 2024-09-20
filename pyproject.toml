@@ -8,7 +8,7 @@ packages = [{ include = "app" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.114.0"
+fastapi = "^0.115.0"
 uvicorn = { extras = ["standard"], version = "^0.30.0" }
 python-jose = { extras = ["cryptography"], version = "^3.3.0" }
 passlib = { extras = ["bcrypt"], version = "^1.7.4" }
@@ -20,7 +20,7 @@ httpx = "^0.27.0"
 sqlalchemy = { version = "^2.0.7" }
 pydantic-settings = "^2.0.1"
 psycopg = { extras = ["binary", "pool"], version = "^3.1.12" }
-faker = "^28.0.0"
+faker = "^29.0.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.11.0"
