@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-python@v5
         id: setup-python
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - uses: snok/install-poetry@v1
         with:
           virtualenvs-path: .venv
