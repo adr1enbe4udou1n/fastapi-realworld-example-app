@@ -25,7 +25,7 @@ faker = "^30.0.0"
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.11.0"
 pytest = "^8.0.0"
-pytest-cov = "^5.0.0"
+pytest-cov = "^6.0.0"
 types-python-slugify = "^8.0.0"
 ruff = "^0.7.0"
 
