@@ -24,7 +24,10 @@ jobs:
         id: setup-python
         with:
           python-version: "3.13"
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          prune-cache: false
       - uses: https://gitea.okami101.io/okami101/actions/task@main
         env:
           DB_HOST: postgres
