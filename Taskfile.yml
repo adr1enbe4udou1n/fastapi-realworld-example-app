@@ -3,16 +3,16 @@ version: "3"
 tasks:
   install:
     cmds:
-      - poetry install
+      - uv sync
   lint:
     cmds:
-      - poetry run ruff check app tests alembic
-      - poetry run ruff format --check app tests alembic
-      - poetry run mypy app tests
+      - uv run ruff check app tests alembic
+      - uv run ruff format --check app tests alembic
+      - uv run mypy app tests
   build:
     cmds:
-      - poetry run alembic upgrade head
-      - poetry export --output requirements.txt
+      - uv run alembic upgrade head
+      - uv export --output requirements.txt
   test:
     cmds:
-      - poetry run pytest --cov --cov-report=term --cov-report=xml
+      - uv run pytest --cov --cov-report=term --cov-report=xml

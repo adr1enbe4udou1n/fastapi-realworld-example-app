@@ -23,8 +23,8 @@ Two databases will spin up, one for normal development and one dedicated for int
 ### Run app
 
 ```sh
-poetry install # install dependencies
-poetry shell # active virtualenv
+uv sync # install dependencies
+uv venv # active virtualenv
 cp .env.example .env # access for above container
 make migrate # alembic migration
 make seed # fake data with faker

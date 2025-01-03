@@ -24,13 +24,9 @@ jobs:
         id: setup-python
         with:
           python-version: "3.13"
-      - uses: snok/install-poetry@v1
+      - uses: astral-sh/setup-uv@v5
         with:
-          virtualenvs-path: .venv
-      - uses: actions/cache@v4
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          enable-cache: true
       - uses: https://gitea.okami101.io/okami101/actions/task@main
         env:
           DB_HOST: postgres
