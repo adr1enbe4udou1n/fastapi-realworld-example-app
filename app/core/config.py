@@ -28,8 +28,8 @@ class Settings(BaseSettings):
             return v
 
         return PostgresDsn(
-            f"""postgresql+psycopg://{info.data['DB_USERNAME']}:{info.data['DB_PASSWORD']}@
-{info.data['DB_HOST']}:{info.data['DB_PORT']}/{info.data['DB_DATABASE']}"""
+            f"""postgresql+psycopg://{info.data["DB_USERNAME"]}:{info.data["DB_PASSWORD"]}@
+{info.data["DB_HOST"]}:{info.data["DB_PORT"]}/{info.data["DB_DATABASE"]}"""
         )
 
     model_config = SettingsConfigDict(
@@ -52,8 +52,8 @@ class SettingsReadOnly(BaseSettings):
             return v
 
         return PostgresDsn(
-            f"""postgresql+psycopg://{info.data['DB_USERNAME']}:{info.data['DB_PASSWORD']}@
-{info.data['DB_HOST'] or info.data['DB_RO_HOST']}:{info.data['DB_PORT']}/{info.data['DB_DATABASE']}"""
+            f"""postgresql+psycopg://{info.data["DB_USERNAME"]}:{info.data["DB_PASSWORD"]}@
+{info.data["DB_HOST"] or info.data["DB_RO_HOST"]}:{info.data["DB_PORT"]}/{info.data["DB_DATABASE"]}"""
         )
 
     model_config = SettingsConfigDict(
