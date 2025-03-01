@@ -31,6 +31,7 @@ async def test_cannot_delete_non_existent_comment(client: TestClient, db: AsyncS
 
 
 async def test_cannot_delete_comment_of_other_author(client: TestClient, db: AsyncSession) -> None:
+    await acting_as_john(db, client)
     jane = await create_jane_user(db)
 
     db_obj = generate_article(jane)
@@ -40,7 +41,6 @@ async def test_cannot_delete_comment_of_other_author(client: TestClient, db: Asy
     await db.commit()
     await db.refresh(comment)
 
-    await acting_as_john(db, client)
     r = client.delete(f"/api/articles/test-title/comments/{comment.id}")
     assert r.status_code == status.HTTP_400_BAD_REQUEST
 
