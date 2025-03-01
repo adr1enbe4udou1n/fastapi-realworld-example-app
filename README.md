@@ -26,9 +26,9 @@ Two databases will spin up, one for normal development and one dedicated for int
 uv sync # install dependencies
 uv venv # active virtualenv
 cp .env.example .env # access for above container
-make migrate # alembic migration
-make seed # fake data with faker
-make run # run uvicorn
+uv run alembic upgrade head # alembic migration
+uv run app/seed.py # fake data with faker
+uv run uvicorn app.main:app --reload # run uvicorn
 ```
 
 And that's all, go to <http://localhost:8000/docs>
