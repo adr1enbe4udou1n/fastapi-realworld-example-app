@@ -71,10 +71,10 @@ class User(Base):
             token=security.create_access_token(self.id),
         )
 
-    def profile(self, user: Optional["User"] = None) -> ProfileDto:
+    async def profile(self, user: Optional["User"] = None) -> ProfileDto:
         return ProfileDto(
             username=self.name,
             bio=self.bio,
             image=self.image,
-            following=user is not None and self.followers.__contains__(user),
+            following=user is not None and (await self.awaitable_attrs.followers).__contains__(user),
         )

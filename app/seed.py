@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import sys
@@ -5,6 +6,7 @@ from random import choice
 
 from faker import Faker
 from slugify import slugify
+from sqlalchemy import delete, select
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
@@ -19,14 +21,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def main() -> None:
+async def main() -> None:
     db = SessionLocal()
 
     logger.info("Cleanup")
-    db.query(Tag).delete()
-    db.query(Comment).delete()
-    db.query(Article).delete()
-    db.query(User).delete()
+    await db.execute(delete(Tag))
+    await db.execute(delete(Comment))
+    await db.execute(delete(Article))
+    await db.execute(delete(User))
 
     fake = Faker()
 
@@ -45,17 +47,17 @@ def main() -> None:
         )
         db.add(user)
 
-    db.commit()
+    await db.commit()
 
-    users = db.query(User).all()
+    users = (await db.scalars(select(User))).all()
 
     for user in users:
         for _ in range(fake.random_int(min=0, max=3)):
             follower = choice(users)
-            if follower not in user.followers:
-                user.followers.append(follower)
+            if follower not in await user.awaitable_attrs.followers:
+                (await user.awaitable_attrs.followers).append(follower)
 
-    db.commit()
+    await db.commit()
 
     logger.info("Generate 30 tags")
 
@@ -65,11 +67,11 @@ def main() -> None:
         )
         db.add(tag)
 
-    db.commit()
+    await db.commit()
 
     logger.info("Generate 500 articles")
 
-    tags = db.query(Tag).all()
+    tags = (await db.scalars(select(Tag))).all()
 
     for _ in range(500):
         title = " ".join(fake.words(nb=3))
@@ -94,19 +96,19 @@ def main() -> None:
 
         db.add(article)
 
-    db.commit()
+    await db.commit()
 
     logger.info("Generate 5000 comments")
 
-    articles = db.query(Article).all()
+    articles = (await db.scalars(select(Article))).all()
 
     for _ in range(5000):
         comment = Comment(body=fake.paragraph(), author=choice(users), article=choice(articles))
 
         db.add(comment)
 
-    db.commit()
+    await db.commit()
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

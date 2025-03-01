@@ -1,15 +1,15 @@
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from app.models.tag import Tag
 
 
-def test_can_list_all_tags(client: TestClient, db: Session) -> None:
+async def test_can_list_all_tags(client: TestClient, db: AsyncSession) -> None:
     db.add(Tag(name="Tag 3"))
     db.add(Tag(name="Tag 2"))
     db.add(Tag(name="Tag 1"))
-    db.commit()
+    await db.commit()
 
     r = client.get("/api/tags")
 

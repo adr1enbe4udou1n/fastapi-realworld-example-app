@@ -63,7 +63,7 @@ class Article(Base):
         uselist=True,
     )
 
-    def schema(self, user: Optional["User"] = None) -> ArticleDto:
+    async def schema(self, user: Optional["User"] = None) -> ArticleDto:
         tags = [tag.name for tag in self.tags]
         tags.sort()
 
@@ -75,7 +75,7 @@ class Article(Base):
             created_at=convert_datetime_to_realworld(self.created_at),
             updated_at=convert_datetime_to_realworld(self.updated_at),
             tag_list=tags,
-            author=self.author.profile(user),
+            author=await self.author.profile(user),
             favorited=user is not None and self.favorited_by.__contains__(user),
             favorites_count=len(self.favorited_by),
         )
