@@ -32,5 +32,5 @@ class Comment(Base):
             body=self.body,
             created_at=convert_datetime_to_realworld(self.created_at),
             updated_at=convert_datetime_to_realworld(self.updated_at),
-            author=await self.author.profile(user),
+            author=await (await self.awaitable_attrs.author).profile(user),
         )
