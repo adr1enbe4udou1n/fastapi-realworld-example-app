@@ -49,11 +49,11 @@ async def test_can_unfollow_profile(client: TestClient, db: AsyncSession) -> Non
     john = await create_john_user(db)
     jane = await create_jane_user(db)
 
+    acting_as_user(jane, client)
+
     (await john.awaitable_attrs.followers).append(jane)
     await db.merge(john)
     await db.commit()
-
-    acting_as_user(jane, client)
 
     r = client.delete("/api/profiles/John Doe/follow")
 
