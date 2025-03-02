@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Path
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import (
     CurrentUser,
@@ -14,11 +14,11 @@ from app.schemas.profiles import ProfileResponse
 router = APIRouter()
 
 
-def _get_profile_from_username(
-    db: Session,
+async def _get_profile_from_username(
+    db: AsyncSession,
     username: str,
 ) -> User:
-    db_user = users.get_by_name(db, name=username)
+    db_user = await users.get_by_name(db, name=username)
     if not db_user:
         raise HTTPException(status_code=404, detail="No user found")
     return db_user
@@ -31,13 +31,13 @@ def _get_profile_from_username(
     description="Get a profile of a user of the system. Auth is optional",
     response_model=ProfileResponse,
 )
-def get(
+async def get(
     current_user: OptionalCurrentUser,
     db: DatabaseRoSession,
     username: str = Path(..., description="Username of the profile to get"),
 ) -> ProfileResponse:
-    user = _get_profile_from_username(db, username)
-    return ProfileResponse(profile=user.profile(current_user))
+    user = await _get_profile_from_username(db, username)
+    return ProfileResponse(profile=await user.profile(current_user))
 
 
 @router.post(
@@ -47,14 +47,14 @@ def get(
     description="Follow a user by username",
     response_model=ProfileResponse,
 )
-def follow(
+async def follow(
     current_user: CurrentUser,
     db: DatabaseSession,
     username: str = Path(..., description="Username of the profile you want to follow"),
 ) -> ProfileResponse:
-    user = _get_profile_from_username(db, username)
-    users.follow(db, db_obj=user, follower=current_user)
-    return ProfileResponse(profile=user.profile(current_user))
+    user = await _get_profile_from_username(db, username)
+    await users.follow(db, db_obj=user, follower=current_user)
+    return ProfileResponse(profile=await user.profile(current_user))
 
 
 @router.delete(
@@ -64,11 +64,11 @@ def follow(
     description="Unfollow a user by username",
     response_model=ProfileResponse,
 )
-def unfollow(
+async def unfollow(
     current_user: CurrentUser,
     db: DatabaseSession,
     username: str = Path(..., description="Username of the profile you want to unfollow"),
 ) -> ProfileResponse:
-    user = _get_profile_from_username(db, username)
-    users.follow(db, db_obj=user, follower=current_user, follow=False)
-    return ProfileResponse(profile=user.profile(current_user))
+    user = await _get_profile_from_username(db, username)
+    await users.follow(db, db_obj=user, follower=current_user, follow=False)
+    return ProfileResponse(profile=await user.profile(current_user))

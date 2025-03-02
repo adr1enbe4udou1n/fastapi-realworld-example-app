@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from app.models.comment import Comment
@@ -11,14 +11,14 @@ def test_cannot_list_all_comments_of_non_existent_article(client: TestClient) ->
     assert r.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_can_list_all_comments_of_article(client: TestClient, db: Session) -> None:
-    john = create_john_user(db)
+async def test_can_list_all_comments_of_article(client: TestClient, db: AsyncSession) -> None:
+    john = await create_john_user(db)
 
     db_obj = generate_article(john)
     for i in range(1, 6):
         db_obj.comments.append(Comment(body=f"Comment {i}", author=john))
     db.add(db_obj)
-    db.commit()
+    await db.commit()
 
     r = client.get("/api/articles/test-title/comments")
     assert r.status_code == status.HTTP_200_OK
