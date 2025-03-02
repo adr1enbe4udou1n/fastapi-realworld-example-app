@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from app.crud.crud_user import users
@@ -23,25 +23,27 @@ def test_guest_user_cannot_update_infos(client: TestClient) -> None:
         },
     ),
 )
-def test_user_cannot_update_infos_with_invalid_data(client: TestClient, db: Session, data: dict[str, str]) -> None:
-    acting_as_john(db, client)
+async def test_user_cannot_update_infos_with_invalid_data(
+    client: TestClient, db: AsyncSession, data: dict[str, str]
+) -> None:
+    await acting_as_john(db, client)
 
     r = client.put("/api/user", json={"user": data})
 
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-def test_user_cannot_update_with_already_used_email(client: TestClient, db: Session) -> None:
-    create_jane_user(db)
-    acting_as_john(db, client)
+async def test_user_cannot_update_with_already_used_email(client: TestClient, db: AsyncSession) -> None:
+    await create_jane_user(db)
+    await acting_as_john(db, client)
 
     r = client.put("/api/user", json={"user": {"email": "jane.doe@example.com"}})
 
     assert r.status_code == status.HTTP_400_BAD_REQUEST
 
 
-def test_user_can_update_infos(client: TestClient, db: Session) -> None:
-    acting_as_john(db, client)
+async def test_user_can_update_infos(client: TestClient, db: AsyncSession) -> None:
+    await acting_as_john(db, client)
 
     r = client.put(
         "/api/user",
@@ -63,5 +65,5 @@ def test_user_can_update_infos(client: TestClient, db: Session) -> None:
         "image": "https://randomuser.me/api/portraits/men/2.jpg",
     }.items() <= r.json()["user"].items()
 
-    db_user = users.get_by_email(db, email="jane.doe@example.com")
+    db_user = await users.get_by_email(db, email="jane.doe@example.com")
     assert db_user

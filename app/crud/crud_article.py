@@ -1,7 +1,10 @@
+from collections.abc import Sequence
 from typing import Any
 
 from slugify import slugify
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import desc
 
 from app.models.article import Article
@@ -11,23 +14,23 @@ from app.schemas.articles import NewArticle, UpdateArticle
 
 
 class ArticlesRepository:
-    def get(self, db: Session, id: Any) -> Article | None:
-        return db.query(Article).filter_by(id=id).first()
+    async def get(self, db: AsyncSession, id: Any) -> Article | None:
+        return await db.scalar(select(Article).filter_by(id=id))
 
-    def get_by_slug(self, db: Session, *, slug: str) -> Article | None:
-        return db.query(Article).filter_by(slug=slug).first()
+    async def get_by_slug(self, db: AsyncSession, *, slug: str) -> Article | None:
+        return await db.scalar(select(Article).filter_by(slug=slug))
 
-    def get_list(
+    async def get_list(
         self,
-        db: Session,
+        db: AsyncSession,
         limit: int,
         offset: int,
         *,
         author: str | None = None,
         tag: str | None = None,
         favorited: str | None = None,
-    ) -> tuple[list[Article], int]:
-        query = db.query(Article).options(
+    ) -> tuple[Sequence[Article], int]:
+        query = select(Article).options(
             joinedload(Article.author),
             joinedload(Article.tags),
             joinedload(Article.favorited_by),
@@ -40,14 +43,17 @@ class ArticlesRepository:
         if favorited:
             query = query.filter(Article.favorited_by.any(User.name.ilike(f"%{favorited}%")))
 
+        query_list = query.order_by(desc(Article.id)).limit(limit).offset(offset)
+        query_count = select(func.count()).select_from(query.subquery())
+
         return (
-            query.order_by(desc(Article.id)).limit(limit).offset(offset).all(),
-            query.count(),
+            (await db.scalars(query_list)).unique().all(),
+            await db.scalar(query_count) or 0,
         )
 
-    def get_feed(self, db: Session, limit: int, offset: int, *, user: User) -> tuple[list[Article], int]:
+    async def get_feed(self, db: AsyncSession, limit: int, offset: int, *, user: User) -> tuple[Sequence[Article], int]:
         query = (
-            db.query(Article)
+            select(Article)
             .options(
                 joinedload(Article.author),
                 joinedload(Article.tags),
@@ -56,12 +62,15 @@ class ArticlesRepository:
             .filter(Article.author.has(User.followers.any(id=user.id)))
         )
 
+        query_list = query.order_by(desc(Article.id)).limit(limit).offset(offset)
+        query_count = select(func.count()).select_from(query.subquery())
+
         return (
-            query.order_by(desc(Article.id)).limit(limit).offset(offset).all(),
-            query.count(),
+            (await db.scalars(query_list)).unique().all(),
+            await db.scalar(query_count) or 0,
         )
 
-    def create(self, db: Session, *, obj_in: NewArticle, author: User) -> Article:
+    async def create(self, db: AsyncSession, *, obj_in: NewArticle, author: User) -> Article:
         db_obj = Article(
             title=obj_in.title,
             description=obj_in.description,
@@ -71,35 +80,35 @@ class ArticlesRepository:
         )
 
         for tag in obj_in.tag_list:
-            db_obj.tags.append(db.query(Tag).filter_by(name=tag).first() or Tag(name=tag))
+            db_obj.tags.append(await db.scalar(select(Tag).filter_by(name=tag)) or Tag(name=tag))
 
         db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
+        await db.commit()
+        await db.refresh(db_obj)
         return db_obj
 
-    def update(self, db: Session, *, db_obj: Article, obj_in: UpdateArticle) -> Article:
+    async def update(self, db: AsyncSession, *, db_obj: Article, obj_in: UpdateArticle) -> Article:
         db_obj.title = obj_in.title or db_obj.title
         db_obj.description = obj_in.description or db_obj.description
         db_obj.body = obj_in.body or db_obj.body
 
         db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
+        await db.commit()
+        await db.refresh(db_obj)
         return db_obj
 
-    def delete(self, db: Session, *, db_obj: Article) -> None:
-        db.delete(db_obj)
-        db.commit()
+    async def delete(self, db: AsyncSession, *, db_obj: Article) -> None:
+        await db.delete(db_obj)
+        await db.commit()
 
-    def favorite(self, db: Session, *, db_obj: Article, user: User, favorite: bool = True) -> None:
+    async def favorite(self, db: AsyncSession, *, db_obj: Article, user: User, favorite: bool = True) -> None:
         if favorite:
-            db_obj.favorited_by.append(user)
+            (await db_obj.awaitable_attrs.favorited_by).append(user)
         else:
-            db_obj.favorited_by.remove(user)
+            (await db_obj.awaitable_attrs.favorited_by).remove(user)
 
-        db.merge(db_obj)
-        db.commit()
+        await db.commit()
+        await db.refresh(db_obj)
 
 
 articles = ArticlesRepository()

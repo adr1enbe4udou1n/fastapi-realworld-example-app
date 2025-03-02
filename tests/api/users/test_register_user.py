@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from app.crud.crud_user import users
@@ -41,8 +41,8 @@ def test_cannot_register_with_invalid_data(client: TestClient, data: dict[str, s
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-def test_cannot_register_twice(client: TestClient, db: Session) -> None:
-    create_john_user(db)
+async def test_cannot_register_twice(client: TestClient, db: AsyncSession) -> None:
+    await create_john_user(db)
 
     r = client.post(
         "/api/users",
@@ -58,7 +58,7 @@ def test_cannot_register_twice(client: TestClient, db: Session) -> None:
     assert r.status_code == status.HTTP_400_BAD_REQUEST
 
 
-def test_can_register(client: TestClient, db: Session) -> None:
+async def test_can_register(client: TestClient, db: AsyncSession) -> None:
     r = client.post(
         "/api/users",
         json={
@@ -72,5 +72,5 @@ def test_can_register(client: TestClient, db: Session) -> None:
 
     assert r.status_code == status.HTTP_200_OK
 
-    db_user = users.get_by_email(db, email="john.doe@example.com")
+    db_user = await users.get_by_email(db, email="john.doe@example.com")
     assert db_user

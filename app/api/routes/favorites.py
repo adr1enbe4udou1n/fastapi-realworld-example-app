@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Path
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import CurrentUser, DatabaseSession
 from app.crud.crud_article import articles
@@ -9,11 +9,11 @@ from app.schemas.articles import SingleArticleResponse
 router = APIRouter()
 
 
-def _get_article_from_slug(
-    db: Session,
+async def _get_article_from_slug(
+    db: AsyncSession,
     slug: str,
 ) -> Article:
-    db_article = articles.get_by_slug(db, slug=slug)
+    db_article = await articles.get_by_slug(db, slug=slug)
     if not db_article:
         raise HTTPException(status_code=404, detail="No article found")
     return db_article
@@ -26,14 +26,14 @@ def _get_article_from_slug(
     description="Favorite an article. Auth is required",
     response_model=SingleArticleResponse,
 )
-def favorite(
+async def favorite(
     db: DatabaseSession,
     current_user: CurrentUser,
     slug: str = Path(..., title="Slug of the article that you want to favorite"),
 ) -> SingleArticleResponse:
-    article = _get_article_from_slug(db, slug)
-    articles.favorite(db, db_obj=article, user=current_user)
-    return SingleArticleResponse(article=article.schema(current_user))
+    article = await _get_article_from_slug(db, slug)
+    await articles.favorite(db, db_obj=article, user=current_user)
+    return SingleArticleResponse(article=await article.schema(current_user))
 
 
 @router.delete(
@@ -43,11 +43,11 @@ def favorite(
     description="Unfavorite an article. Auth is required",
     response_model=SingleArticleResponse,
 )
-def unfavorite(
+async def unfavorite(
     db: DatabaseSession,
     current_user: CurrentUser,
     slug: str = Path(..., title="Slug of the article that you want to unfavorite"),
 ) -> SingleArticleResponse:
-    article = _get_article_from_slug(db, slug)
-    articles.favorite(db, db_obj=article, user=current_user, favorite=False)
-    return SingleArticleResponse(article=article.schema(current_user))
+    article = await _get_article_from_slug(db, slug)
+    await articles.favorite(db, db_obj=article, user=current_user, favorite=False)
+    return SingleArticleResponse(article=await article.schema(current_user))
