@@ -101,12 +101,12 @@ class ArticlesRepository:
 
     async def favorite(self, db: AsyncSession, *, db_obj: Article, user: User, favorite: bool = True) -> None:
         if favorite:
-            (await db_obj.awaitable_attrs.favorited_by).append(user)
+            db_obj.favorited_by.append(user)
         else:
-            (await db_obj.awaitable_attrs.favorited_by).remove(user)
+            db_obj.favorited_by.remove(user)
 
+        await db.merge(db_obj)
         await db.commit()
-        await db.refresh(db_obj)
 
 
 articles = ArticlesRepository()
