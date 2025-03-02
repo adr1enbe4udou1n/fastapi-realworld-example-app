@@ -14,4 +14,4 @@ COPY alembic.ini ./
 EXPOSE 8000
 
 CMD alembic upgrade head && \
-    uvicorn --host=0.0.0.0 app.main:app --no-access-log
+    uvicorn --host=0.0.0.0  --workers ${UVICORN_WORKERS:-1} app.main:app --no-access-log
