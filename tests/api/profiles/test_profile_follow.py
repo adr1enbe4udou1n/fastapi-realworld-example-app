@@ -1,6 +1,5 @@
 from fastapi.testclient import TestClient
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from starlette import status
 
 from app.models.user import follower_user
@@ -12,25 +11,25 @@ from tests.conftest import (
 )
 
 
-async def test_cannot_follow_profile(client: TestClient, db: AsyncSession) -> None:
-    await create_john_user(db)
+def test_cannot_follow_profile(client: TestClient, db: Session) -> None:
+    create_john_user(db)
 
     r = client.post("/api/profiles/John Doe/follow")
 
     assert r.status_code == status.HTTP_403_FORBIDDEN
 
 
-async def test_cannot_follow_non_existent_profile(client: TestClient, db: AsyncSession) -> None:
-    await acting_as_jane(db, client)
+def test_cannot_follow_non_existent_profile(client: TestClient, db: Session) -> None:
+    acting_as_jane(db, client)
 
     r = client.post("/api/profiles/John Doe/follow")
 
     assert r.status_code == status.HTTP_404_NOT_FOUND
 
 
-async def test_can_follow_profile(client: TestClient, db: AsyncSession) -> None:
-    await create_john_user(db)
-    await acting_as_jane(db, client)
+def test_can_follow_profile(client: TestClient, db: Session) -> None:
+    create_john_user(db)
+    acting_as_jane(db, client)
 
     r = client.post("/api/profiles/John Doe/follow")
 
@@ -42,16 +41,16 @@ async def test_can_follow_profile(client: TestClient, db: AsyncSession) -> None:
         "following": True,
     }
 
-    assert (await db.scalar(select(follower_user))) is not None
+    assert db.query(follower_user).count() == 1
 
 
-async def test_can_unfollow_profile(client: TestClient, db: AsyncSession) -> None:
-    john = await create_john_user(db)
-    jane = await create_jane_user(db)
+def test_can_unfollow_profile(client: TestClient, db: Session) -> None:
+    john = create_john_user(db)
+    jane = create_jane_user(db)
 
-    (await john.awaitable_attrs.followers).append(jane)
-    await db.merge(john)
-    await db.commit()
+    john.followers.append(jane)
+    db.merge(john)
+    db.commit()
 
     acting_as_user(jane, client)
 
@@ -65,4 +64,4 @@ async def test_can_unfollow_profile(client: TestClient, db: AsyncSession) -> Non
         "following": False,
     }
 
-    assert (await db.scalar(select(follower_user))) is None
+    assert db.query(follower_user).count() == 0

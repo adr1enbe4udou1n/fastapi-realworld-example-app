@@ -30,7 +30,6 @@ dev = [
     "pytest-cov<7.0.0,>=6.0.0",
     "types-python-slugify<9.0.0,>=8.0.0",
     "ruff<1.0.0,>=0.8.0",
-    "pytest-asyncio>=0.25.3",
 ]
 
 [tool.ruff]
@@ -41,7 +40,3 @@ lint.extend-select = ["UP", "RUF", "I"]
 [tool.mypy]
 ignore_missing_imports = true
 disallow_untyped_defs = true
-
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-asyncio_default_fixture_loop_scope = "function"

@@ -1,6 +1,5 @@
 from fastapi.testclient import TestClient
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from starlette import status
 
 from app.models.article import Article
@@ -12,8 +11,8 @@ def test_guest_cannot_update_article(client: TestClient) -> None:
     assert r.status_code == status.HTTP_403_FORBIDDEN
 
 
-async def test_cannot_update_non_existant_article(client: TestClient, db: AsyncSession) -> None:
-    await acting_as_john(db, client)
+def test_cannot_update_non_existant_article(client: TestClient, db: Session) -> None:
+    acting_as_john(db, client)
     r = client.put(
         "/api/articles/test-title",
         json={
@@ -25,24 +24,24 @@ async def test_cannot_update_non_existant_article(client: TestClient, db: AsyncS
     assert r.status_code == status.HTTP_404_NOT_FOUND
 
 
-async def test_cannot_update_article_of_other_author(client: TestClient, db: AsyncSession) -> None:
-    jane = await create_jane_user(db)
+def test_cannot_update_article_of_other_author(client: TestClient, db: Session) -> None:
+    jane = create_jane_user(db)
 
     db_obj = generate_article(jane)
     db.add(db_obj)
-    await db.commit()
+    db.commit()
 
-    await acting_as_john(db, client)
+    acting_as_john(db, client)
     r = client.put("/api/articles/test-title", json={"article": {"title": "New Title"}})
     assert r.status_code == status.HTTP_400_BAD_REQUEST
 
 
-async def test_can_update_own_article(client: TestClient, db: AsyncSession) -> None:
-    john = await acting_as_john(db, client)
+def test_can_update_own_article(client: TestClient, db: Session) -> None:
+    john = acting_as_john(db, client)
 
     db_obj = generate_article(john)
     db.add(db_obj)
-    await db.commit()
+    db.commit()
 
     r = client.put(
         "/api/articles/test-title",
@@ -54,4 +53,4 @@ async def test_can_update_own_article(client: TestClient, db: AsyncSession) -> N
     )
     assert r.status_code == status.HTTP_200_OK
     assert r.json()["article"]["title"] == "New Title"
-    assert await db.scalar(select(Article).filter_by(title="New Title")) is not None
+    assert db.query(Article).filter_by(title="New Title").count() == 1

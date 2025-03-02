@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Body, HTTPException, Path, Query
 from slugify import slugify
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.api.deps import (
     CurrentUser,
@@ -22,11 +22,11 @@ router = APIRouter()
 max_limit: int = 20
 
 
-async def _get_article_from_slug(
-    db: AsyncSession,
+def _get_article_from_slug(
+    db: Session,
     slug: str,
 ) -> Article:
-    db_article = await articles.get_by_slug(db, slug=slug)
+    db_article = articles.get_by_slug(db, slug=slug)
     if not db_article:
         raise HTTPException(status_code=404, detail="No article found")
     return db_article
@@ -39,7 +39,7 @@ async def _get_article_from_slug(
     description="Get most recent articles globally. Use query parameters to filter results. Auth is optional",
     response_model=MultipleArticlesResponse,
 )
-async def get_list(
+def get_list(
     db: DatabaseRoSession,
     current_user: OptionalCurrentUser,
     limit: int = Query(max_limit, title="Limit number of articles returned (default is 20)"),
@@ -48,7 +48,7 @@ async def get_list(
     tag: str = Query(None, title="Filter by tag"),
     favorited: str = Query(None, title="Filter by favorites of a user (username)"),
 ) -> MultipleArticlesResponse:
-    result, count = await articles.get_list(
+    result, count = articles.get_list(
         db,
         min(limit, max_limit),
         offset,
@@ -57,7 +57,7 @@ async def get_list(
         tag=tag,
     )
     return MultipleArticlesResponse(
-        articles=[await article.schema(current_user) for article in result],
+        articles=[article.schema(current_user) for article in result],
         articles_count=count,
     )
 
@@ -69,15 +69,15 @@ async def get_list(
     description="Get most recent articles from users you follow. Use query parameters to limit. Auth is required",
     response_model=MultipleArticlesResponse,
 )
-async def get_feed(
+def get_feed(
     db: DatabaseRoSession,
     current_user: CurrentUser,
     limit: int = Query(20, title="Limit number of articles returned (default is 20)"),
     offset: int = Query(0, title="Offset/skip number of articles (default is 0)"),
 ) -> MultipleArticlesResponse:
-    result, count = await articles.get_feed(db, min(limit, max_limit), offset, user=current_user)
+    result, count = articles.get_feed(db, min(limit, max_limit), offset, user=current_user)
     return MultipleArticlesResponse(
-        articles=[await article.schema(current_user) for article in result],
+        articles=[article.schema(current_user) for article in result],
         articles_count=count,
     )
 
@@ -89,17 +89,17 @@ async def get_feed(
     description="Create an article. Auth is required",
     response_model=SingleArticleResponse,
 )
-async def create(
+def create(
     db: DatabaseSession,
     current_user: CurrentUser,
     new_article: NewArticleRequest = Body(...),
 ) -> SingleArticleResponse:
-    existing_article = await articles.get_by_slug(db, slug=slugify(new_article.article.title))
+    existing_article = articles.get_by_slug(db, slug=slugify(new_article.article.title))
     if existing_article:
         raise HTTPException(status_code=400, detail="Article with this title already exists")
 
-    article = await articles.create(db, obj_in=new_article.article, author=current_user)
-    return SingleArticleResponse(article=await article.schema(current_user))
+    article = articles.create(db, obj_in=new_article.article, author=current_user)
+    return SingleArticleResponse(article=article.schema(current_user))
 
 
 @router.get(
@@ -109,13 +109,13 @@ async def create(
     description="Get an article. Auth not required",
     response_model=SingleArticleResponse,
 )
-async def get(
+def get(
     db: DatabaseRoSession,
     current_user: OptionalCurrentUser,
     slug: str = Path(..., title="Slug of the article to get"),
 ) -> SingleArticleResponse:
-    article = await _get_article_from_slug(db, slug)
-    return SingleArticleResponse(article=await article.schema(current_user))
+    article = _get_article_from_slug(db, slug)
+    return SingleArticleResponse(article=article.schema(current_user))
 
 
 @router.put(
@@ -125,18 +125,18 @@ async def get(
     description="Update an article. Auth is required",
     response_model=SingleArticleResponse,
 )
-async def update(
+def update(
     db: DatabaseSession,
     current_user: CurrentUser,
     slug: str = Path(..., title="Slug of the article to update"),
     update_article: UpdateArticleRequest = Body(...),
 ) -> SingleArticleResponse:
-    article = await _get_article_from_slug(db, slug)
+    article = _get_article_from_slug(db, slug)
 
     if article.author != current_user:
         raise HTTPException(status_code=400, detail="You are not the author of this article")
-    article = await articles.update(db, db_obj=article, obj_in=update_article.article)
-    return SingleArticleResponse(article=await article.schema(current_user))
+    article = articles.update(db, db_obj=article, obj_in=update_article.article)
+    return SingleArticleResponse(article=article.schema(current_user))
 
 
 @router.delete(
@@ -145,13 +145,13 @@ async def update(
     summary="Delete an article",
     description="Delete an article. Auth is required",
 )
-async def delete(
+def delete(
     db: DatabaseSession,
     current_user: CurrentUser,
     slug: str = Path(..., title="Slug of the article to delete"),
 ) -> None:
-    article = await _get_article_from_slug(db, slug)
+    article = _get_article_from_slug(db, slug)
 
     if article.author != current_user:
         raise HTTPException(status_code=400, detail="You are not the author of this article")
-    await articles.delete(db, db_obj=article)
+    articles.delete(db, db_obj=article)

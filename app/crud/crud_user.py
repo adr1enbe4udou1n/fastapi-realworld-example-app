@@ -1,5 +1,4 @@
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.core.security import get_password_hash, verify_password
 from app.models.user import User
@@ -7,53 +6,53 @@ from app.schemas.users import NewUser, UpdateUser
 
 
 class UsersRepository:
-    async def get(self, db: AsyncSession, id: int) -> User | None:
-        return await db.scalar(select(User).filter_by(id=id))
+    def get(self, db: Session, id: int) -> User | None:
+        return db.query(User).filter_by(id=id).first()
 
-    async def get_by_name(self, db: AsyncSession, *, name: str) -> User | None:
-        return await db.scalar(select(User).filter_by(name=name))
+    def get_by_name(self, db: Session, *, name: str) -> User | None:
+        return db.query(User).filter_by(name=name).first()
 
-    async def get_by_email(self, db: AsyncSession, *, email: str) -> User | None:
-        return await db.scalar(select(User).filter_by(email=email))
+    def get_by_email(self, db: Session, *, email: str) -> User | None:
+        return db.query(User).filter_by(email=email).first()
 
-    async def create(self, db: AsyncSession, *, obj_in: NewUser) -> User:
+    def create(self, db: Session, *, obj_in: NewUser) -> User:
         db_obj = User(
             name=obj_in.username,
             email=obj_in.email,
             password=get_password_hash(obj_in.password),
         )
         db.add(db_obj)
-        await db.commit()
-        await db.refresh(db_obj)
+        db.commit()
+        db.refresh(db_obj)
         return db_obj
 
-    async def update(self, db: AsyncSession, *, db_obj: User, obj_in: UpdateUser) -> User:
+    def update(self, db: Session, *, db_obj: User, obj_in: UpdateUser) -> User:
         db_obj.name = obj_in.username or db_obj.name
         db_obj.email = obj_in.email or db_obj.email
         db_obj.bio = obj_in.bio or db_obj.bio
         db_obj.image = obj_in.image or db_obj.image
 
         db.add(db_obj)
-        await db.commit()
-        await db.refresh(db_obj)
+        db.commit()
+        db.refresh(db_obj)
         return db_obj
 
-    async def authenticate(self, db: AsyncSession, *, email: str, password: str) -> User | None:
-        user = await self.get_by_email(db, email=email)
+    def authenticate(self, db: Session, *, email: str, password: str) -> User | None:
+        user = self.get_by_email(db, email=email)
         if not user or not user.password:
             return None
         if not verify_password(password, user.password):
             return None
         return user
 
-    async def follow(self, db: AsyncSession, *, db_obj: User, follower: User, follow: bool = True) -> None:
+    def follow(self, db: Session, *, db_obj: User, follower: User, follow: bool = True) -> None:
         if follow:
-            (await db_obj.awaitable_attrs.followers).append(follower)
+            db_obj.followers.append(follower)
         else:
-            (await db_obj.awaitable_attrs.followers).remove(follower)
+            db_obj.followers.remove(follower)
 
-        await db.merge(db_obj)
-        await db.commit()
+        db.merge(db_obj)
+        db.commit()
 
 
 users = UsersRepository()

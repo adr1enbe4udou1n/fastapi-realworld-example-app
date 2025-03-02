@@ -1,9 +1,6 @@
-from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.expression import desc
 
 from app.models.article import Article
@@ -13,33 +10,32 @@ from app.schemas.comments import NewComment
 
 
 class CommentsRepository:
-    async def get(self, db: AsyncSession, id: Any) -> Comment | None:
-        return await db.scalar(select(Comment).filter_by(id=id))
+    def get(self, db: Session, id: Any) -> Comment | None:
+        return db.query(Comment).filter_by(id=id).first()
 
-    async def get_list(self, db: AsyncSession, article: Article) -> Sequence[Comment]:
+    def get_list(self, db: Session, article: Article) -> list[Comment]:
         return (
-            await db.scalars(
-                select(Comment)
-                .options(joinedload(Comment.author))
-                .filter_by(article=article)
-                .order_by(desc(Comment.id))
-            )
-        ).all()
+            db.query(Comment)
+            .options(joinedload(Comment.author))
+            .filter_by(article=article)
+            .order_by(desc(Comment.id))
+            .all()
+        )
 
-    async def create(self, db: AsyncSession, *, obj_in: NewComment, article: Article, author: User) -> Comment:
+    def create(self, db: Session, *, obj_in: NewComment, article: Article, author: User) -> Comment:
         db_obj = Comment(
             article=article,
             author=author,
             body=obj_in.body,
         )
         db.add(db_obj)
-        await db.commit()
-        await db.refresh(db_obj)
+        db.commit()
+        db.refresh(db_obj)
         return db_obj
 
-    async def delete(self, db: AsyncSession, *, db_obj: Comment) -> None:
-        await db.delete(db_obj)
-        await db.commit()
+    def delete(self, db: Session, *, db_obj: Comment) -> None:
+        db.delete(db_obj)
+        db.commit()
 
 
 comments = CommentsRepository()

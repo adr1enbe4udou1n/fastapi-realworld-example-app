@@ -1,7 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from starlette import status
 
 from app.models.article import Article
@@ -34,20 +33,18 @@ def test_guest_cannot_create_article(client: TestClient) -> None:
         },
     ),
 )
-async def test_cannot_create_article_with_invalid_data(
-    client: TestClient, db: AsyncSession, data: dict[str, str]
-) -> None:
-    await acting_as_john(db, client)
+def test_cannot_create_article_with_invalid_data(client: TestClient, db: Session, data: dict[str, str]) -> None:
+    acting_as_john(db, client)
     r = client.post("/api/articles", json={"article": data})
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-async def test_cannot_create_article_with_same_title(client: TestClient, db: AsyncSession) -> None:
-    john = await acting_as_john(db, client)
+def test_cannot_create_article_with_same_title(client: TestClient, db: Session) -> None:
+    john = acting_as_john(db, client)
 
     db_obj = generate_article(john)
     db.add(db_obj)
-    await db.commit()
+    db.commit()
 
     r = client.post(
         "/api/articles",
@@ -62,11 +59,11 @@ async def test_cannot_create_article_with_same_title(client: TestClient, db: Asy
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-async def test_can_create_article(client: TestClient, db: AsyncSession) -> None:
+def test_can_create_article(client: TestClient, db: Session) -> None:
     db.add(Tag(name="Existing Tag"))
-    await db.commit()
+    db.commit()
 
-    await acting_as_john(db, client)
+    acting_as_john(db, client)
 
     r = client.post(
         "/api/articles",
@@ -95,5 +92,5 @@ async def test_can_create_article(client: TestClient, db: AsyncSession) -> None:
         "favorited": False,
         "favoritesCount": 0,
     }.items() <= r.json()["article"].items()
-    assert await db.scalar(select(Article).filter_by(slug="test-title")) is not None
-    assert len((await db.scalars(select(Tag))).all()) == 3
+    assert db.query(Article).filter_by(slug="test-title").count() == 1
+    assert db.query(Tag).count() == 3
