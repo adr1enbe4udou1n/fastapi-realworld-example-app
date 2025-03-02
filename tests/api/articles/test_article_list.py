@@ -5,7 +5,7 @@ from starlette import status
 from app.models.article import Article
 from app.models.tag import Tag
 from app.models.user import User
-from tests.conftest import acting_as_user, create_jane_user, create_john_user
+from tests.conftest import acting_as_user
 
 
 async def generate_articles(db: AsyncSession) -> User:
@@ -14,8 +14,18 @@ async def generate_articles(db: AsyncSession) -> User:
     johnTag = Tag(name="John Tag")
     janeTag = Tag(name="Jane Tag")
 
-    john = await create_john_user(db)
-    jane = await create_jane_user(db)
+    john = User(
+        name="John Doe",
+        email="john.doe@example.com",
+        bio="John Bio",
+        image="https://randomuser.me/api/portraits/men/1.jpg",
+    )
+    jane = User(
+        name="Jane Doe",
+        email="jane.doe@example.com",
+        bio="Jane Bio",
+        image="https://randomuser.me/api/portraits/women/1.jpg",
+    )
 
     (await jane.awaitable_attrs.followers).append(john)
 
@@ -58,15 +68,12 @@ async def generate_articles(db: AsyncSession) -> User:
         db.add(article)
 
     await db.commit()
-    await db.refresh(john)
     return john
 
 
 async def test_can_paginate_articles(client: TestClient, db: AsyncSession) -> None:
     await generate_articles(db)
-
     r = client.get("/api/articles?limit=10&offset=20")
-
     assert r.status_code == status.HTTP_200_OK
     assert len(r.json()["articles"]) == 10
     assert r.json()["articlesCount"] == 50
@@ -89,9 +96,7 @@ async def test_can_paginate_articles(client: TestClient, db: AsyncSession) -> No
 
 async def test_can_filter_articles_by_author(client: TestClient, db: AsyncSession) -> None:
     await generate_articles(db)
-
     r = client.get("/api/articles?limit=10&offset=0&author=john")
-
     assert r.status_code == status.HTTP_200_OK
     assert len(r.json()["articles"]) == 10
     assert r.json()["articlesCount"] == 30
@@ -114,9 +119,7 @@ async def test_can_filter_articles_by_author(client: TestClient, db: AsyncSessio
 
 async def test_can_filter_articles_by_tag(client: TestClient, db: AsyncSession) -> None:
     await generate_articles(db)
-
     r = client.get("/api/articles?limit=10&offset=0&tag=jane")
-
     assert r.status_code == status.HTTP_200_OK
     assert len(r.json()["articles"]) == 10
     assert r.json()["articlesCount"] == 20
@@ -142,7 +145,6 @@ async def test_can_filter_articles_by_favorited(client: TestClient, db: AsyncSes
     acting_as_user(john, client)
 
     r = client.get("/api/articles?limit=10&offset=0&favorited=john")
-
     assert r.status_code == status.HTTP_200_OK
     assert len(r.json()["articles"]) == 5
     assert r.json()["articlesCount"] == 5
