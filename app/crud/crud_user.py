@@ -52,8 +52,8 @@ class UsersRepository:
         else:
             (await db_obj.awaitable_attrs.followers).remove(follower)
 
+        await db.merge(db_obj)
         await db.commit()
-        await db.refresh(db_obj)
 
 
 users = UsersRepository()
