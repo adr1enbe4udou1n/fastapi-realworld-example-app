@@ -48,7 +48,7 @@ async def get_list(
 ) -> MultipleCommentsResponse:
     article = await _get_article_from_slug(slug)
     return MultipleCommentsResponse(
-        comments=[await comment.schema(current_user) for comment in await comments.get_list(article=article)]
+        comments=[comment.schema(current_user) for comment in await comments.get_list(article=article)]
     )
 
 
@@ -66,7 +66,7 @@ async def create(
 ) -> SingleCommentResponse:
     article = await _get_article_from_slug(slug)
     comment = await comments.create(obj_in=new_comment.comment, article=article, author=current_user)
-    return SingleCommentResponse(comment=await comment.schema(current_user))
+    return SingleCommentResponse(comment=comment.schema(current_user))
 
 
 @router.delete(
@@ -83,10 +83,10 @@ async def delete(
     article = await _get_article_from_slug(slug)
     comment = await _get_comment_from_id(comment_id)
 
-    if await comment.awaitable_attrs.article != article:
+    if comment.article != article:
         raise HTTPException(status_code=400, detail="Comment does not belong to this article")
 
-    if await comment.awaitable_attrs.author != current_user and await article.awaitable_attrs.author != current_user:
+    if comment.author != current_user and article.author != current_user:
         raise HTTPException(status_code=400, detail="Comment does not belong to this user")
 
     await comments.delete(db_obj=comment)

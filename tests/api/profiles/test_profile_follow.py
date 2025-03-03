@@ -51,7 +51,7 @@ async def test_can_unfollow_profile(client: TestClient, db: AsyncSession) -> Non
 
     acting_as_user(jane, client)
 
-    (await john.awaitable_attrs.followers).append(jane)
+    john.followers.append(jane)
     await db.merge(john)
     await db.commit()
 

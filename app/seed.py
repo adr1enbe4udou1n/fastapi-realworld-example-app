@@ -54,8 +54,8 @@ async def main() -> None:
     for user in users:
         for _ in range(fake.random_int(min=0, max=3)):
             follower = choice(users)
-            if follower not in await user.awaitable_attrs.followers:
-                (await user.awaitable_attrs.followers).append(follower)
+            if follower not in user.followers:
+                user.followers.append(follower)
 
     await db.commit()
 

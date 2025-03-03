@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from app.core.security import get_password_hash, verify_password
 from app.db.session import SessionLocal, SessionLocalRo
@@ -13,7 +14,7 @@ class UsersRepository:
 
     async def get_by_name(self, *, name: str) -> User | None:
         async with SessionLocalRo() as db:
-            return await db.scalar(select(User).filter_by(name=name))
+            return await db.scalar(select(User).options(joinedload(User.followers)).filter_by(name=name))
 
     async def get_by_email(self, *, email: str) -> User | None:
         async with SessionLocalRo() as db:
@@ -54,9 +55,9 @@ class UsersRepository:
     async def follow(self, *, db_obj: User, follower: User, follow: bool = True) -> None:
         async with SessionLocal() as db:
             if follow:
-                (await db_obj.awaitable_attrs.followers).append(follower)
+                db_obj.followers.append(follower)
             else:
-                (await db_obj.awaitable_attrs.followers).remove(follower)
+                db_obj.followers.remove(follower)
 
             await db.commit()
             await db.refresh(db_obj)

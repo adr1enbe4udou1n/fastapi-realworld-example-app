@@ -30,7 +30,7 @@ async def favorite(
 ) -> SingleArticleResponse:
     article = await _get_article_from_slug(slug)
     await articles.favorite(db_obj=article, user=current_user)
-    return SingleArticleResponse(article=await article.schema(current_user))
+    return SingleArticleResponse(article=article.schema(current_user))
 
 
 @router.delete(
@@ -46,4 +46,4 @@ async def unfavorite(
 ) -> SingleArticleResponse:
     article = await _get_article_from_slug(slug)
     await articles.favorite(db_obj=article, user=current_user, favorite=False)
-    return SingleArticleResponse(article=await article.schema(current_user))
+    return SingleArticleResponse(article=article.schema(current_user))

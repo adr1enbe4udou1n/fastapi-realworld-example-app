@@ -111,9 +111,9 @@ class ArticlesRepository:
     async def favorite(self, *, db_obj: Article, user: User, favorite: bool = True) -> None:
         async with SessionLocal() as db:
             if favorite:
-                (await db_obj.awaitable_attrs.favorited_by).append(user)
+                db_obj.favorited_by.append(user)
             else:
-                (await db_obj.awaitable_attrs.favorited_by).remove(user)
+                db_obj.favorited_by.remove(user)
 
             await db.commit()
             await db.refresh(db_obj)

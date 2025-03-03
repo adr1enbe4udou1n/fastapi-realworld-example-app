@@ -17,7 +17,7 @@ async def generate_articles(db: AsyncSession) -> User:
     john = await create_john_user(db)
     jane = await create_jane_user(db)
 
-    (await jane.awaitable_attrs.followers).append(john)
+    jane.followers.append(john)
 
     john_favorited_articles = [
         "jane-article-1",

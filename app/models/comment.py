@@ -26,11 +26,11 @@ class Comment(Base):
     article: Mapped["Article"] = relationship("Article", back_populates="comments")
     author: Mapped["User"] = relationship("User", back_populates="comments")
 
-    async def schema(self, user: Optional["User"] = None) -> CommentDto:
+    def schema(self, user: Optional["User"] = None) -> CommentDto:
         return CommentDto(
             id=self.id,
             body=self.body,
             created_at=convert_datetime_to_realworld(self.created_at),
             updated_at=convert_datetime_to_realworld(self.updated_at),
-            author=await (await self.awaitable_attrs.author).profile(user),
+            author=self.author.profile(user),
         )

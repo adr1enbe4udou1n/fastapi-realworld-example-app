@@ -51,7 +51,7 @@ async def get_list(
         tag=tag,
     )
     return MultipleArticlesResponse(
-        articles=[await article.schema(current_user) for article in result],
+        articles=[article.schema(current_user) for article in result],
         articles_count=count,
     )
 
@@ -70,7 +70,7 @@ async def get_feed(
 ) -> MultipleArticlesResponse:
     result, count = await articles.get_feed(min(limit, max_limit), offset, user=current_user)
     return MultipleArticlesResponse(
-        articles=[await article.schema(current_user) for article in result],
+        articles=[article.schema(current_user) for article in result],
         articles_count=count,
     )
 
@@ -91,7 +91,7 @@ async def create(
         raise HTTPException(status_code=400, detail="Article with this title already exists")
 
     article = await articles.create(obj_in=new_article.article, author=current_user)
-    return SingleArticleResponse(article=await article.schema(current_user))
+    return SingleArticleResponse(article=article.schema(current_user))
 
 
 @router.get(
@@ -106,7 +106,7 @@ async def get(
     slug: str = Path(..., title="Slug of the article to get"),
 ) -> SingleArticleResponse:
     article = await _get_article_from_slug(slug)
-    return SingleArticleResponse(article=await article.schema(current_user))
+    return SingleArticleResponse(article=article.schema(current_user))
 
 
 @router.put(
@@ -123,10 +123,10 @@ async def update(
 ) -> SingleArticleResponse:
     article = await _get_article_from_slug(slug)
 
-    if await article.awaitable_attrs.author != current_user:
+    if article.author != current_user:
         raise HTTPException(status_code=400, detail="You are not the author of this article")
     article = await articles.update(db_obj=article, obj_in=update_article.article)
-    return SingleArticleResponse(article=await article.schema(current_user))
+    return SingleArticleResponse(article=article.schema(current_user))
 
 
 @router.delete(
@@ -141,6 +141,6 @@ async def delete(
 ) -> None:
     article = await _get_article_from_slug(slug)
 
-    if await article.awaitable_attrs.author != current_user:
+    if article.author != current_user:
         raise HTTPException(status_code=400, detail="You are not the author of this article")
     await articles.delete(db_obj=article)

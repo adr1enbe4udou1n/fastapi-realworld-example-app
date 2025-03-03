@@ -32,7 +32,7 @@ async def get(
     username: str = Path(..., description="Username of the profile to get"),
 ) -> ProfileResponse:
     user = await _get_profile_from_username(username)
-    return ProfileResponse(profile=await user.profile(current_user))
+    return ProfileResponse(profile=user.profile(current_user))
 
 
 @router.post(
@@ -48,7 +48,7 @@ async def follow(
 ) -> ProfileResponse:
     user = await _get_profile_from_username(username)
     await users.follow(db_obj=user, follower=current_user)
-    return ProfileResponse(profile=await user.profile(current_user))
+    return ProfileResponse(profile=user.profile(current_user))
 
 
 @router.delete(
@@ -64,4 +64,4 @@ async def unfollow(
 ) -> ProfileResponse:
     user = await _get_profile_from_username(username)
     await users.follow(db_obj=user, follower=current_user, follow=False)
-    return ProfileResponse(profile=await user.profile(current_user))
+    return ProfileResponse(profile=user.profile(current_user))

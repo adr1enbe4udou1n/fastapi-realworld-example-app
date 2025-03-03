@@ -32,7 +32,7 @@ async def test_can_get_followed_profile(client: TestClient, db: AsyncSession) ->
 
     acting_as_user(jane, client)
 
-    (await john.awaitable_attrs.followers).append(jane)
+    john.followers.append(jane)
     await db.merge(john)
     await db.commit()
 
