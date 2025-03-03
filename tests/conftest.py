@@ -46,15 +46,8 @@ async def db() -> AsyncGenerator:
 
 
 @pytest.fixture()
-async def client(db: AsyncSession) -> AsyncGenerator:
-    async def override_get_db() -> AsyncGenerator:
-        yield db
-
-    app.dependency_overrides[_get_db] = override_get_db
-    app.dependency_overrides[_get_db_ro] = override_get_db
+async def client() -> AsyncGenerator:
     yield TestClient(app)
-    del app.dependency_overrides[_get_db]
-    del app.dependency_overrides[_get_db_ro]
 
 
 async def create_john_user(db: AsyncSession) -> User:

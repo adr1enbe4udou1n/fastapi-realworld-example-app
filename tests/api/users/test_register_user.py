@@ -72,5 +72,5 @@ async def test_can_register(client: TestClient, db: AsyncSession) -> None:
 
     assert r.status_code == status.HTTP_200_OK
 
-    db_user = await users.get_by_email(db, email="john.doe@example.com")
+    db_user = await users.get_by_email(email="john.doe@example.com")
     assert db_user

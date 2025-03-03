@@ -65,5 +65,5 @@ async def test_user_can_update_infos(client: TestClient, db: AsyncSession) -> No
         "image": "https://randomuser.me/api/portraits/men/2.jpg",
     }.items() <= r.json()["user"].items()
 
-    db_user = await users.get_by_email(db, email="jane.doe@example.com")
+    db_user = await users.get_by_email(email="jane.doe@example.com")
     assert db_user
