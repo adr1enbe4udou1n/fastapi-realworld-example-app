@@ -17,11 +17,27 @@ from app.schemas.articles import NewArticle, UpdateArticle
 class ArticlesRepository:
     async def get(self, id: Any) -> Article | None:
         async with SessionLocalRo() as db:
-            return await db.scalar(select(Article).filter_by(id=id))
+            return await db.scalar(
+                select(Article)
+                .options(
+                    joinedload(Article.tags),
+                    joinedload(Article.author).joinedload(User.followers),
+                    joinedload(Article.favorited_by),
+                )
+                .filter_by(id=id)
+            )
 
     async def get_by_slug(self, *, slug: str) -> Article | None:
         async with SessionLocalRo() as db:
-            return await db.scalar(select(Article).filter_by(slug=slug))
+            return await db.scalar(
+                select(Article)
+                .options(
+                    joinedload(Article.tags),
+                    joinedload(Article.author).joinedload(User.followers),
+                    joinedload(Article.favorited_by),
+                )
+                .filter_by(slug=slug)
+            )
 
     async def get_list(
         self,
@@ -90,7 +106,8 @@ class ArticlesRepository:
             db.add(db_obj)
             await db.commit()
             await db.refresh(db_obj)
-            return db_obj
+
+        return await self.get(db_obj.id) or db_obj
 
     async def update(self, *, db_obj: Article, obj_in: UpdateArticle) -> Article:
         async with SessionLocal() as db:
@@ -101,7 +118,8 @@ class ArticlesRepository:
             db.add(db_obj)
             await db.commit()
             await db.refresh(db_obj)
-            return db_obj
+
+        return await self.get(db_obj.id) or db_obj
 
     async def delete(self, *, db_obj: Article) -> None:
         async with SessionLocal() as db:
@@ -113,10 +131,10 @@ class ArticlesRepository:
             if favorite:
                 db_obj.favorited_by.append(user)
             else:
-                db_obj.favorited_by.remove(user)
+                db_obj.favorited_by = [fav_user for fav_user in db_obj.favorited_by if fav_user.id != user.id]
 
+            await db.merge(db_obj)
             await db.commit()
-            await db.refresh(db_obj)
 
 
 articles = ArticlesRepository()

@@ -123,7 +123,7 @@ async def update(
 ) -> SingleArticleResponse:
     article = await _get_article_from_slug(slug)
 
-    if article.author != current_user:
+    if article.author.id != current_user.id:
         raise HTTPException(status_code=400, detail="You are not the author of this article")
     article = await articles.update(db_obj=article, obj_in=update_article.article)
     return SingleArticleResponse(article=article.schema(current_user))
@@ -141,6 +141,6 @@ async def delete(
 ) -> None:
     article = await _get_article_from_slug(slug)
 
-    if article.author != current_user:
+    if article.author.id != current_user.id:
         raise HTTPException(status_code=400, detail="You are not the author of this article")
     await articles.delete(db_obj=article)
