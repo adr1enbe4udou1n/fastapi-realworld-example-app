@@ -38,11 +38,9 @@ async def db() -> AsyncGenerator:
         await db.execute(delete(Comment))
         await db.execute(delete(Article))
         await db.execute(delete(User))
+        await db.commit()
 
         yield db
-
-        await db.rollback()
-        await db.close()
 
 
 @pytest.fixture()
