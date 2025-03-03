@@ -34,13 +34,13 @@ asyncio.run(init_db())
 @pytest.fixture()
 async def db() -> AsyncGenerator:
     async with TestingSessionLocal() as db:
+        yield db
+
         await db.execute(delete(Tag))
         await db.execute(delete(Comment))
         await db.execute(delete(Article))
         await db.execute(delete(User))
         await db.commit()
-
-        yield db
 
 
 @pytest.fixture()
