@@ -1,4 +1,3 @@
-import asyncio
 from collections.abc import Sequence
 from typing import Any
 
@@ -47,9 +46,10 @@ class ArticlesRepository:
         query_list = query.order_by(desc(Article.id)).limit(limit).offset(offset)
         query_count = select(func.count()).select_from(query.subquery())
 
-        articles, count = await asyncio.gather(db.scalars(query_list), db.scalar(query_count))
-
-        return articles.unique().all(), count or 0
+        return (
+            (await db.scalars(query_list)).unique().all(),
+            await db.scalar(query_count) or 0,
+        )
 
     async def get_feed(self, db: AsyncSession, limit: int, offset: int, *, user: User) -> tuple[Sequence[Article], int]:
         query = (
@@ -65,9 +65,10 @@ class ArticlesRepository:
         query_list = query.order_by(desc(Article.id)).limit(limit).offset(offset)
         query_count = select(func.count()).select_from(query.subquery())
 
-        articles, count = await asyncio.gather(db.scalars(query_list), db.scalar(query_count))
-
-        return articles.unique().all(), count or 0
+        return (
+            (await db.scalars(query_list)).unique().all(),
+            await db.scalar(query_count) or 0,
+        )
 
     async def create(self, db: AsyncSession, *, obj_in: NewArticle, author: User) -> Article:
         db_obj = Article(
