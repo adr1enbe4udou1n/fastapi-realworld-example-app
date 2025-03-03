@@ -12,7 +12,6 @@ from app.models.tag import Tag
 
 os.environ["PYTHON_ENVIRONNEMENT"] = "testing"
 
-from app.api.deps import _get_db, _get_db_ro
 from app.core.config import settings
 from app.core.security import create_access_token
 from app.db.base_class import Base

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Body, HTTPException
 
-from app.api.deps import CurrentUser, DatabaseSession
+from app.api.deps import CurrentUser
 from app.crud.crud_user import users
 from app.schemas.users import UpdateUserRequest, UserResponse
 
@@ -28,13 +28,12 @@ async def current(
     response_model=UserResponse,
 )
 async def update(
-    db: DatabaseSession,
     current_user: CurrentUser,
     update_user: UpdateUserRequest = Body(...),
 ) -> UserResponse:
-    db_user = await users.get_by_email(db, email=str(update_user.user.email))
+    db_user = await users.get_by_email(email=str(update_user.user.email))
     if db_user and db_user != current_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    db_user = await users.update(db, db_obj=current_user, obj_in=update_user.user)
+    db_user = await users.update(db_obj=current_user, obj_in=update_user.user)
     return UserResponse(user=db_user.schema())

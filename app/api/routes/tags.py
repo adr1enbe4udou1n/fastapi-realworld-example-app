@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from sqlalchemy import select
 
-from app.api.deps import DatabaseRoSession
+from app.db.session import SessionLocalRo
 from app.models.tag import Tag
 from app.schemas.tags import TagsResponse
 
@@ -15,8 +15,7 @@ router = APIRouter()
     description="Get tags. Auth not required",
     response_model=TagsResponse,
 )
-async def get_list(
-    db: DatabaseRoSession,
-) -> TagsResponse:
-    tags = await db.scalars(select(Tag).order_by(Tag.name))
-    return TagsResponse(tags=[tag.name for tag in tags])
+async def get_list() -> TagsResponse:
+    async with SessionLocalRo() as db:
+        tags = await db.scalars(select(Tag).order_by(Tag.name))
+        return TagsResponse(tags=[tag.name for tag in tags])
