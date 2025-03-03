@@ -59,6 +59,7 @@ async def generate_articles(db: AsyncSession) -> User:
 
     await db.commit()
     await db.refresh(john)
+    await db.close()
     return john
 
 

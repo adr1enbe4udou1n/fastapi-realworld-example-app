@@ -49,7 +49,7 @@ class ArticlesRepository:
         favorited: str | None = None,
     ) -> tuple[Sequence[Article], int]:
         query = select(Article).options(
-            joinedload(Article.author),
+            joinedload(Article.author).joinedload(User.followers),
             joinedload(Article.tags),
             joinedload(Article.favorited_by),
         )
@@ -74,7 +74,7 @@ class ArticlesRepository:
         query = (
             select(Article)
             .options(
-                joinedload(Article.author),
+                joinedload(Article.author).joinedload(User.followers),
                 joinedload(Article.tags),
                 joinedload(Article.favorited_by),
             )

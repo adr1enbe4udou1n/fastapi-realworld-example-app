@@ -57,7 +57,7 @@ class UsersRepository:
             if follow:
                 db_obj.followers.append(follower)
             else:
-                db_obj.followers.remove(follower)
+                db_obj.followers = [user for user in db_obj.followers if user.id != follower.id]
 
             await db.merge(db_obj)
             await db.commit()

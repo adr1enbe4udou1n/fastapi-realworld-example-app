@@ -57,7 +57,8 @@ async def create_john_user(db: AsyncSession) -> User:
     )
     db.add(db_obj)
     await db.commit()
-    await db.refresh(db_obj)
+    await db.refresh(db_obj, ["followers"])
+    await db.close()
     return db_obj
 
 
@@ -70,7 +71,8 @@ async def create_jane_user(db: AsyncSession) -> User:
     )
     db.add(db_obj)
     await db.commit()
-    await db.refresh(db_obj)
+    await db.refresh(db_obj, ["followers"])
+    await db.close()
     return db_obj
 
 

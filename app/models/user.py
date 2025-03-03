@@ -76,5 +76,5 @@ class User(Base):
             username=self.name,
             bio=self.bio,
             image=self.image,
-            following=user is not None and self.followers.__contains__(user),
+            following=user is not None and any(follower.id == user.id for follower in self.followers),
         )
