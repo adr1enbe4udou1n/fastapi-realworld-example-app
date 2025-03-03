@@ -1,9 +1,7 @@
-from fastapi import APIRouter, Body, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Body, HTTPException
 
-from app.api.deps import _get_current_user, _get_db
+from app.api.deps import CurrentUser, DatabaseSession
 from app.crud.crud_user import users
-from app.models.user import User
 from app.schemas.users import UpdateUserRequest, UserResponse
 
 router = APIRouter()
@@ -17,7 +15,7 @@ router = APIRouter()
     response_model=UserResponse,
 )
 async def current(
-    current_user: User = Depends(_get_current_user),
+    current_user: CurrentUser,
 ) -> UserResponse:
     return UserResponse(user=current_user.schema())
 
@@ -30,8 +28,8 @@ async def current(
     response_model=UserResponse,
 )
 async def update(
-    db: AsyncSession = Depends(_get_db),
-    current_user: User = Depends(_get_current_user),
+    db: DatabaseSession,
+    current_user: CurrentUser,
     update_user: UpdateUserRequest = Body(...),
 ) -> UserResponse:
     db_user = await users.get_by_email(db, email=str(update_user.user.email))
