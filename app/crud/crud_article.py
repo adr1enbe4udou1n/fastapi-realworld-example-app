@@ -108,6 +108,7 @@ class ArticlesRepository:
         return await self.get(db_obj.id) or db_obj
 
     async def update(self, *, db_obj: Article, obj_in: UpdateArticle) -> Article:
+        db_obj = await self.db.merge(db_obj)
         db_obj.title = obj_in.title or db_obj.title
         db_obj.description = obj_in.description or db_obj.description
         db_obj.body = obj_in.body or db_obj.body
@@ -116,9 +117,10 @@ class ArticlesRepository:
         await self.db.commit()
         await self.db.refresh(db_obj)
 
-        return await self.get(db_obj.id) or db_obj
+        return db_obj
 
     async def delete(self, *, db_obj: Article) -> None:
+        db_obj = await self.db.merge(db_obj)
         await self.db.delete(db_obj)
         await self.db.commit()
 

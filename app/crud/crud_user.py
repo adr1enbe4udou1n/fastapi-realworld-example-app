@@ -33,6 +33,8 @@ class UsersRepository:
         return db_obj
 
     async def update(self, *, db_obj: User, obj_in: UpdateUser) -> User:
+        db_obj = await self.db.merge(db_obj)
+
         db_obj.name = obj_in.username or db_obj.name
         db_obj.email = obj_in.email or db_obj.email
         db_obj.bio = obj_in.bio or db_obj.bio
@@ -41,6 +43,7 @@ class UsersRepository:
         self.db.add(db_obj)
         await self.db.commit()
         await self.db.refresh(db_obj)
+
         return db_obj
 
     async def authenticate(self, *, email: str, password: str) -> User | None:

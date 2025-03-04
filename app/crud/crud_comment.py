@@ -48,5 +48,6 @@ class CommentsRepository:
         return comment or db_obj
 
     async def delete(self, *, db_obj: Comment) -> None:
+        db_obj = await self.db.merge(db_obj)
         await self.db.delete(db_obj)
         await self.db.commit()
