@@ -10,7 +10,7 @@ from sqlalchemy import delete, select
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import selectinload
 
 from app.core.security import get_password_hash
 from app.db.session import SessionLocal
@@ -51,7 +51,7 @@ async def main() -> None:
 
     await db.commit()
 
-    users = (await db.scalars(select(User).options(joinedload(User.followers)))).unique().all()
+    users = (await db.scalars(select(User).options(selectinload(User.followers)))).unique().all()
 
     for user in users:
         for _ in range(fake.random_int(min=0, max=3)):
