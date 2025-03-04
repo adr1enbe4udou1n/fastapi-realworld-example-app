@@ -1,9 +1,10 @@
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from app.crud.crud_user import users
+from app.models.user import User
 from tests.conftest import create_john_user
 
 
@@ -71,6 +72,4 @@ async def test_can_register(client: TestClient, db: AsyncSession) -> None:
     )
 
     assert r.status_code == status.HTTP_200_OK
-
-    db_user = await users.get_by_email(email="john.doe@example.com")
-    assert db_user
+    assert (await db.scalar(select(User).filter_by(email="john.doe@example.com"))) is not None

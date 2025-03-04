@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path
 
 from app.api.deps import (
     CurrentUser,
     OptionalCurrentUser,
+    get_users_service,
 )
-from app.crud.crud_user import users
+from app.crud.crud_user import UsersRepository
 from app.models.user import User
 from app.schemas.profiles import ProfileResponse
 
@@ -13,6 +14,7 @@ router = APIRouter()
 
 async def _get_profile_from_username(
     username: str,
+    users: UsersRepository,
 ) -> User:
     db_user = await users.get_by_name(name=username)
     if not db_user:
@@ -30,8 +32,9 @@ async def _get_profile_from_username(
 async def get(
     current_user: OptionalCurrentUser,
     username: str = Path(..., description="Username of the profile to get"),
+    users: UsersRepository = Depends(get_users_service),
 ) -> ProfileResponse:
-    user = await _get_profile_from_username(username)
+    user = await _get_profile_from_username(username, users)
     return ProfileResponse(profile=user.profile(current_user))
 
 
@@ -45,8 +48,9 @@ async def get(
 async def follow(
     current_user: CurrentUser,
     username: str = Path(..., description="Username of the profile you want to follow"),
+    users: UsersRepository = Depends(get_users_service),
 ) -> ProfileResponse:
-    user = await _get_profile_from_username(username)
+    user = await _get_profile_from_username(username, users)
     await users.follow(db_obj=user, follower=current_user)
     return ProfileResponse(profile=user.profile(current_user))
 
@@ -61,7 +65,8 @@ async def follow(
 async def unfollow(
     current_user: CurrentUser,
     username: str = Path(..., description="Username of the profile you want to unfollow"),
+    users: UsersRepository = Depends(get_users_service),
 ) -> ProfileResponse:
-    user = await _get_profile_from_username(username)
+    user = await _get_profile_from_username(username, users)
     await users.follow(db_obj=user, follower=current_user, follow=False)
     return ProfileResponse(profile=user.profile(current_user))

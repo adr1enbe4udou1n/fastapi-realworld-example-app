@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Body, HTTPException, Path, Query
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query
 from slugify import slugify
 
 from app.api.deps import (
     CurrentUser,
     OptionalCurrentUser,
+    get_articles_service,
 )
-from app.crud.crud_article import articles
+from app.crud.crud_article import ArticlesRepository
 from app.models.article import Article
 from app.schemas.articles import (
     MultipleArticlesResponse,
@@ -21,6 +22,7 @@ max_limit: int = 20
 
 async def _get_article_from_slug(
     slug: str,
+    articles: ArticlesRepository,
 ) -> Article:
     db_article = await articles.get_by_slug(slug=slug)
     if not db_article:
@@ -42,6 +44,7 @@ async def get_list(
     author: str = Query(None, title="Filter by author (username)"),
     tag: str = Query(None, title="Filter by tag"),
     favorited: str = Query(None, title="Filter by favorites of a user (username)"),
+    articles: ArticlesRepository = Depends(get_articles_service),
 ) -> MultipleArticlesResponse:
     result, count = await articles.get_list(
         min(limit, max_limit),
@@ -67,6 +70,7 @@ async def get_feed(
     current_user: CurrentUser,
     limit: int = Query(20, title="Limit number of articles returned (default is 20)"),
     offset: int = Query(0, title="Offset/skip number of articles (default is 0)"),
+    articles: ArticlesRepository = Depends(get_articles_service),
 ) -> MultipleArticlesResponse:
     result, count = await articles.get_feed(min(limit, max_limit), offset, user=current_user)
     return MultipleArticlesResponse(
@@ -85,6 +89,7 @@ async def get_feed(
 async def create(
     current_user: CurrentUser,
     new_article: NewArticleRequest = Body(...),
+    articles: ArticlesRepository = Depends(get_articles_service),
 ) -> SingleArticleResponse:
     existing_article = await articles.get_by_slug(slug=slugify(new_article.article.title))
     if existing_article:
@@ -104,8 +109,9 @@ async def create(
 async def get(
     current_user: OptionalCurrentUser,
     slug: str = Path(..., title="Slug of the article to get"),
+    articles: ArticlesRepository = Depends(get_articles_service),
 ) -> SingleArticleResponse:
-    article = await _get_article_from_slug(slug)
+    article = await _get_article_from_slug(slug, articles)
     return SingleArticleResponse(article=article.schema(current_user))
 
 
@@ -120,8 +126,9 @@ async def update(
     current_user: CurrentUser,
     slug: str = Path(..., title="Slug of the article to update"),
     update_article: UpdateArticleRequest = Body(...),
+    articles: ArticlesRepository = Depends(get_articles_service),
 ) -> SingleArticleResponse:
-    article = await _get_article_from_slug(slug)
+    article = await _get_article_from_slug(slug, articles)
 
     if article.author.id != current_user.id:
         raise HTTPException(status_code=400, detail="You are not the author of this article")
@@ -138,8 +145,9 @@ async def update(
 async def delete(
     current_user: CurrentUser,
     slug: str = Path(..., title="Slug of the article to delete"),
+    articles: ArticlesRepository = Depends(get_articles_service),
 ) -> None:
-    article = await _get_article_from_slug(slug)
+    article = await _get_article_from_slug(slug, articles)
 
     if article.author.id != current_user.id:
         raise HTTPException(status_code=400, detail="You are not the author of this article")
