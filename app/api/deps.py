@@ -31,14 +31,6 @@ async def _get_db_ro() -> AsyncGenerator:
         await db.close()
 
 
-async def _get_db_ro2() -> AsyncGenerator:
-    db = SessionLocalRo()
-    try:
-        yield db
-    finally:
-        await db.close()
-
-
 async def _get_current_user_from_token(token: str, users: UsersRepository) -> User:
     try:
         payload = security.decode_access_token(token)
@@ -78,7 +70,6 @@ def _get_optional_authorization_header(request: Request) -> str:
 
 SessionDatabase = Annotated[AsyncSession, Depends(_get_db)]
 SessionDatabaseRo = Annotated[AsyncSession, Depends(_get_db_ro)]
-SessionDatabaseRo2 = Annotated[AsyncSession, Depends(_get_db_ro2)]
 
 
 def get_users_service(db: SessionDatabase, dbro: SessionDatabaseRo) -> UsersRepository:
@@ -89,10 +80,8 @@ def get_comments_service(db: SessionDatabase, dbro: SessionDatabaseRo) -> Commen
     return CommentsRepository(db=db, dbro=dbro)
 
 
-def get_articles_service(
-    db: SessionDatabase, dbro: SessionDatabaseRo, dbro_count: SessionDatabaseRo2
-) -> ArticlesRepository:
-    return ArticlesRepository(db=db, dbro=dbro, dbro_count=dbro_count)
+def get_articles_service(db: SessionDatabase, dbro: SessionDatabaseRo) -> ArticlesRepository:
+    return ArticlesRepository(db=db, dbro=dbro)
 
 
 async def _get_current_user(

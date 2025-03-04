@@ -3,11 +3,12 @@ from collections.abc import Sequence
 from typing import Any
 
 from slugify import slugify
-from sqlalchemy import func, select
+from sqlalchemy import Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import desc
 
+from app.db.session import SessionLocalRo
 from app.models.article import Article
 from app.models.tag import Tag
 from app.models.user import User
@@ -15,10 +16,9 @@ from app.schemas.articles import NewArticle, UpdateArticle
 
 
 class ArticlesRepository:
-    def __init__(self, db: AsyncSession, dbro: AsyncSession, dbro_count: AsyncSession):
+    def __init__(self, db: AsyncSession, dbro: AsyncSession):
         self.db = db
         self.dbro = dbro
-        self.dbro_count = dbro_count
 
     async def get(self, id: Any) -> Article | None:
         return await self.dbro.scalar(
@@ -64,12 +64,7 @@ class ArticlesRepository:
         if favorited:
             query = query.filter(Article.favorited_by.any(User.name.ilike(f"%{favorited}%")))
 
-        query_list = query.order_by(desc(Article.id)).limit(limit).offset(offset)
-        query_count = select(func.count()).select_from(query.subquery())
-
-        articles, count = await asyncio.gather(self.dbro.scalars(query_list), self.dbro_count.scalar(query_count))
-
-        return articles.unique().all(), count or 0
+        return await self.get_paginated_list(limit, offset, query)
 
     async def get_feed(self, limit: int, offset: int, *, user: User) -> tuple[Sequence[Article], int]:
         query = (
@@ -82,10 +77,17 @@ class ArticlesRepository:
             .filter(Article.author.has(User.followers.any(id=user.id)))
         )
 
-        query_list = query.order_by(desc(Article.id)).limit(limit).offset(offset)
-        query_count = select(func.count()).select_from(query.subquery())
+        return await self.get_paginated_list(limit, offset, query)
 
-        articles, count = await asyncio.gather(self.dbro.scalars(query_list), self.dbro_count.scalar(query_count))
+    async def get_paginated_list(
+        self, limit: int, offset: int, query: Select[tuple[Article]]
+    ) -> tuple[Sequence[Article], int]:
+        query_list = query.order_by(desc(Article.id)).limit(limit).offset(offset)
+
+        async with SessionLocalRo() as db_count:
+            query_count = select(func.count()).select_from(query.subquery())
+
+            articles, count = await asyncio.gather(self.dbro.scalars(query_list), db_count.scalar(query_count))
 
         return articles.unique().all(), count or 0
 
