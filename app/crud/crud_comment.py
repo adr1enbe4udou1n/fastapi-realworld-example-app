@@ -3,7 +3,7 @@ from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import desc
 
 from app.models.article import Article
@@ -20,7 +20,7 @@ class CommentsRepository:
     async def get(self, id: Any) -> Comment | None:
         return await self.dbro.scalar(
             select(Comment)
-            .options(selectinload(Comment.article), selectinload(Comment.author).selectinload(User.followers))
+            .options(joinedload(Comment.article), joinedload(Comment.author).joinedload(User.followers))
             .filter_by(id=id)
         )
 
@@ -28,7 +28,7 @@ class CommentsRepository:
         return (
             await self.dbro.scalars(
                 select(Comment)
-                .options(selectinload(Comment.author))
+                .options(joinedload(Comment.author))
                 .filter_by(article=article)
                 .order_by(desc(Comment.id))
             )

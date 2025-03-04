@@ -5,7 +5,7 @@ from typing import Any
 from slugify import slugify
 from sqlalchemy import Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import desc
 
 from app.db.session import SessionLocalRo
@@ -24,9 +24,9 @@ class ArticlesRepository:
         return await self.dbro.scalar(
             select(Article)
             .options(
-                selectinload(Article.tags),
-                selectinload(Article.author).selectinload(User.followers),
-                selectinload(Article.favorited_by),
+                joinedload(Article.tags),
+                joinedload(Article.author).joinedload(User.followers),
+                joinedload(Article.favorited_by),
             )
             .filter_by(id=id)
         )
@@ -35,9 +35,9 @@ class ArticlesRepository:
         return await self.dbro.scalar(
             select(Article)
             .options(
-                selectinload(Article.tags),
-                selectinload(Article.author).selectinload(User.followers),
-                selectinload(Article.favorited_by),
+                joinedload(Article.tags),
+                joinedload(Article.author).joinedload(User.followers),
+                joinedload(Article.favorited_by),
             )
             .filter_by(slug=slug)
         )
@@ -52,9 +52,9 @@ class ArticlesRepository:
         favorited: str | None = None,
     ) -> tuple[Sequence[Article], int]:
         query = select(Article).options(
-            selectinload(Article.author).selectinload(User.followers),
-            selectinload(Article.tags),
-            selectinload(Article.favorited_by),
+            joinedload(Article.author).joinedload(User.followers),
+            joinedload(Article.tags),
+            joinedload(Article.favorited_by),
         )
 
         if author:
@@ -70,9 +70,9 @@ class ArticlesRepository:
         query = (
             select(Article)
             .options(
-                selectinload(Article.author).selectinload(User.followers),
-                selectinload(Article.tags),
-                selectinload(Article.favorited_by),
+                joinedload(Article.author).joinedload(User.followers),
+                joinedload(Article.tags),
+                joinedload(Article.favorited_by),
             )
             .filter(Article.author.has(User.followers.any(id=user.id)))
         )

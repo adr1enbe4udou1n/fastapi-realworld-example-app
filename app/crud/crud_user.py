@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload
 
 from app.core.security import get_password_hash, verify_password
 from app.models.user import User
@@ -16,7 +16,7 @@ class UsersRepository:
         return await self.dbro.scalar(select(User).filter_by(id=id))
 
     async def get_by_name(self, *, name: str) -> User | None:
-        return await self.dbro.scalar(select(User).options(selectinload(User.followers)).filter_by(name=name))
+        return await self.dbro.scalar(select(User).options(joinedload(User.followers)).filter_by(name=name))
 
     async def get_by_email(self, *, email: str) -> User | None:
         return await self.dbro.scalar(select(User).filter_by(email=email))
