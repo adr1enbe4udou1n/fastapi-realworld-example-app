@@ -128,7 +128,7 @@ class ArticlesRepository:
         if favorite:
             db_obj.favorited_by.append(user)
         else:
-            db_obj.favorited_by = [fav_user for fav_user in db_obj.favorited_by if fav_user.id != user.id]
+            db_obj.favorited_by.remove(user)
 
         await self.db.merge(db_obj)
         await self.db.commit()

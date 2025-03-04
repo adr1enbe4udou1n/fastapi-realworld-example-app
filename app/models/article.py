@@ -76,6 +76,6 @@ class Article(Base):
             updated_at=convert_datetime_to_realworld(self.updated_at),
             tag_list=tags,
             author=self.author.profile(user),
-            favorited=user is not None and any(favorited.id == user.id for favorited in self.favorited_by),
+            favorited=user is not None and self.favorited_by.__contains__(user),
             favorites_count=len(self.favorited_by),
         )

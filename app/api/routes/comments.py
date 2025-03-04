@@ -93,10 +93,10 @@ async def delete(
     article = await _get_article_from_slug(slug, articles)
     comment = await _get_comment_from_id(comment_id, comments)
 
-    if comment.article.id != article.id:
+    if comment.article != article:
         raise HTTPException(status_code=400, detail="Comment does not belong to this article")
 
-    if comment.author.id != current_user.id and article.author.id != current_user.id:
+    if comment.author != current_user and article.author != current_user:
         raise HTTPException(status_code=400, detail="Comment does not belong to this user")
 
     await comments.delete(db_obj=comment)
