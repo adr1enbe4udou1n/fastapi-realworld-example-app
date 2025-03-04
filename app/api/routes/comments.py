@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Body, HTTPException, Path
+from fastapi import APIRouter, Body, Depends, HTTPException, Path
 
 from app.api.deps import (
     CurrentUser,
     OptionalCurrentUser,
+    get_articles_service,
+    get_comments_service,
 )
-from app.crud.crud_article import articles
-from app.crud.crud_comment import comments
+from app.crud.crud_article import ArticlesRepository
+from app.crud.crud_comment import CommentsRepository
 from app.models.article import Article
 from app.models.comment import Comment
 from app.schemas.comments import (
@@ -19,6 +21,7 @@ router = APIRouter()
 
 async def _get_article_from_slug(
     slug: str,
+    articles: ArticlesRepository,
 ) -> Article:
     db_article = await articles.get_by_slug(slug=slug)
     if not db_article:
@@ -28,6 +31,7 @@ async def _get_article_from_slug(
 
 async def _get_comment_from_id(
     id: int,
+    comments: CommentsRepository,
 ) -> Comment:
     db_comment = await comments.get(id=id)
     if not db_comment:
@@ -45,8 +49,10 @@ async def _get_comment_from_id(
 async def get_list(
     current_user: OptionalCurrentUser,
     slug: str = Path(..., title="Slug of the article that you want to get comments for"),
+    articles: ArticlesRepository = Depends(get_articles_service),
+    comments: CommentsRepository = Depends(get_comments_service),
 ) -> MultipleCommentsResponse:
-    article = await _get_article_from_slug(slug)
+    article = await _get_article_from_slug(slug, articles)
     return MultipleCommentsResponse(
         comments=[comment.schema(current_user) for comment in await comments.get_list(article=article)]
     )
@@ -63,8 +69,10 @@ async def create(
     current_user: CurrentUser,
     slug: str = Path(..., title="Slug of the article that you want to create a comment for"),
     new_comment: NewCommentRequest = Body(...),
+    articles: ArticlesRepository = Depends(get_articles_service),
+    comments: CommentsRepository = Depends(get_comments_service),
 ) -> SingleCommentResponse:
-    article = await _get_article_from_slug(slug)
+    article = await _get_article_from_slug(slug, articles)
     comment = await comments.create(obj_in=new_comment.comment, article=article, author=current_user)
     return SingleCommentResponse(comment=comment.schema(current_user))
 
@@ -79,9 +87,11 @@ async def delete(
     current_user: CurrentUser,
     slug: str = Path(..., title="Slug of the article that you want to delete a comment for"),
     comment_id: int = Path(..., title="ID of the comment you want to delete", alias="commentId"),
+    articles: ArticlesRepository = Depends(get_articles_service),
+    comments: CommentsRepository = Depends(get_comments_service),
 ) -> None:
-    article = await _get_article_from_slug(slug)
-    comment = await _get_comment_from_id(comment_id)
+    article = await _get_article_from_slug(slug, articles)
+    comment = await _get_comment_from_id(comment_id, comments)
 
     if comment.article.id != article.id:
         raise HTTPException(status_code=400, detail="Comment does not belong to this article")

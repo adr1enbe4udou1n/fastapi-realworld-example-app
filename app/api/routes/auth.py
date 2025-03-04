@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException
 
-from app.crud.crud_user import users
+from app.api.deps import get_users_service
+from app.crud.crud_user import UsersRepository
 from app.schemas.users import LoginUserRequest, NewUserRequest, UserResponse
 
 router = APIRouter()
@@ -15,6 +16,7 @@ router = APIRouter()
 )
 async def register(
     new_user: NewUserRequest = Body(...),
+    users: UsersRepository = Depends(get_users_service),
 ) -> UserResponse:
     db_user = await users.get_by_email(email=new_user.user.email)
     if db_user:
@@ -33,6 +35,7 @@ async def register(
 )
 async def login(
     user_credentials: LoginUserRequest = Body(...),
+    users: UsersRepository = Depends(get_users_service),
 ) -> UserResponse:
     db_user = await users.authenticate(email=user_credentials.user.email, password=user_credentials.user.password)
     if not db_user:

@@ -1,9 +1,10 @@
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from app.crud.crud_user import users
+from app.models.user import User
 from tests.conftest import acting_as_john, create_jane_user
 
 
@@ -65,5 +66,4 @@ async def test_user_can_update_infos(client: TestClient, db: AsyncSession) -> No
         "image": "https://randomuser.me/api/portraits/men/2.jpg",
     }.items() <= r.json()["user"].items()
 
-    db_user = await users.get_by_email(email="jane.doe@example.com")
-    assert db_user
+    assert (await db.scalar(select(User).filter_by(email="jane.doe@example.com"))) is not None
