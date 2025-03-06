@@ -31,7 +31,7 @@ uv run app/seed.py # fake data with faker
 uv run uvicorn app.main:app --reload # run uvicorn
 ```
 
-And that's all, go to <http://localhost:8000/docs>
+And that's all, go to <http://localhost:8000/api> to view the Open API documentation
 
 ### Validate API with Newman
 
