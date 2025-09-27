@@ -51,7 +51,7 @@ def _get_authorization_header(
     ),
 ) -> str:
     try:
-        token_prefix, token = api_key.split(" ")
+        _, token = api_key.split(" ")
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
