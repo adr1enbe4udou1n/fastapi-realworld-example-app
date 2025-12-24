@@ -17,6 +17,14 @@ run = [
 [tasks.test]
 run = "uv run pytest --cov --cov-report=term --cov-report=xml"
 
+[tasks.ci]
+run = [
+  { task = "vendor" },
+  { task = "lint" },
+  { task = "build" },
+  { task = "test" },
+]
+
 [tools]
 python = "3.14"
 uv = "latest"
