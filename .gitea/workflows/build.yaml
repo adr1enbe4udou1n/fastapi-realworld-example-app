@@ -32,16 +32,15 @@ jobs:
       - uses: jdx/mise-action@v3
         with:
           install: false
+      - run: mise ci
         env:
+          MISE_TASK_RUN_AUTO_INSTALL: false
           DB_HOST: postgres
           DB_PORT: 5432
           DB_DATABASE: test
           DB_USERNAME: test
           DB_PASSWORD: test
           JWT_SECRET_KEY: "super secret key"
-      - run: mise ci
-        env:
-          MISE_TASK_RUN_AUTO_INSTALL: false
       - name: Cache sonar
         uses: actions/cache@v5
         with:
