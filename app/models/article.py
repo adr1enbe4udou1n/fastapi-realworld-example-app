@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -53,17 +53,17 @@ class Article(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False, onupdate=datetime.now)
 
-    author: Mapped["User"] = relationship("User", back_populates="articles")
-    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="article", uselist=True)
-    tags: Mapped[list["Tag"]] = relationship("Tag", back_populates="articles", secondary=article_tag, uselist=True)
-    favorited_by: Mapped[list["User"]] = relationship(
+    author: Mapped[User] = relationship("User", back_populates="articles")
+    comments: Mapped[list[Comment]] = relationship("Comment", back_populates="article", uselist=True)
+    tags: Mapped[list[Tag]] = relationship("Tag", back_populates="articles", secondary=article_tag, uselist=True)
+    favorited_by: Mapped[list[User]] = relationship(
         "User",
         back_populates="favorite_articles",
         secondary=article_favorite,
         uselist=True,
     )
 
-    def schema(self, user: Optional["User"] = None) -> ArticleDto:
+    def schema(self, user: User | None = None) -> ArticleDto:
         tags = [tag.name for tag in self.tags]
         tags.sort()
 

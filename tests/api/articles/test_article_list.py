@@ -166,7 +166,7 @@ async def test_can_filter_articles_by_favorited(client: TestClient, db: AsyncSes
 
 def test_guest_cannot_paginate_feed(client: TestClient) -> None:
     r = client.get("/api/articles/feed")
-    assert r.status_code == status.HTTP_403_FORBIDDEN
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 async def test_can_paginate_feed(client: TestClient, db: AsyncSession) -> None:

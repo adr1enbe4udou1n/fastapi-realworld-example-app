@@ -8,7 +8,7 @@ from tests.conftest import acting_as_john
 def test_guest_cannot_fetch_infos(client: TestClient) -> None:
     r = client.get("/api/user")
 
-    assert r.status_code == status.HTTP_403_FORBIDDEN
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 async def test_user_can_fetch_infos(client: TestClient, db: AsyncSession) -> None:

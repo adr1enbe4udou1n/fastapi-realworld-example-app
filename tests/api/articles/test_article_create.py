@@ -11,7 +11,7 @@ from tests.conftest import acting_as_john, generate_article
 
 def test_guest_cannot_create_article(client: TestClient) -> None:
     r = client.post("/api/articles")
-    assert r.status_code == status.HTTP_403_FORBIDDEN
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @pytest.mark.parametrize(
@@ -39,7 +39,7 @@ async def test_cannot_create_article_with_invalid_data(
 ) -> None:
     await acting_as_john(db, client)
     r = client.post("/api/articles", json={"article": data})
-    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 async def test_cannot_create_article_with_same_title(client: TestClient, db: AsyncSession) -> None:
@@ -59,7 +59,7 @@ async def test_cannot_create_article_with_same_title(client: TestClient, db: Asy
             }
         },
     )
-    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 async def test_can_create_article(client: TestClient, db: AsyncSession) -> None:

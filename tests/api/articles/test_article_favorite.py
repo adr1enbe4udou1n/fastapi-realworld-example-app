@@ -9,7 +9,7 @@ from tests.conftest import acting_as_john, create_jane_user, generate_article
 
 def test_guest_cannot_favorite_article(client: TestClient) -> None:
     r = client.post("/api/articles/test-title/favorite")
-    assert r.status_code == status.HTTP_403_FORBIDDEN
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 async def test_cannot_favorite_non_existent_article(client: TestClient, db: AsyncSession) -> None:

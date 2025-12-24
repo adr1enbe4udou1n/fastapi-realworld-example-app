@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -45,7 +45,7 @@ class User(Base):
     created_at = mapped_column(DateTime, default=datetime.now, nullable=False)
     updated_at = mapped_column(DateTime, default=datetime.now, nullable=False, onupdate=datetime.now)
 
-    followers: Mapped[list["User"]] = relationship(
+    followers: Mapped[list[User]] = relationship(
         "User",
         secondary=follower_user,
         primaryjoin=id == follower_user.c.following_id,
@@ -54,9 +54,9 @@ class User(Base):
         uselist=True,
     )
 
-    articles: Mapped[list["Article"]] = relationship("Article", back_populates="author")
-    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="author")
-    favorite_articles: Mapped[list["Article"]] = relationship(
+    articles: Mapped[list[Article]] = relationship("Article", back_populates="author")
+    comments: Mapped[list[Comment]] = relationship("Comment", back_populates="author")
+    favorite_articles: Mapped[list[Article]] = relationship(
         "Article",
         back_populates="favorited_by",
         secondary=article_favorite,
@@ -71,7 +71,7 @@ class User(Base):
             token=security.create_access_token(self.id),
         )
 
-    def profile(self, user: Optional["User"] = None) -> ProfileDto:
+    def profile(self, user: User | None = None) -> ProfileDto:
         return ProfileDto(
             username=self.name,
             bio=self.bio,

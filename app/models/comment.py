@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, Integer, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -23,10 +23,10 @@ class Comment(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False, onupdate=datetime.now)
 
-    article: Mapped["Article"] = relationship("Article", back_populates="comments")
-    author: Mapped["User"] = relationship("User", back_populates="comments")
+    article: Mapped[Article] = relationship("Article", back_populates="comments")
+    author: Mapped[User] = relationship("User", back_populates="comments")
 
-    def schema(self, user: Optional["User"] = None) -> CommentDto:
+    def schema(self, user: User | None = None) -> CommentDto:
         return CommentDto(
             id=self.id,
             body=self.body,

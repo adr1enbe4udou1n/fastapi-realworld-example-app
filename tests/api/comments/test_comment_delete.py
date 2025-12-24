@@ -10,7 +10,7 @@ from tests.conftest import acting_as_john, create_jane_user, generate_article
 
 def test_guest_cannot_delete_comment(client: TestClient) -> None:
     r = client.delete("/api/articles/test-title/comments/1")
-    assert r.status_code == status.HTTP_403_FORBIDDEN
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 async def test_cannot_delete_comment_with_non_existent_article(client: TestClient, db: AsyncSession) -> None:

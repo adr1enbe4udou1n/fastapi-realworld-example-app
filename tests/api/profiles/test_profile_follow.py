@@ -17,7 +17,7 @@ async def test_cannot_follow_profile(client: TestClient, db: AsyncSession) -> No
 
     r = client.post("/api/profiles/John Doe/follow")
 
-    assert r.status_code == status.HTTP_403_FORBIDDEN
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 async def test_cannot_follow_non_existent_profile(client: TestClient, db: AsyncSession) -> None:

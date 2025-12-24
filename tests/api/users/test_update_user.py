@@ -11,7 +11,7 @@ from tests.conftest import acting_as_john, create_jane_user
 def test_guest_user_cannot_update_infos(client: TestClient) -> None:
     r = client.put("/api/user")
 
-    assert r.status_code == status.HTTP_403_FORBIDDEN
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @pytest.mark.parametrize(
@@ -31,7 +31,7 @@ async def test_user_cannot_update_infos_with_invalid_data(
 
     r = client.put("/api/user", json={"user": data})
 
-    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 async def test_user_cannot_update_with_already_used_email(client: TestClient, db: AsyncSession) -> None:

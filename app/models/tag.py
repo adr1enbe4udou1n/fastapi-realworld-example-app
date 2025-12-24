@@ -16,7 +16,7 @@ class Tag(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String, nullable=False, unique=True, index=True)
 
-    articles: Mapped[list["Article"]] = relationship(
+    articles: Mapped[list[Article]] = relationship(
         "Article",
         back_populates="tags",
         secondary=article_tag,

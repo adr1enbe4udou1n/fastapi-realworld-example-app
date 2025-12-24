@@ -39,7 +39,7 @@ from tests.conftest import create_john_user
 def test_cannot_register_with_invalid_data(client: TestClient, data: dict[str, str]) -> None:
     r = client.post("/api/users", json={"user": data})
 
-    assert r.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert r.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 async def test_cannot_register_twice(client: TestClient, db: AsyncSession) -> None:
