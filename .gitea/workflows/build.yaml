@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        image: postgres:18
         env:
           POSTGRES_PASSWORD: test
           POSTGRES_USER: test
@@ -19,17 +19,20 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         id: setup-python
         with:
-          python-version: "3.13"
-      - uses: astral-sh/setup-uv@v5
+          python-version: "3.14"
+      - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
           prune-cache: false
           github-token: ${{ secrets.CONDUIT_GITHUB_TOKEN }}
-      - uses: https://gitea.okami101.io/okami101/actions/task@main
+      - uses: jdx/mise-action@v3
+        with:
+          cache: false
+          install: false
         env:
           DB_HOST: postgres
           DB_PORT: 5432
@@ -37,12 +40,13 @@ jobs:
           DB_USERNAME: test
           DB_PASSWORD: test
           JWT_SECRET_KEY: "super secret key"
+      - run: mise vendor lint build test
       - name: Cache sonar
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /opt/sonar-scanner/.sonar/cache
           key: ${{ runner.os }}-sonar
-      - uses: https://github.com/sonarsource/sonarqube-scan-action@v5
+      - uses: https://github.com/sonarsource/sonarqube-scan-action@v7
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
