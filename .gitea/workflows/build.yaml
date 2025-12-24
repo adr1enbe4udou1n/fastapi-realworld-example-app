@@ -31,7 +31,6 @@ jobs:
           github-token: ${{ secrets.CONDUIT_GITHUB_TOKEN }}
       - uses: jdx/mise-action@v3
         with:
-          cache: false
           install: false
         env:
           DB_HOST: postgres
