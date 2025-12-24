@@ -41,6 +41,8 @@ jobs:
           DB_PASSWORD: test
           JWT_SECRET_KEY: "super secret key"
       - run: mise ci
+        env:
+          MISE_TASK_RUN_AUTO_INSTALL: false
       - name: Cache sonar
         uses: actions/cache@v5
         with:
