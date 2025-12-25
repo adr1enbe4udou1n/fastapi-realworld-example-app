@@ -20,34 +20,27 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
-        id: setup-python
-        with:
-          python-version: "3.14"
-      - uses: astral-sh/setup-uv@v7
-        with:
-          enable-cache: true
-          prune-cache: false
-          github-token: ${{ secrets.CONDUIT_GITHUB_TOKEN }}
       - uses: jdx/mise-action@v3
         with:
-          install: false
-      - run: mise ci
+          github_token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+      - name: uv cache
+        uses: actions/cache@v5
+        with:
+          path: /root/.cache/uv
+          key: ${{ runner.os }}-uv
+      - name: sonar cache
+        uses: actions/cache@v5
+        with:
+          path: /root/.sonar/cache
+          key: ${{ runner.os }}-sonar
+      - run: "mise ci ::: scan"
         env:
-          MISE_TASK_RUN_AUTO_INSTALL: false
           DB_HOST: postgres
           DB_PORT: 5432
           DB_DATABASE: test
           DB_USERNAME: test
           DB_PASSWORD: test
           JWT_SECRET_KEY: "super secret key"
-      - name: Cache sonar
-        uses: actions/cache@v5
-        with:
-          path: /opt/sonar-scanner/.sonar/cache
-          key: ${{ runner.os }}-sonar
-      - uses: https://github.com/sonarsource/sonarqube-scan-action@v7
-        env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
       - uses: https://gitea.okami101.io/okami101/actions/docker@main
