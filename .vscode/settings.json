@@ -1,0 +1,6 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "okami101",
+        "projectKey": "fastapi-realworld"
+    }
+}
