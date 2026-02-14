@@ -34,7 +34,7 @@ async def _get_db_ro() -> AsyncGenerator:
 async def _get_current_user_from_token(token: str, users: UsersRepository) -> User:
     try:
         payload = security.decode_access_token(token)
-    except (jwt.JWTError, ValidationError):
+    except jwt.JWTError, ValidationError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
