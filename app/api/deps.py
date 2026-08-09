@@ -85,15 +85,13 @@ def get_articles_service(db: SessionDatabase, dbro: SessionDatabaseRo) -> Articl
 
 
 async def _get_current_user(
-    token: Annotated[str, Depends(_get_authorization_header)],
-    users: Annotated[UsersRepository, Depends(get_users_service)],
+    token: str = Depends(_get_authorization_header), users: UsersRepository = Depends(get_users_service)
 ) -> User:
     return await _get_current_user_from_token(token, users)
 
 
 async def _get_optional_current_user(
-    token: Annotated[str, Depends(_get_optional_authorization_header)],
-    users: Annotated[UsersRepository, Depends(get_users_service)],
+    token: str = Depends(_get_optional_authorization_header), users: UsersRepository = Depends(get_users_service)
 ) -> User | None:
     if token:
         return await _get_current_user_from_token(token, users)

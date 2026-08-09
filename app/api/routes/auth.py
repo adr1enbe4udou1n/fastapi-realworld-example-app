@@ -1,5 +1,3 @@
-from typing import Annotated
-
 from fastapi import APIRouter, Body, Depends, HTTPException
 
 from app.api.deps import get_users_service
@@ -17,8 +15,8 @@ router = APIRouter()
     response_model=UserResponse,
 )
 async def register(
-    new_user: Annotated[NewUserRequest, Body(...)],
-    users: Annotated[UsersRepository, Depends(get_users_service)],
+    new_user: NewUserRequest = Body(...),
+    users: UsersRepository = Depends(get_users_service),
 ) -> UserResponse:
     db_user = await users.get_by_email(email=new_user.user.email)
     if db_user:
@@ -36,8 +34,8 @@ async def register(
     response_model=UserResponse,
 )
 async def login(
-    user_credentials: Annotated[LoginUserRequest, Body(...)],
-    users: Annotated[UsersRepository, Depends(get_users_service)],
+    user_credentials: LoginUserRequest = Body(...),
+    users: UsersRepository = Depends(get_users_service),
 ) -> UserResponse:
     db_user = await users.authenticate(email=user_credentials.user.email, password=user_credentials.user.password)
     if not db_user:
