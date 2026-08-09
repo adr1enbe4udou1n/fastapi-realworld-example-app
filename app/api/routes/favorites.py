@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, Path
 
 from app.api.deps import CurrentUser, get_articles_service
@@ -27,8 +29,8 @@ async def _get_article_from_slug(
 )
 async def favorite(
     current_user: CurrentUser,
-    slug: str = Path(..., title="Slug of the article that you want to favorite"),
-    articles: ArticlesRepository = Depends(get_articles_service),
+    slug: Annotated[str, Path(title="Slug of the article that you want to favorite")],
+    articles: Annotated[ArticlesRepository, Depends(get_articles_service)],
 ) -> SingleArticleResponse:
     article = await _get_article_from_slug(slug, articles)
     await articles.favorite(db_obj=article, user=current_user)
@@ -44,8 +46,8 @@ async def favorite(
 )
 async def unfavorite(
     current_user: CurrentUser,
-    slug: str = Path(..., title="Slug of the article that you want to unfavorite"),
-    articles: ArticlesRepository = Depends(get_articles_service),
+    slug: Annotated[str, Path(title="Slug of the article that you want to unfavorite")],
+    articles: Annotated[ArticlesRepository, Depends(get_articles_service)],
 ) -> SingleArticleResponse:
     article = await _get_article_from_slug(slug, articles)
     await articles.favorite(db_obj=article, user=current_user, favorite=False)

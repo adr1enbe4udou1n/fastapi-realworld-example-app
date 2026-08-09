@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Body, Depends, HTTPException, Path
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Path
 
 from app.api.deps import (
     CurrentUser,
@@ -48,9 +50,9 @@ async def _get_comment_from_id(
 )
 async def get_list(
     current_user: OptionalCurrentUser,
-    slug: str = Path(..., title="Slug of the article that you want to get comments for"),
-    articles: ArticlesRepository = Depends(get_articles_service),
-    comments: CommentsRepository = Depends(get_comments_service),
+    slug: Annotated[str, Path(title="Slug of the article that you want to get comments for")],
+    articles: Annotated[ArticlesRepository, Depends(get_articles_service)],
+    comments: Annotated[CommentsRepository, Depends(get_comments_service)],
 ) -> MultipleCommentsResponse:
     article = await _get_article_from_slug(slug, articles)
     return MultipleCommentsResponse(
@@ -67,10 +69,10 @@ async def get_list(
 )
 async def create(
     current_user: CurrentUser,
-    slug: str = Path(..., title="Slug of the article that you want to create a comment for"),
-    new_comment: NewCommentRequest = Body(...),
-    articles: ArticlesRepository = Depends(get_articles_service),
-    comments: CommentsRepository = Depends(get_comments_service),
+    slug: Annotated[str, Path(title="Slug of the article that you want to create a comment for")],
+    new_comment: NewCommentRequest,
+    articles: Annotated[ArticlesRepository, Depends(get_articles_service)],
+    comments: Annotated[CommentsRepository, Depends(get_comments_service)],
 ) -> SingleCommentResponse:
     article = await _get_article_from_slug(slug, articles)
     comment = await comments.create(obj_in=new_comment.comment, article=article, author=current_user)
@@ -85,10 +87,10 @@ async def create(
 )
 async def delete(
     current_user: CurrentUser,
-    slug: str = Path(..., title="Slug of the article that you want to delete a comment for"),
-    comment_id: int = Path(..., title="ID of the comment you want to delete", alias="commentId"),
-    articles: ArticlesRepository = Depends(get_articles_service),
-    comments: CommentsRepository = Depends(get_comments_service),
+    slug: Annotated[str, Path(title="Slug of the article that you want to delete a comment for")],
+    comment_id: Annotated[int, Path(title="ID of the comment you want to delete", alias="commentId")],
+    articles: Annotated[ArticlesRepository, Depends(get_articles_service)],
+    comments: Annotated[CommentsRepository, Depends(get_comments_service)],
 ) -> None:
     article = await _get_article_from_slug(slug, articles)
     comment = await _get_comment_from_id(comment_id, comments)
