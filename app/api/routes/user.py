@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Body, Depends, HTTPException
 
 from app.api.deps import CurrentUser, get_users_service
@@ -29,8 +31,8 @@ async def current(
 )
 async def update(
     current_user: CurrentUser,
-    update_user: UpdateUserRequest = Body(...),
-    users: UsersRepository = Depends(get_users_service),
+    update_user: Annotated[UpdateUserRequest, Body(...)],
+    users: Annotated[UsersRepository, Depends(get_users_service)],
 ) -> UserResponse:
     db_user = await users.get_by_email(email=str(update_user.user.email))
     if db_user and db_user != current_user:

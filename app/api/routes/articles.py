@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query
 from slugify import slugify
 
@@ -39,12 +41,12 @@ async def _get_article_from_slug(
 )
 async def get_list(
     current_user: OptionalCurrentUser,
-    limit: int = Query(max_limit, title="Limit number of articles returned (default is 20)"),
-    offset: int = Query(0, title="Offset/skip number of articles (default is 0)"),
-    author: str = Query(None, title="Filter by author (username)"),
-    tag: str = Query(None, title="Filter by tag"),
-    favorited: str = Query(None, title="Filter by favorites of a user (username)"),
-    articles: ArticlesRepository = Depends(get_articles_service),
+    articles: Annotated[ArticlesRepository, Depends(get_articles_service)],
+    limit: Annotated[int, Query(max_limit, title="Limit number of articles returned (default is 20)")] = max_limit,
+    offset: Annotated[int, Query(0, title="Offset/skip number of articles (default is 0)")] = 0,
+    author: Annotated[str | None, Query(title="Filter by author (username)")] = None,
+    tag: Annotated[str | None, Query(title="Filter by tag")] = None,
+    favorited: Annotated[str | None, Query(title="Filter by favorites of a user (username)")] = None,
 ) -> MultipleArticlesResponse:
     result, count = await articles.get_list(
         min(limit, max_limit),
@@ -68,9 +70,9 @@ async def get_list(
 )
 async def get_feed(
     current_user: CurrentUser,
-    limit: int = Query(20, title="Limit number of articles returned (default is 20)"),
-    offset: int = Query(0, title="Offset/skip number of articles (default is 0)"),
-    articles: ArticlesRepository = Depends(get_articles_service),
+    articles: Annotated[ArticlesRepository, Depends(get_articles_service)],
+    limit: Annotated[int, Query(20, title="Limit number of articles returned (default is 20)")] = 20,
+    offset: Annotated[int, Query(0, title="Offset/skip number of articles (default is 0)")] = 0,
 ) -> MultipleArticlesResponse:
     result, count = await articles.get_feed(min(limit, max_limit), offset, user=current_user)
     return MultipleArticlesResponse(
@@ -88,8 +90,8 @@ async def get_feed(
 )
 async def create(
     current_user: CurrentUser,
-    new_article: NewArticleRequest = Body(...),
-    articles: ArticlesRepository = Depends(get_articles_service),
+    new_article: Annotated[NewArticleRequest, Body(...)],
+    articles: Annotated[ArticlesRepository, Depends(get_articles_service)],
 ) -> SingleArticleResponse:
     existing_article = await articles.get_by_slug(slug=slugify(new_article.article.title))
     if existing_article:
@@ -108,8 +110,8 @@ async def create(
 )
 async def get(
     current_user: OptionalCurrentUser,
-    slug: str = Path(..., title="Slug of the article to get"),
-    articles: ArticlesRepository = Depends(get_articles_service),
+    slug: Annotated[str, Path(..., title="Slug of the article to get")],
+    articles: Annotated[ArticlesRepository, Depends(get_articles_service)],
 ) -> SingleArticleResponse:
     article = await _get_article_from_slug(slug, articles)
     return SingleArticleResponse(article=article.schema(current_user))
@@ -124,9 +126,9 @@ async def get(
 )
 async def update(
     current_user: CurrentUser,
-    slug: str = Path(..., title="Slug of the article to update"),
-    update_article: UpdateArticleRequest = Body(...),
-    articles: ArticlesRepository = Depends(get_articles_service),
+    slug: Annotated[str, Path(..., title="Slug of the article to update")],
+    update_article: Annotated[UpdateArticleRequest, Body(...)],
+    articles: Annotated[ArticlesRepository, Depends(get_articles_service)],
 ) -> SingleArticleResponse:
     article = await _get_article_from_slug(slug, articles)
 
@@ -144,8 +146,8 @@ async def update(
 )
 async def delete(
     current_user: CurrentUser,
-    slug: str = Path(..., title="Slug of the article to delete"),
-    articles: ArticlesRepository = Depends(get_articles_service),
+    slug: Annotated[str, Path(..., title="Slug of the article to delete")],
+    articles: Annotated[ArticlesRepository, Depends(get_articles_service)],
 ) -> None:
     article = await _get_article_from_slug(slug, articles)
 
