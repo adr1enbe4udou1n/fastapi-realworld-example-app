@@ -80,7 +80,7 @@ class ArticlesRepository:
         return await self.get_paginated_list(limit, offset, query)
 
     async def get_paginated_list(
-        self, limit: int, offset: int, query: Select[tuple[Article]]
+        self, limit: int, offset: int, query: Select[Article]
     ) -> tuple[Sequence[Article], int]:
         query_list = query.order_by(desc(Article.id)).limit(limit).offset(offset)
 
