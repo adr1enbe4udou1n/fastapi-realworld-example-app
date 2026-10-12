@@ -23,7 +23,7 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v7
-      - uses: jdx/mise-action@v4
+      - uses: jdx/mise-action@v5
         with:
           github_token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
       - name: uv cache
