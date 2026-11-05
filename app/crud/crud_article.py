@@ -59,8 +59,8 @@ class ArticlesRepository:
 
         if author:
             query = query.filter(Article.author.has(User.name.ilike(f"%{author}%")))
-        if tag:
-            query = query.filter(Article.tags.any(Tag.name.ilike(f"%{tag}%")))
+        # if tag:
+        #     query = query.filter(Article.tags.any(Tag.name.ilike(f"%{tag}%")))
         if favorited:
             query = query.filter(Article.favorited_by.any(User.name.ilike(f"%{favorited}%")))
 

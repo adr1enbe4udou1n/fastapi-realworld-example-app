@@ -15,7 +15,6 @@ router = APIRouter()
     summary="Register a new user",
     description="Register a new user",
     response_model=UserResponse,
-    status_code=201,
 )
 async def register(
     new_user: NewUserRequest,

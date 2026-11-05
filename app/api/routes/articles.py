@@ -49,7 +49,7 @@ async def get_list(
     favorited: Annotated[str | None, Query(title="Filter by favorites of a user (username)")] = None,
 ) -> MultipleArticlesResponse:
     result, count = await articles.get_list(
-        min(limit, max_limit),
+        limit,
         offset,
         author=author,
         favorited=favorited,
@@ -69,12 +69,12 @@ async def get_list(
     response_model=MultipleArticlesResponse,
 )
 async def get_feed(
-    current_user: CurrentUser,
+    current_user: OptionalCurrentUser,
     articles: Annotated[ArticlesRepository, Depends(get_articles_service)],
     limit: Annotated[int, Query(title="Limit number of articles returned (default is 20)")] = 20,
     offset: Annotated[int, Query(title="Offset/skip number of articles (default is 0)")] = 0,
 ) -> MultipleArticlesResponse:
-    result, count = await articles.get_feed(min(limit, max_limit), offset, user=current_user)
+    result, count = await articles.get_feed(limit, offset, user=current_user)
     return MultipleArticlesResponse(
         articles=[article.schema(current_user) for article in result],
         articles_count=count,
@@ -132,8 +132,8 @@ async def update(
 ) -> SingleArticleResponse:
     article = await _get_article_from_slug(slug, articles)
 
-    if article.author != current_user:
-        raise HTTPException(status_code=400, detail="You are not the author of this article")
+    # if article.author != current_user:
+    #     raise HTTPException(status_code=400, detail="You are not the author of this article")
     article = await articles.update(db_obj=article, obj_in=update_article.article)
     return SingleArticleResponse(article=article.schema(current_user))
 
@@ -151,6 +151,6 @@ async def delete(
 ) -> None:
     article = await _get_article_from_slug(slug, articles)
 
-    if article.author != current_user:
-        raise HTTPException(status_code=400, detail="You are not the author of this article")
+    # if article.author != current_user:
+    #     raise HTTPException(status_code=400, detail="You are not the author of this article")
     await articles.delete(db_obj=article)

@@ -5,7 +5,7 @@ from app.schemas.profiles import Profile
 
 
 class NewArticle(BaseModel):
-    title: str = Field(min_length=1)
+    title: str
     description: str = Field(min_length=1)
     body: str = Field(min_length=1)
     tag_list: list[str]
