@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title id="head-title">test_report.html</title>
+      <style type="text/css">body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  /* do not increase min-width as some may use split screens */
+  min-width: 800px;
+  color: #999;
+}
+
+h1 {
+  font-size: 24px;
+  color: black;
+}
+
+h2 {
+  font-size: 16px;
+  color: black;
+}
+
+p {
+  color: black;
+}
+
+a {
+  color: #999;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+/******************************
+ * SUMMARY INFORMATION
+ ******************************/
+#environment td {
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  vertical-align: top;
+}
+#environment tr:nth-child(odd) {
+  background-color: #f6f6f6;
+}
+#environment ul {
+  margin: 0;
+  padding: 0 20px;
+}
+
+/******************************
+ * TEST RESULT COLORS
+ ******************************/
+span.passed,
+.passed .col-result {
+  color: green;
+}
+
+span.skipped,
+span.xfailed,
+span.rerun,
+.skipped .col-result,
+.xfailed .col-result,
+.rerun .col-result {
+  color: orange;
+}
+
+span.error,
+span.failed,
+span.xpassed,
+.error .col-result,
+.failed .col-result,
+.xpassed .col-result {
+  color: red;
+}
+
+.col-links__extra {
+  margin-right: 3px;
+}
+
+/******************************
+ * RESULTS TABLE
+ *
+ * 1. Table Layout
+ * 2. Extra
+ * 3. Sorting items
+ *
+ ******************************/
+/*------------------
+ * 1. Table Layout
+ *------------------*/
+#results-table {
+  border: 1px solid #e6e6e6;
+  color: #999;
+  font-size: 12px;
+  width: 100%;
+}
+#results-table th,
+#results-table td {
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  text-align: left;
+}
+#results-table th {
+  font-weight: bold;
+}
+
+/*------------------
+ * 2. Extra
+ *------------------*/
+.logwrapper {
+  max-height: 230px;
+  overflow-y: scroll;
+  background-color: #e6e6e6;
+}
+.logwrapper.expanded {
+  max-height: none;
+}
+.logwrapper.expanded .logexpander:after {
+  content: "collapse [-]";
+}
+.logwrapper .logexpander {
+  z-index: 1;
+  position: sticky;
+  top: 10px;
+  width: max-content;
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 5px 7px;
+  margin: 10px 0 10px calc(100% - 80px);
+  cursor: pointer;
+  background-color: #e6e6e6;
+}
+.logwrapper .logexpander:after {
+  content: "expand [+]";
+}
+.logwrapper .logexpander:hover {
+  color: #000;
+  border-color: #000;
+}
+.logwrapper .log {
+  min-height: 40px;
+  position: relative;
+  top: -50px;
+  height: calc(100% + 50px);
+  border: 1px solid #e6e6e6;
+  color: black;
+  display: block;
+  font-family: "Courier New", Courier, monospace;
+  padding: 5px;
+  padding-right: 80px;
+  white-space: pre-wrap;
+}
+
+div.media {
+  border: 1px solid #e6e6e6;
+  float: right;
+  height: 240px;
+  margin: 0 5px;
+  overflow: hidden;
+  width: 320px;
+}
+
+.media-container {
+  display: grid;
+  grid-template-columns: 25px auto 25px;
+  align-items: center;
+  flex: 1 1;
+  overflow: hidden;
+  height: 200px;
+}
+
+.media-container--fullscreen {
+  grid-template-columns: 0px auto 0px;
+}
+
+.media-container__nav--right,
+.media-container__nav--left {
+  text-align: center;
+  cursor: pointer;
+}
+
+.media-container__viewport {
+  cursor: pointer;
+  text-align: center;
+  height: inherit;
+}
+.media-container__viewport img,
+.media-container__viewport video {
+  object-fit: cover;
+  width: 100%;
+  max-height: 100%;
+}
+
+.media__name,
+.media__counter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex: 0 0 25px;
+  align-items: center;
+}
+
+.collapsible td:not(.col-links) {
+  cursor: pointer;
+}
+.collapsible td:not(.col-links):hover::after {
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+}
+
+.col-result {
+  width: 130px;
+}
+.col-result:hover::after {
+  content: " (hide details)";
+}
+
+.col-result.collapsed:hover::after {
+  content: " (show details)";
+}
+
+#environment-header h2:hover::after {
+  content: " (hide details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#environment-header.collapsed h2:hover::after {
+  content: " (show details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/*------------------
+ * 3. Sorting items
+ *------------------*/
+.sortable {
+  cursor: pointer;
+}
+.sortable.desc:after {
+  content: " ";
+  position: relative;
+  left: 5px;
+  bottom: -12.5px;
+  border: 10px solid #4caf50;
+  border-bottom: 0;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+.sortable.asc:after {
+  content: " ";
+  position: relative;
+  left: 5px;
+  bottom: 12.5px;
+  border: 10px solid #4caf50;
+  border-top: 0;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+
+.hidden, .summary__reload__button.hidden {
+  display: none;
+}
+
+.summary__data {
+  flex: 0 0 550px;
+}
+.summary__reload {
+  flex: 1 1;
+  display: flex;
+  justify-content: center;
+}
+.summary__reload__button {
+  flex: 0 0 300px;
+  display: flex;
+  color: white;
+  font-weight: bold;
+  background-color: #4caf50;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.summary__reload__button:hover {
+  background-color: #46a049;
+}
+.summary__spacer {
+  flex: 0 0 550px;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+}
+
+.filters,
+.collapse {
+  display: flex;
+  align-items: center;
+}
+.filters button,
+.collapse button {
+  color: #999;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.filters button:hover,
+.collapse button:hover {
+  color: #ccc;
+}
+
+.filter__label {
+  margin-right: 10px;
+}
+
+      </style>
+    
+  </head>
+  <body>
+    <h1 id="title">test_report.html</h1>
+    <p>Report generated on 05-Nov-2026 at 13:23:33 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a>
+        v4.2.0</p>
+    <div id="environment-header">
+      <h2>Environment</h2>
+    </div>
+    <table id="environment"></table>
+    <!-- TEMPLATES -->
+      <template id="template_environment_row">
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+    </template>
+    <template id="template_results-table__body--empty">
+      <tbody class="results-table-row">
+        <tr id="not-found-message">
+          <td colspan="4">No results found. Check the filters.</td>
+        </tr>
+      </tbody>
+    </template>
+    <template id="template_results-table__tbody">
+      <tbody class="results-table-row">
+        <tr class="collapsible">
+        </tr>
+        <tr class="extras-row">
+          <td class="extra" colspan="4">
+            <div class="extraHTML"></div>
+            <div class="media">
+              <div class="media-container">
+                  <div class="media-container__nav--left">&lt;</div>
+                  <div class="media-container__viewport">
+                    <img src="" />
+                    <video controls>
+                      <source src="" type="video/mp4">
+                    </video>
+                  </div>
+                  <div class="media-container__nav--right">&gt;</div>
+                </div>
+                <div class="media__name"></div>
+                <div class="media__counter"></div>
+            </div>
+            <div class="logwrapper">
+              <div class="logexpander"></div>
+              <div class="log"></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </template>
+    <!-- END TEMPLATES -->
+    <div class="summary">
+      <div class="summary__data">
+        <h2>Summary</h2>
+        <div class="additional-summary prefix">
+        </div>
+        <p class="run-count">26 tests took 00:00:29.</p>
+        <p class="filter">(Un)check the boxes to filter the results.</p>
+        <div class="summary__reload">
+          <div class="summary__reload__button hidden" onclick="location.reload()">
+            <div>There are still tests running. <br />Reload this page to get the latest results!</div>
+          </div>
+        </div>
+        <div class="summary__spacer"></div>
+        <div class="controls">
+          <div class="filters">
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="failed" >
+            <span class="failed">11 Failed,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="passed" >
+            <span class="passed">15 Passed,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="skipped" disabled>
+            <span class="skipped">0 Skipped,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="xfailed" disabled>
+            <span class="xfailed">0 Expected failures,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="xpassed" disabled>
+            <span class="xpassed">0 Unexpected passes,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="error" disabled>
+            <span class="error">0 Errors,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="rerun" disabled>
+            <span class="rerun">0 Reruns</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="retried" disabled>
+            <span class="retried">0 Retried,</span>
+          </div>
+          <div class="collapse">
+            <button id="show_all_details">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details">Hide all details</button>
+          </div>
+        </div>
+      </div>
+      <div class="additional-summary summary">
+      </div>
+      <div class="additional-summary postfix">
+      </div>
+    </div>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable" data-column-type="result">Result</th>
+          <th class="sortable" data-column-type="testId">Test</th>
+          <th class="sortable" data-column-type="duration">Duration</th>
+          <th>Links</th>
+        </tr>
+      </thead>
+    </table>
+  <footer>
+    <div id="data-container" data-jsonblob="{&#34;environment&#34;: {&#34;Python&#34;: &#34;3.14.4&#34;, &#34;Platform&#34;: &#34;Windows-11-10.0.26200-SP0&#34;, &#34;Packages&#34;: {&#34;pytest&#34;: &#34;9.1.1&#34;, &#34;pluggy&#34;: &#34;1.7.0&#34;}, &#34;Plugins&#34;: {&#34;anyio&#34;: &#34;4.15.1&#34;, &#34;Faker&#34;: &#34;40.43.0&#34;, &#34;asyncio&#34;: &#34;1.4.0&#34;, &#34;cov&#34;: &#34;7.1.0&#34;, &#34;html&#34;: &#34;4.2.0&#34;, &#34;json-report&#34;: &#34;1.5.0&#34;, &#34;metadata&#34;: &#34;3.1.1&#34;}}, &#34;tests&#34;: {&#34;tests/test_articles.py::test_crear_articulo_valido&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_articles.py::test_crear_articulo_valido&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_articles.py::test_crear_articulo_valido&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_articles.py::test_crear_articulo_titulo_vacio_retorna_422&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_articles.py::test_crear_articulo_titulo_vacio_retorna_422&#34;, &#34;duration&#34;: &#34;769 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_articles.py::test_crear_articulo_titulo_vacio_retorna_422&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;769 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;client = &amp;lt;starlette.testclient.TestClient object at 0x00000214CCD47110&amp;gt;\ndb = &amp;lt;sqlalchemy.ext.asyncio.session.AsyncSession object at 0x00000214CCFC50F0&amp;gt;\n\n    @pytest.mark.asyncio\n    async def test_crear_articulo_titulo_vacio_retorna_422(\n        client: TestClient, db: AsyncSession\n    ) -&amp;gt; None:\n        &amp;quot;&amp;quot;&amp;quot;CP-ART-A-002: POST /api/articles con title=&amp;#x27;&amp;#x27; debe retornar HTTP 422.&amp;quot;&amp;quot;&amp;quot;\n        john = await create_john(db)\n        headers = auth_header(john)\n    \n        payload = {\n            &amp;quot;article&amp;quot;: {\n                &amp;quot;title&amp;quot;: &amp;quot;&amp;quot;,  # BVA: valor en el l\u00edmite inferior (0 &amp;lt; m\u00ednimo de 1)\n                &amp;quot;description&amp;quot;: &amp;quot;Test Description&amp;quot;,\n                &amp;quot;body&amp;quot;: &amp;quot;Test Body&amp;quot;,\n                &amp;quot;tagList&amp;quot;: [],\n            }\n        }\n    \n        response = client.post(&amp;quot;/api/articles&amp;quot;, json=payload, headers=headers)\n    \n&amp;gt;       assert response.status_code == 422, (\n            f&amp;quot;[CP-ART-A-002] Se esperaba HTTP 422, se obtuvo {response.status_code}. &amp;quot;\n            &amp;quot;Posible BUG-02: la validaci\u00f3n min_length=1 en el campo &amp;#x27;title&amp;#x27; fue eliminada.&amp;quot;\n        )\nE       AssertionError: [CP-ART-A-002] Se esperaba HTTP 422, se obtuvo 200. Posible BUG-02: la validaci\u00f3n min_length=1 en el campo &amp;#x27;title&amp;#x27; fue eliminada.\nE       assert 200 == 422\nE        +  where 200 = &amp;lt;Response [200 OK]&amp;gt;.status_code\n\ntests\\test_articles.py:96: AssertionError\n&#34;}], &#34;tests/test_articles.py::test_crear_articulo_sin_auth_retorna_401&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_articles.py::test_crear_articulo_sin_auth_retorna_401&#34;, &#34;duration&#34;: &#34;43 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_articles.py::test_crear_articulo_sin_auth_retorna_401&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;43 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_articles.py::test_editar_articulo_como_autor&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_articles.py::test_editar_articulo_como_autor&#34;, &#34;duration&#34;: &#34;00:00:02&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_articles.py::test_editar_articulo_como_autor&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:02&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_articles.py::test_editar_articulo_ajeno_retorna_400&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_articles.py::test_editar_articulo_ajeno_retorna_400&#34;, &#34;duration&#34;: &#34;00:00:02&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_articles.py::test_editar_articulo_ajeno_retorna_400&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:02&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;client = &amp;lt;starlette.testclient.TestClient object at 0x00000214CD115220&amp;gt;\ndb = &amp;lt;sqlalchemy.ext.asyncio.session.AsyncSession object at 0x00000214CD1A53D0&amp;gt;\n\n    @pytest.mark.asyncio\n    async def test_editar_articulo_ajeno_retorna_400(\n        client: TestClient, db: AsyncSession\n    ) -&amp;gt; None:\n        &amp;quot;&amp;quot;&amp;quot;CP-ART-A-005: PUT /api/articles/{slug} como no-autor debe retornar HTTP 400.&amp;quot;&amp;quot;&amp;quot;\n        john = await create_john(db)\n        jane = await create_jane(db)\n    \n        # Jane crea un art\u00edculo\n        await create_article(db, author=jane, title=&amp;quot;Jane Article&amp;quot;, slug=&amp;quot;jane-article&amp;quot;)\n    \n        # John (no-autor) intenta editar el art\u00edculo de Jane\n        headers = auth_header(john)\n        payload = {&amp;quot;article&amp;quot;: {&amp;quot;title&amp;quot;: &amp;quot;Modificado por John&amp;quot;}}\n    \n        response = client.put(\n            &amp;quot;/api/articles/jane-article&amp;quot;, json=payload, headers=headers\n        )\n    \n&amp;gt;       assert response.status_code == 400, (\n            f&amp;quot;[CP-ART-A-005] Se esperaba HTTP 400, se obtuvo {response.status_code}. &amp;quot;\n            &amp;quot;Posible BUG-03: la verificaci\u00f3n de autor\u00eda en PUT fue eliminada. &amp;quot;\n            &amp;quot;Cualquier usuario autenticado puede editar art\u00edculos ajenos.&amp;quot;\n        )\nE       AssertionError: [CP-ART-A-005] Se esperaba HTTP 400, se obtuvo 200. Posible BUG-03: la verificaci\u00f3n de autor\u00eda en PUT fue eliminada. Cualquier usuario autenticado puede editar art\u00edculos ajenos.\nE       assert 200 == 400\nE        +  where 200 = &amp;lt;Response [200 OK]&amp;gt;.status_code\n\ntests\\test_articles.py:179: AssertionError\n&#34;}], &#34;tests/test_articles.py::test_eliminar_articulo_ajeno_retorna_400&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_articles.py::test_eliminar_articulo_ajeno_retorna_400&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_articles.py::test_eliminar_articulo_ajeno_retorna_400&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;client = &amp;lt;starlette.testclient.TestClient object at 0x00000214CD0CAD50&amp;gt;\ndb = &amp;lt;sqlalchemy.ext.asyncio.session.AsyncSession object at 0x00000214CD13F6A0&amp;gt;\n\n    @pytest.mark.asyncio\n    async def test_eliminar_articulo_ajeno_retorna_400(\n        client: TestClient, db: AsyncSession\n    ) -&amp;gt; None:\n        &amp;quot;&amp;quot;&amp;quot;CP-ART-A-006: DELETE /api/articles/{slug} como no-autor debe retornar HTTP 400.&amp;quot;&amp;quot;&amp;quot;\n        john = await create_john(db)\n        jane = await create_jane(db)\n    \n        # Jane crea un art\u00edculo\n        await create_article(db, author=jane, title=&amp;quot;Jane Article&amp;quot;, slug=&amp;quot;jane-article&amp;quot;)\n    \n        # John (no-autor) intenta eliminar el art\u00edculo de Jane\n        headers = auth_header(john)\n    \n        response = client.delete(&amp;quot;/api/articles/jane-article&amp;quot;, headers=headers)\n    \n&amp;gt;       assert response.status_code == 400, (\n            f&amp;quot;[CP-ART-A-006] Se esperaba HTTP 400, se obtuvo {response.status_code}. &amp;quot;\n            &amp;quot;ALERTA DE SEGURIDAD (BUG-04): la verificaci\u00f3n de autor\u00eda en DELETE fue eliminada. &amp;quot;\n            &amp;quot;Cualquier usuario autenticado puede eliminar art\u00edculos ajenos.&amp;quot;\n        )\nE       AssertionError: [CP-ART-A-006] Se esperaba HTTP 400, se obtuvo 200. ALERTA DE SEGURIDAD (BUG-04): la verificaci\u00f3n de autor\u00eda en DELETE fue eliminada. Cualquier usuario autenticado puede eliminar art\u00edculos ajenos.\nE       assert 200 == 400\nE        +  where 200 = &amp;lt;Response [200 OK]&amp;gt;.status_code\n\ntests\\test_articles.py:209: AssertionError\n&#34;}], &#34;tests/test_articles.py::test_feed_sin_auth_retorna_401&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_articles.py::test_feed_sin_auth_retorna_401&#34;, &#34;duration&#34;: &#34;117 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_articles.py::test_feed_sin_auth_retorna_401&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;117 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;client = &amp;lt;starlette.testclient.TestClient object at 0x00000214CD07D480&amp;gt;\ndb = &amp;lt;sqlalchemy.ext.asyncio.session.AsyncSession object at 0x00000214CD1BAAD0&amp;gt;\n\n    @pytest.mark.asyncio\n    async def test_feed_sin_auth_retorna_401(client: TestClient, db: AsyncSession) -&amp;gt; None:\n        &amp;quot;&amp;quot;&amp;quot;CP-ART-A-007: GET /api/articles/feed sin token debe retornar HTTP 401.&amp;quot;&amp;quot;&amp;quot;\n&amp;gt;       response = client.get(&amp;quot;/api/articles/feed&amp;quot;)  # Sin Authorization\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_articles.py:231: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n.venv\\Lib\\site-packages\\httpx\\_client.py:1053: in get\n    return self.request(\n.venv\\Lib\\site-packages\\starlette\\testclient.py:518: in request\n    return super().request(\n.venv\\Lib\\site-packages\\httpx\\_client.py:825: in request\n    return self.send(request, auth=auth, follow_redirects=follow_redirects)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\httpx\\_client.py:928: in send\n    raise exc\n.venv\\Lib\\site-packages\\httpx\\_client.py:922: in send\n    response.read()\n.venv\\Lib\\site-packages\\httpx\\_models.py:881: in read\n    self._content = b&amp;quot;&amp;quot;.join(self.iter_bytes())\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\httpx\\_models.py:897: in iter_bytes\n    for raw_bytes in self.iter_raw():\n                     ^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\httpx\\_models.py:951: in iter_raw\n    for raw_stream_bytes in self.stream:\n                            ^^^^^^^^^^^\n.venv\\Lib\\site-packages\\httpx\\_client.py:153: in __iter__\n    for chunk in self._stream:\n                 ^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\starlette\\testclient.py:384: in iter_body\n    exit_stack.close()\nC:\\Python314\\Lib\\contextlib.py:627: in close\n    self.__exit__(None, None, None)\nC:\\Python314\\Lib\\contextlib.py:619: in __exit__\n    raise exc\nC:\\Python314\\Lib\\contextlib.py:604: in __exit__\n    if cb(*exc_details):\n       ^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\starlette\\testclient.py:399: in close_app\n    raise exception\n.venv\\Lib\\site-packages\\anyio\\from_thread.py:265: in _call_func\n    retval = await retval_or_awaitable\n             ^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\starlette\\testclient.py:366: in run_app\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\applications.py:1194: in __call__\n    await super().__call__(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\applications.py:96: in __call__\n    await self.middleware_stack(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py:186: in __call__\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py:164: in __call__\n    await self.app(scope, receive, _send)\n.venv\\Lib\\site-packages\\fastapi\\telemetry\\_asgi.py:151: in __call__\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\cors.py:91: in __call__\n    await self.simple_response(scope, receive, send, request_headers=headers)\n.venv\\Lib\\site-packages\\starlette\\middleware\\cors.py:149: in simple_response\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\exceptions.py:63: in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:53: in wrapped_app\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:42: in wrapped_app\n    await app(scope, receive, sender)\n.venv\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py:18: in __call__\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\routing.py:678: in __call__\n    await self.middleware_stack(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:2811: in app\n    await route.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\routing.py:459: in handle\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\applications.py:1194: in __call__\n    await super().__call__(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\applications.py:96: in __call__\n    await self.middleware_stack(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py:186: in __call__\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py:164: in __call__\n    await self.app(scope, receive, _send)\n.venv\\Lib\\site-packages\\fastapi\\telemetry\\_asgi.py:151: in __call__\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\exceptions.py:63: in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:53: in wrapped_app\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:42: in wrapped_app\n    await app(scope, receive, sender)\n.venv\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py:18: in __call__\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\routing.py:678: in __call__\n    await self.middleware_stack(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:2811: in app\n    await route.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1839: in handle\n    await self.original_router.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:2894: in handle\n    await included_router._handle_selected(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1850: in _handle_selected\n    await route.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1839: in handle\n    await self.original_router.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:2894: in handle\n    await included_router._handle_selected(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1865: in _handle_selected\n    await original_route.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1328: in handle\n    await effective_context.app(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:166: in app\n    await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:53: in wrapped_app\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:42: in wrapped_app\n    await app(scope, receive, sender)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:152: in app\n    response = await f(request)\n               ^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\fastapi\\routing.py:745: in app\n    raw_response = await run_endpoint_function(\n.venv\\Lib\\site-packages\\fastapi\\routing.py:372: in run_endpoint_function\n    return await dependant.call(**values)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\napp\\api\\routes\\articles.py:77: in get_feed\n    result, count = await articles.get_feed(limit, offset, user=current_user)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nself = &amp;lt;app.crud.crud_article.ArticlesRepository object at 0x00000214CD215EB0&amp;gt;\nlimit = 20, offset = 0, user = None\n\n    async def get_feed(self, limit: int, offset: int, *, user: User) -&amp;gt; tuple[Sequence[Article], int]:\n        query = (\n            select(Article)\n            .options(\n                joinedload(Article.author).joinedload(User.followers),\n                joinedload(Article.tags),\n                joinedload(Article.favorited_by),\n            )\n&amp;gt;           .filter(Article.author.has(User.followers.any(id=user.id)))\n                                                             ^^^^^^^\n        )\nE       AttributeError: &amp;#x27;NoneType&amp;#x27; object has no attribute &amp;#x27;id&amp;#x27;\n\napp\\crud\\crud_article.py:77: AttributeError\n&#34;}], &#34;tests/test_articles.py::test_filtrar_articulos_por_tag&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_articles.py::test_filtrar_articulos_por_tag&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_articles.py::test_filtrar_articulos_por_tag&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;client = &amp;lt;starlette.testclient.TestClient object at 0x00000214CD07F240&amp;gt;\ndb = &amp;lt;sqlalchemy.ext.asyncio.session.AsyncSession object at 0x00000214CD96D010&amp;gt;\n\n    @pytest.mark.asyncio\n    async def test_filtrar_articulos_por_tag(client: TestClient, db: AsyncSession) -&amp;gt; None:\n        &amp;quot;&amp;quot;&amp;quot;CP-ART-A-008: GET /api/articles?tag=python debe retornar solo art\u00edculos con ese tag.&amp;quot;&amp;quot;&amp;quot;\n        john = await create_john(db)\n    \n        # Crear art\u00edculos con tags distintos\n        await create_article(\n            db, author=john, title=&amp;quot;Python Article 1&amp;quot;, slug=&amp;quot;python-article-1&amp;quot;,\n            tags=[&amp;quot;python&amp;quot;]\n        )\n        await create_article(\n            db, author=john, title=&amp;quot;Python Article 2&amp;quot;, slug=&amp;quot;python-article-2&amp;quot;,\n            tags=[&amp;quot;python&amp;quot;]\n        )\n        await create_article(\n            db, author=john, title=&amp;quot;Java Article&amp;quot;, slug=&amp;quot;java-article&amp;quot;,\n            tags=[&amp;quot;java&amp;quot;]\n        )\n    \n        response = client.get(&amp;quot;/api/articles?tag=python&amp;quot;)\n        body = response.json()\n    \n        assert response.status_code == 200, (\n            f&amp;quot;[CP-ART-A-008] Se esperaba HTTP 200, se obtuvo {response.status_code}.&amp;quot;\n        )\n&amp;gt;       assert body[&amp;quot;articlesCount&amp;quot;] == 2, (\n            f&amp;quot;[CP-ART-A-008] Se esperaban 2 art\u00edculos con tag &amp;#x27;python&amp;#x27;, &amp;quot;\n            f&amp;quot;se obtuvieron {body[&amp;#x27;articlesCount&amp;#x27;]}. &amp;quot;\n            &amp;quot;Posible BUG-08: el filtro por tag est\u00e1 siendo ignorado (retorna todos los art\u00edculos).&amp;quot;\n        )\nE       AssertionError: [CP-ART-A-008] Se esperaban 2 art\u00edculos con tag &amp;#x27;python&amp;#x27;, se obtuvieron 3. Posible BUG-08: el filtro por tag est\u00e1 siendo ignorado (retorna todos los art\u00edculos).\nE       assert 3 == 2\n\ntests\\test_articles.py:270: AssertionError\n&#34;}], &#34;tests/test_articles.py::test_limit_capeado_en_20_articulos&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_articles.py::test_limit_capeado_en_20_articulos&#34;, &#34;duration&#34;: &#34;00:00:02&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_articles.py::test_limit_capeado_en_20_articulos&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:02&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;client = &amp;lt;starlette.testclient.TestClient object at 0x00000214CB974050&amp;gt;\ndb = &amp;lt;sqlalchemy.ext.asyncio.session.AsyncSession object at 0x00000214CD2AD710&amp;gt;\n\n    @pytest.mark.asyncio\n    async def test_limit_capeado_en_20_articulos(\n        client: TestClient, db: AsyncSession\n    ) -&amp;gt; None:\n        &amp;quot;&amp;quot;&amp;quot;CP-ART-A-009: GET /api/articles?limit=100 debe retornar m\u00e1ximo 20 art\u00edculos.&amp;quot;&amp;quot;&amp;quot;\n        john = await create_john(db)\n    \n        # Crear 25 art\u00edculos para superar el l\u00edmite\n        for i in range(1, 26):\n            await create_article(\n                db,\n                author=john,\n                title=f&amp;quot;Article {i:02d}&amp;quot;,\n                slug=f&amp;quot;article-{i:02d}&amp;quot;,\n            )\n    \n        response = client.get(&amp;quot;/api/articles?limit=100&amp;quot;)\n        body = response.json()\n    \n        assert response.status_code == 200, (\n            f&amp;quot;[CP-ART-A-009] Se esperaba HTTP 200, se obtuvo {response.status_code}.&amp;quot;\n        )\n    \n        articles_returned = len(body[&amp;quot;articles&amp;quot;])\n&amp;gt;       assert articles_returned &amp;lt;= 20, (\n            f&amp;quot;[CP-ART-A-009] Se esperaban m\u00e1ximo 20 art\u00edculos, se obtuvieron {articles_returned}. &amp;quot;\n            &amp;quot;Posible BUG-09: el par\u00e1metro limit no est\u00e1 siendo capado al m\u00e1ximo de 20.&amp;quot;\n        )\nE       AssertionError: [CP-ART-A-009] Se esperaban m\u00e1ximo 20 art\u00edculos, se obtuvieron 25. Posible BUG-09: el par\u00e1metro limit no est\u00e1 siendo capado al m\u00e1ximo de 20.\nE       assert 25 &amp;lt;= 20\n\ntests\\test_articles.py:312: AssertionError\n&#34;}], &#34;tests/test_auth.py::test_registro_retorna_201&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_auth.py::test_registro_retorna_201&#34;, &#34;duration&#34;: &#34;620 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_auth.py::test_registro_retorna_201&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;620 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;client = &amp;lt;starlette.testclient.TestClient object at 0x00000214CCED5150&amp;gt;\ndb = &amp;lt;sqlalchemy.ext.asyncio.session.AsyncSession object at 0x00000214CD2B8E50&amp;gt;\n\n    @pytest.mark.asyncio\n    async def test_registro_retorna_201(client: TestClient, db: AsyncSession) -&amp;gt; None:\n        &amp;quot;&amp;quot;&amp;quot;CP-AUTH-A-001: POST /api/users con datos v\u00e1lidos debe retornar HTTP 201.&amp;quot;&amp;quot;&amp;quot;\n        payload = {\n            &amp;quot;user&amp;quot;: {\n                &amp;quot;username&amp;quot;: &amp;quot;testuser&amp;quot;,\n                &amp;quot;email&amp;quot;: &amp;quot;testuser@test.com&amp;quot;,\n                &amp;quot;password&amp;quot;: &amp;quot;password123&amp;quot;,\n            }\n        }\n    \n        response = client.post(&amp;quot;/api/users&amp;quot;, json=payload)\n    \n&amp;gt;       assert response.status_code == 201, (\n            f&amp;quot;[CP-AUTH-A-001] Se esperaba HTTP 201, se obtuvo {response.status_code}. &amp;quot;\n            &amp;quot;Posible BUG-01: el endpoint retorna 200 en lugar de 201.&amp;quot;\n        )\nE       AssertionError: [CP-AUTH-A-001] Se esperaba HTTP 201, se obtuvo 200. Posible BUG-01: el endpoint retorna 200 en lugar de 201.\nE       assert 200 == 201\nE        +  where 200 = &amp;lt;Response [200 OK]&amp;gt;.status_code\n\ntests\\test_auth.py:35: AssertionError\n&#34;}], &#34;tests/test_auth.py::test_registro_retorna_token_jwt&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_auth.py::test_registro_retorna_token_jwt&#34;, &#34;duration&#34;: &#34;611 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_auth.py::test_registro_retorna_token_jwt&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;611 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_auth.py::test_login_retorna_token_jwt&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_auth.py::test_login_retorna_token_jwt&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_auth.py::test_login_retorna_token_jwt&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_auth.py::test_login_email_inexistente_retorna_400&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_auth.py::test_login_email_inexistente_retorna_400&#34;, &#34;duration&#34;: &#34;49 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_auth.py::test_login_email_inexistente_retorna_400&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;49 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_auth.py::test_registro_email_duplicado_retorna_400&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_auth.py::test_registro_email_duplicado_retorna_400&#34;, &#34;duration&#34;: &#34;611 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_auth.py::test_registro_email_duplicado_retorna_400&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;611 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_comments.py::test_crear_comentario_en_articulo_existente&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_comments.py::test_crear_comentario_en_articulo_existente&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_comments.py::test_crear_comentario_en_articulo_existente&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_comments.py::test_crear_comentario_sin_auth_retorna_401&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_comments.py::test_crear_comentario_sin_auth_retorna_401&#34;, &#34;duration&#34;: &#34;631 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_comments.py::test_crear_comentario_sin_auth_retorna_401&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;631 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_comments.py::test_eliminar_comentario_propio&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_comments.py::test_eliminar_comentario_propio&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_comments.py::test_eliminar_comentario_propio&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_comments.py::test_get_comentarios_articulo_inexistente_retorna_404&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_comments.py::test_get_comentarios_articulo_inexistente_retorna_404&#34;, &#34;duration&#34;: &#34;58 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_comments.py::test_get_comentarios_articulo_inexistente_retorna_404&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;58 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_favorites.py::test_marcar_favorito_incrementa_contador&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_favorites.py::test_marcar_favorito_incrementa_contador&#34;, &#34;duration&#34;: &#34;681 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_favorites.py::test_marcar_favorito_incrementa_contador&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;681 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;client = &amp;lt;starlette.testclient.TestClient object at 0x00000214CD261150&amp;gt;\ndb = &amp;lt;sqlalchemy.ext.asyncio.session.AsyncSession object at 0x00000214CD2CE900&amp;gt;\n\n    @pytest.mark.asyncio\n    async def test_marcar_favorito_incrementa_contador(\n        client: TestClient, db: AsyncSession\n    ) -&amp;gt; None:\n        &amp;quot;&amp;quot;&amp;quot;CP-FAV-A-001: POST /api/articles/{slug}/favorite debe poner favorited=true y count=1.&amp;quot;&amp;quot;&amp;quot;\n        john = await create_john(db)\n        await create_article(db, author=john, title=&amp;quot;Test Article&amp;quot;, slug=&amp;quot;test-article&amp;quot;)\n        headers = auth_header(john)\n    \n        # Verificar estado inicial\n        initial_response = client.get(&amp;quot;/api/articles/test-article&amp;quot;)\n        initial_body = initial_response.json()\n        assert initial_body[&amp;quot;article&amp;quot;][&amp;quot;favoritesCount&amp;quot;] == 0, (\n            &amp;quot;[CP-FAV-A-001] El art\u00edculo reci\u00e9n creado deber\u00eda tener favoritesCount=0.&amp;quot;\n        )\n    \n        # Marcar como favorito\n&amp;gt;       response = client.post(&amp;quot;/api/articles/test-article/favorite&amp;quot;, headers=headers)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_favorites.py:38: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n.venv\\Lib\\site-packages\\httpx\\_client.py:1144: in post\n    return self.request(\n.venv\\Lib\\site-packages\\starlette\\testclient.py:518: in request\n    return super().request(\n.venv\\Lib\\site-packages\\httpx\\_client.py:825: in request\n    return self.send(request, auth=auth, follow_redirects=follow_redirects)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\httpx\\_client.py:928: in send\n    raise exc\n.venv\\Lib\\site-packages\\httpx\\_client.py:922: in send\n    response.read()\n.venv\\Lib\\site-packages\\httpx\\_models.py:881: in read\n    self._content = b&amp;quot;&amp;quot;.join(self.iter_bytes())\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\httpx\\_models.py:897: in iter_bytes\n    for raw_bytes in self.iter_raw():\n                     ^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\httpx\\_models.py:951: in iter_raw\n    for raw_stream_bytes in self.stream:\n                            ^^^^^^^^^^^\n.venv\\Lib\\site-packages\\httpx\\_client.py:153: in __iter__\n    for chunk in self._stream:\n                 ^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\starlette\\testclient.py:384: in iter_body\n    exit_stack.close()\nC:\\Python314\\Lib\\contextlib.py:627: in close\n    self.__exit__(None, None, None)\nC:\\Python314\\Lib\\contextlib.py:619: in __exit__\n    raise exc\nC:\\Python314\\Lib\\contextlib.py:604: in __exit__\n    if cb(*exc_details):\n       ^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\starlette\\testclient.py:399: in close_app\n    raise exception\n.venv\\Lib\\site-packages\\anyio\\from_thread.py:265: in _call_func\n    retval = await retval_or_awaitable\n             ^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\starlette\\testclient.py:366: in run_app\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\applications.py:1194: in __call__\n    await super().__call__(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\applications.py:96: in __call__\n    await self.middleware_stack(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py:186: in __call__\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py:164: in __call__\n    await self.app(scope, receive, _send)\n.venv\\Lib\\site-packages\\fastapi\\telemetry\\_asgi.py:151: in __call__\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\cors.py:91: in __call__\n    await self.simple_response(scope, receive, send, request_headers=headers)\n.venv\\Lib\\site-packages\\starlette\\middleware\\cors.py:149: in simple_response\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\exceptions.py:63: in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:53: in wrapped_app\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:42: in wrapped_app\n    await app(scope, receive, sender)\n.venv\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py:18: in __call__\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\routing.py:678: in __call__\n    await self.middleware_stack(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:2811: in app\n    await route.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\routing.py:459: in handle\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\applications.py:1194: in __call__\n    await super().__call__(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\applications.py:96: in __call__\n    await self.middleware_stack(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py:186: in __call__\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py:164: in __call__\n    await self.app(scope, receive, _send)\n.venv\\Lib\\site-packages\\fastapi\\telemetry\\_asgi.py:151: in __call__\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\exceptions.py:63: in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:53: in wrapped_app\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:42: in wrapped_app\n    await app(scope, receive, sender)\n.venv\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py:18: in __call__\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\routing.py:678: in __call__\n    await self.middleware_stack(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:2811: in app\n    await route.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1839: in handle\n    await self.original_router.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:2894: in handle\n    await included_router._handle_selected(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1850: in _handle_selected\n    await route.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1839: in handle\n    await self.original_router.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:2894: in handle\n    await included_router._handle_selected(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1865: in _handle_selected\n    await original_route.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1328: in handle\n    await effective_context.app(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:166: in app\n    await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:53: in wrapped_app\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:42: in wrapped_app\n    await app(scope, receive, sender)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:152: in app\n    response = await f(request)\n               ^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\fastapi\\routing.py:745: in app\n    raw_response = await run_endpoint_function(\n.venv\\Lib\\site-packages\\fastapi\\routing.py:372: in run_endpoint_function\n    return await dependant.call(**values)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\napp\\api\\routes\\favorites.py:36: in favorite\n    await articles.favorite(db_obj=article, user=current_user, favorite=False)\napp\\crud\\crud_article.py:133: in favorite\n    db_obj.favorited_by.remove(user)\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nself = [], value = &amp;lt;app.models.user.User object at 0x00000214CD9A0FF0&amp;gt;\n_sa_initiator = None\n\n    def remove(self, value, _sa_initiator=None):\n        __del(self, value, _sa_initiator, NO_KEY)\n        # testlib.pragma exempt:__eq__\n&amp;gt;       fn(self, value)\nE       ValueError: list.remove(x): x not in list\n\n.venv\\Lib\\site-packages\\sqlalchemy\\orm\\collections.py:1097: ValueError\n&#34;}], &#34;tests/test_favorites.py::test_desmarcar_favorito_decrementa_contador&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_favorites.py::test_desmarcar_favorito_decrementa_contador&#34;, &#34;duration&#34;: &#34;921 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_favorites.py::test_desmarcar_favorito_decrementa_contador&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;921 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;client = &amp;lt;starlette.testclient.TestClient object at 0x00000214CD23B680&amp;gt;\ndb = &amp;lt;sqlalchemy.ext.asyncio.session.AsyncSession object at 0x00000214CD9C8EC0&amp;gt;\n\n    @pytest.mark.asyncio\n    async def test_desmarcar_favorito_decrementa_contador(\n        client: TestClient, db: AsyncSession\n    ) -&amp;gt; None:\n        &amp;quot;&amp;quot;&amp;quot;CP-FAV-A-002: DELETE /api/articles/{slug}/favorite debe poner favorited=false y count=0.&amp;quot;&amp;quot;&amp;quot;\n        john = await create_john(db)\n        await create_article(db, author=john, title=&amp;quot;Test Article&amp;quot;, slug=&amp;quot;test-article&amp;quot;)\n        headers = auth_header(john)\n    \n        # Precondici\u00f3n: marcar como favorito primero\n&amp;gt;       fav_response = client.post(&amp;quot;/api/articles/test-article/favorite&amp;quot;, headers=headers)\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests\\test_favorites.py:71: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n.venv\\Lib\\site-packages\\httpx\\_client.py:1144: in post\n    return self.request(\n.venv\\Lib\\site-packages\\starlette\\testclient.py:518: in request\n    return super().request(\n.venv\\Lib\\site-packages\\httpx\\_client.py:825: in request\n    return self.send(request, auth=auth, follow_redirects=follow_redirects)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\httpx\\_client.py:928: in send\n    raise exc\n.venv\\Lib\\site-packages\\httpx\\_client.py:922: in send\n    response.read()\n.venv\\Lib\\site-packages\\httpx\\_models.py:881: in read\n    self._content = b&amp;quot;&amp;quot;.join(self.iter_bytes())\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\httpx\\_models.py:897: in iter_bytes\n    for raw_bytes in self.iter_raw():\n                     ^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\httpx\\_models.py:951: in iter_raw\n    for raw_stream_bytes in self.stream:\n                            ^^^^^^^^^^^\n.venv\\Lib\\site-packages\\httpx\\_client.py:153: in __iter__\n    for chunk in self._stream:\n                 ^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\starlette\\testclient.py:384: in iter_body\n    exit_stack.close()\nC:\\Python314\\Lib\\contextlib.py:627: in close\n    self.__exit__(None, None, None)\nC:\\Python314\\Lib\\contextlib.py:619: in __exit__\n    raise exc\nC:\\Python314\\Lib\\contextlib.py:604: in __exit__\n    if cb(*exc_details):\n       ^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\starlette\\testclient.py:399: in close_app\n    raise exception\n.venv\\Lib\\site-packages\\anyio\\from_thread.py:265: in _call_func\n    retval = await retval_or_awaitable\n             ^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\starlette\\testclient.py:366: in run_app\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\applications.py:1194: in __call__\n    await super().__call__(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\applications.py:96: in __call__\n    await self.middleware_stack(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py:186: in __call__\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py:164: in __call__\n    await self.app(scope, receive, _send)\n.venv\\Lib\\site-packages\\fastapi\\telemetry\\_asgi.py:151: in __call__\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\cors.py:91: in __call__\n    await self.simple_response(scope, receive, send, request_headers=headers)\n.venv\\Lib\\site-packages\\starlette\\middleware\\cors.py:149: in simple_response\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\exceptions.py:63: in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:53: in wrapped_app\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:42: in wrapped_app\n    await app(scope, receive, sender)\n.venv\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py:18: in __call__\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\routing.py:678: in __call__\n    await self.middleware_stack(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:2811: in app\n    await route.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\routing.py:459: in handle\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\applications.py:1194: in __call__\n    await super().__call__(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\applications.py:96: in __call__\n    await self.middleware_stack(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py:186: in __call__\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\middleware\\errors.py:164: in __call__\n    await self.app(scope, receive, _send)\n.venv\\Lib\\site-packages\\fastapi\\telemetry\\_asgi.py:151: in __call__\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\middleware\\exceptions.py:63: in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:53: in wrapped_app\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:42: in wrapped_app\n    await app(scope, receive, sender)\n.venv\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py:18: in __call__\n    await self.app(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\routing.py:678: in __call__\n    await self.middleware_stack(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:2811: in app\n    await route.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1839: in handle\n    await self.original_router.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:2894: in handle\n    await included_router._handle_selected(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1850: in _handle_selected\n    await route.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1839: in handle\n    await self.original_router.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:2894: in handle\n    await included_router._handle_selected(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1865: in _handle_selected\n    await original_route.handle(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:1328: in handle\n    await effective_context.app(scope, receive, send)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:166: in app\n    await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:53: in wrapped_app\n    raise exc\n.venv\\Lib\\site-packages\\starlette\\_exception_handler.py:42: in wrapped_app\n    await app(scope, receive, sender)\n.venv\\Lib\\site-packages\\fastapi\\routing.py:152: in app\n    response = await f(request)\n               ^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\fastapi\\routing.py:745: in app\n    raw_response = await run_endpoint_function(\n.venv\\Lib\\site-packages\\fastapi\\routing.py:372: in run_endpoint_function\n    return await dependant.call(**values)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\napp\\api\\routes\\favorites.py:36: in favorite\n    await articles.favorite(db_obj=article, user=current_user, favorite=False)\napp\\crud\\crud_article.py:133: in favorite\n    db_obj.favorited_by.remove(user)\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nself = [], value = &amp;lt;app.models.user.User object at 0x00000214CD936210&amp;gt;\n_sa_initiator = None\n\n    def remove(self, value, _sa_initiator=None):\n        __del(self, value, _sa_initiator, NO_KEY)\n        # testlib.pragma exempt:__eq__\n&amp;gt;       fn(self, value)\nE       ValueError: list.remove(x): x not in list\n\n.venv\\Lib\\site-packages\\sqlalchemy\\orm\\collections.py:1097: ValueError\n&#34;}], &#34;tests/test_profiles.py::test_seguir_usuario_cambia_following_a_true&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_profiles.py::test_seguir_usuario_cambia_following_a_true&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_profiles.py::test_seguir_usuario_cambia_following_a_true&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;client = &amp;lt;starlette.testclient.TestClient object at 0x00000214CD07D8C0&amp;gt;\ndb = &amp;lt;sqlalchemy.ext.asyncio.session.AsyncSession object at 0x00000214CDE9FE70&amp;gt;\n\n    @pytest.mark.asyncio\n    async def test_seguir_usuario_cambia_following_a_true(\n        client: TestClient, db: AsyncSession\n    ) -&amp;gt; None:\n        &amp;quot;&amp;quot;&amp;quot;CP-PRF-A-001: POST /api/profiles/{username}/follow debe retornar following=true.&amp;quot;&amp;quot;&amp;quot;\n        john = await create_john(db)\n        jane = await create_jane(db)\n    \n        # John sigue a Jane\n        headers = auth_header(john)\n        response = client.post(\n            &amp;quot;/api/profiles/Jane Doe/follow&amp;quot;, headers=headers\n        )\n        body = response.json()\n    \n        assert response.status_code == 200, (\n            f&amp;quot;[CP-PRF-A-001] Se esperaba HTTP 200, se obtuvo {response.status_code}. Body: {body}&amp;quot;\n        )\n        assert &amp;quot;profile&amp;quot; in body, &amp;quot;[CP-PRF-A-001] La respuesta no contiene la clave &amp;#x27;profile&amp;#x27;.&amp;quot;\n&amp;gt;       assert body[&amp;quot;profile&amp;quot;][&amp;quot;following&amp;quot;] is True, (\n            f&amp;quot;[CP-PRF-A-001] Se esperaba following=true despu\u00e9s de seguir, &amp;quot;\n            f&amp;quot;se obtuvo {body[&amp;#x27;profile&amp;#x27;].get(&amp;#x27;following&amp;#x27;)}. &amp;quot;\n            &amp;quot;Posible BUG-06: el m\u00e9todo profile() siempre retorna following=False.&amp;quot;\n        )\nE       AssertionError: [CP-PRF-A-001] Se esperaba following=true despu\u00e9s de seguir, se obtuvo False. Posible BUG-06: el m\u00e9todo profile() siempre retorna following=False.\nE       assert False is True\n\ntests\\test_profiles.py:42: AssertionError\n&#34;}], &#34;tests/test_profiles.py::test_dejar_de_seguir_cambia_following_a_false&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_profiles.py::test_dejar_de_seguir_cambia_following_a_false&#34;, &#34;duration&#34;: &#34;00:00:02&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_profiles.py::test_dejar_de_seguir_cambia_following_a_false&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:02&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;client = &amp;lt;starlette.testclient.TestClient object at 0x00000214CD2399D0&amp;gt;\ndb = &amp;lt;sqlalchemy.ext.asyncio.session.AsyncSession object at 0x00000214CD9C7620&amp;gt;\n\n    @pytest.mark.asyncio\n    async def test_dejar_de_seguir_cambia_following_a_false(\n        client: TestClient, db: AsyncSession\n    ) -&amp;gt; None:\n        &amp;quot;&amp;quot;&amp;quot;CP-PRF-A-002: DELETE /api/profiles/{username}/follow debe retornar following=false.&amp;quot;&amp;quot;&amp;quot;\n        john = await create_john(db)\n        jane = await create_jane(db)\n        headers = auth_header(john)\n    \n        # Precondici\u00f3n: John ya sigue a Jane\n        follow_response = client.post(&amp;quot;/api/profiles/Jane Doe/follow&amp;quot;, headers=headers)\n        assert follow_response.status_code == 200, (\n            f&amp;quot;[CP-PRF-A-002] Error en el setup de follow: {follow_response.status_code}.&amp;quot;\n        )\n        # Verificar que el follow funcion\u00f3 (precondici\u00f3n del estado)\n&amp;gt;       assert follow_response.json()[&amp;quot;profile&amp;quot;][&amp;quot;following&amp;quot;] is True, (\n            &amp;quot;[CP-PRF-A-002] El follow inicial no dej\u00f3 following=true. No se puede validar el unfollow.&amp;quot;\n        )\nE       AssertionError: [CP-PRF-A-002] El follow inicial no dej\u00f3 following=true. No se puede validar el unfollow.\nE       assert False is True\n\ntests\\test_profiles.py:70: AssertionError\n&#34;}], &#34;tests/test_profiles.py::test_get_perfil_inexistente_retorna_404&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_profiles.py::test_get_perfil_inexistente_retorna_404&#34;, &#34;duration&#34;: &#34;77 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_profiles.py::test_get_perfil_inexistente_retorna_404&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;77 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_profiles.py::test_seguir_usuario_sin_auth_retorna_401&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_profiles.py::test_seguir_usuario_sin_auth_retorna_401&#34;, &#34;duration&#34;: &#34;591 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_profiles.py::test_seguir_usuario_sin_auth_retorna_401&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;591 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_tags.py::test_get_tags_retorna_lista&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_tags.py::test_get_tags_retorna_lista&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_tags.py::test_get_tags_retorna_lista&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_tags.py::test_tags_de_articulo_creado_aparecen_en_get_tags&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_tags.py::test_tags_de_articulo_creado_aparecen_en_get_tags&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_tags.py::test_tags_de_articulo_creado_aparecen_en_get_tags&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}]}, &#34;renderCollapsed&#34;: [&#34;passed&#34;], &#34;initialSort&#34;: &#34;result&#34;, &#34;title&#34;: &#34;test_report.html&#34;}"></div>
+    <script>
+      (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+const { getCollapsedCategory, setCollapsedIds } = require('./storage.js')
+
+class DataManager {
+    setManager(data) {
+        const collapsedCategories = [...getCollapsedCategory(data.renderCollapsed)]
+        const collapsedIds = []
+        const tests = Object.values(data.tests).flat().map((test, index) => {
+            const collapsed = collapsedCategories.includes(test.result.toLowerCase())
+            const id = `test_${index}`
+            if (collapsed) {
+                collapsedIds.push(id)
+            }
+            return {
+                ...test,
+                id,
+                collapsed,
+            }
+        })
+        const dataBlob = { ...data, tests }
+        this.data = { ...dataBlob }
+        this.renderData = { ...dataBlob }
+        setCollapsedIds(collapsedIds)
+    }
+
+    get allData() {
+        return { ...this.data }
+    }
+
+    resetRender() {
+        this.renderData = { ...this.data }
+    }
+
+    setRender(data) {
+        this.renderData.tests = [...data]
+    }
+
+    toggleCollapsedItem(id) {
+        this.renderData.tests = this.renderData.tests.map((test) =>
+            test.id === id ? { ...test, collapsed: !test.collapsed } : test,
+        )
+    }
+
+    set allCollapsed(collapsed) {
+        this.renderData = { ...this.renderData, tests: [...this.renderData.tests.map((test) => (
+            { ...test, collapsed }
+        ))] }
+    }
+
+    get testSubset() {
+        return [...this.renderData.tests]
+    }
+
+    get environment() {
+        return this.renderData.environment
+    }
+
+    get initialSort() {
+        return this.data.initialSort
+    }
+}
+
+module.exports = {
+    manager: new DataManager(),
+}
+
+},{"./storage.js":8}],2:[function(require,module,exports){
+const mediaViewer = require('./mediaviewer.js')
+const templateEnvRow = document.getElementById('template_environment_row')
+const templateResult = document.getElementById('template_results-table__tbody')
+
+function htmlToElements(html) {
+    const temp = document.createElement('template')
+    temp.innerHTML = html
+    return temp.content.childNodes
+}
+
+const find = (selector, elem) => {
+    if (!elem) {
+        elem = document
+    }
+    return elem.querySelector(selector)
+}
+
+const findAll = (selector, elem) => {
+    if (!elem) {
+        elem = document
+    }
+    return [...elem.querySelectorAll(selector)]
+}
+
+const dom = {
+    getStaticRow: (key, value) => {
+        const envRow = templateEnvRow.content.cloneNode(true)
+        const isObj = typeof value === 'object' && value !== null
+        const values = isObj ? Object.keys(value).map((k) => `${k}: ${value[k]}`) : null
+
+        const valuesElement = htmlToElements(
+            values ? `<ul>${values.map((val) => `<li>${val}</li>`).join('')}<ul>` : `<div>${value}</div>`)[0]
+        const td = findAll('td', envRow)
+        td[0].textContent = key
+        td[1].appendChild(valuesElement)
+
+        return envRow
+    },
+    getResultTBody: ({ testId, id, log, extras, resultsTableRow, tableHtml, result, collapsed }) => {
+        const resultBody = templateResult.content.cloneNode(true)
+        resultBody.querySelector('tbody').classList.add(result.toLowerCase())
+        resultBody.querySelector('tbody').id = testId
+        resultBody.querySelector('.collapsible').dataset.id = id
+
+        resultsTableRow.forEach((html) => {
+            const t = document.createElement('template')
+            t.innerHTML = html
+            resultBody.querySelector('.collapsible').appendChild(t.content)
+        })
+
+        if (log) {
+            // Wrap lines starting with "E" with span.error to color those lines red
+            const wrappedLog = log.replace(/^E.*$/gm, (match) => `<span class="error">${match}</span>`)
+            resultBody.querySelector('.log').innerHTML = wrappedLog
+        } else {
+            resultBody.querySelector('.log').remove()
+        }
+
+        if (collapsed) {
+            resultBody.querySelector('.collapsible > .col-result')?.classList.add('collapsed')
+            resultBody.querySelector('.extras-row').classList.add('hidden')
+        } else {
+            resultBody.querySelector('.collapsible > .col-result')?.classList.remove('collapsed')
+        }
+
+        const media = []
+        extras?.forEach(({ name, format_type, content }) => {
+            if (['image', 'video'].includes(format_type)) {
+                media.push({ path: content, name, format_type })
+            }
+
+            if (format_type === 'html') {
+                resultBody.querySelector('.extraHTML').insertAdjacentHTML('beforeend', `<div>${content}</div>`)
+            }
+        })
+        mediaViewer.setup(resultBody, media)
+
+        // Add custom html from the pytest_html_results_table_html hook
+        tableHtml?.forEach((item) => {
+            resultBody.querySelector('td[class="extra"]').insertAdjacentHTML('beforeend', item)
+        })
+
+        return resultBody
+    },
+}
+
+module.exports = {
+    dom,
+    htmlToElements,
+    find,
+    findAll,
+}
+
+},{"./mediaviewer.js":6}],3:[function(require,module,exports){
+const { manager } = require('./datamanager.js')
+const { doSort } = require('./sort.js')
+const storageModule = require('./storage.js')
+
+const getFilteredSubSet = (filter) =>
+    manager.allData.tests.filter(({ result }) => filter.includes(result.toLowerCase()))
+
+const doInitFilter = () => {
+    const currentFilter = storageModule.getVisible()
+    const filteredSubset = getFilteredSubSet(currentFilter)
+    manager.setRender(filteredSubset)
+}
+
+const doFilter = (type, show) => {
+    if (show) {
+        storageModule.showCategory(type)
+    } else {
+        storageModule.hideCategory(type)
+    }
+
+    const currentFilter = storageModule.getVisible()
+    const filteredSubset = getFilteredSubSet(currentFilter)
+    manager.setRender(filteredSubset)
+
+    const sortColumn = storageModule.getSort()
+    doSort(sortColumn, true)
+}
+
+module.exports = {
+    doFilter,
+    doInitFilter,
+}
+
+},{"./datamanager.js":1,"./sort.js":7,"./storage.js":8}],4:[function(require,module,exports){
+const { redraw, bindEvents, renderStatic } = require('./main.js')
+const { doInitFilter } = require('./filter.js')
+const { doInitSort } = require('./sort.js')
+const { manager } = require('./datamanager.js')
+const data = JSON.parse(document.getElementById('data-container').dataset.jsonblob)
+
+function init() {
+    manager.setManager(data)
+    doInitFilter()
+    doInitSort()
+    renderStatic()
+    redraw()
+    bindEvents()
+}
+
+init()
+
+},{"./datamanager.js":1,"./filter.js":3,"./main.js":5,"./sort.js":7}],5:[function(require,module,exports){
+const { dom, find, findAll } = require('./dom.js')
+const { manager } = require('./datamanager.js')
+const { doSort } = require('./sort.js')
+const { doFilter } = require('./filter.js')
+const {
+    getVisible,
+    getCollapsedIds,
+    setCollapsedIds,
+    getSort,
+    getSortDirection,
+    possibleFilters,
+} = require('./storage.js')
+
+const removeChildren = (node) => {
+    while (node.firstChild) {
+        node.removeChild(node.firstChild)
+    }
+}
+
+const renderStatic = () => {
+    const renderEnvironmentTable = () => {
+        const environment = manager.environment
+        const rows = Object.keys(environment).map((key) => dom.getStaticRow(key, environment[key]))
+        const table = document.getElementById('environment')
+        removeChildren(table)
+        rows.forEach((row) => table.appendChild(row))
+    }
+    renderEnvironmentTable()
+}
+
+const addItemToggleListener = (elem) => {
+    elem.addEventListener('click', ({ target }) => {
+        const id = target.parentElement.dataset.id
+        manager.toggleCollapsedItem(id)
+
+        const collapsedIds = getCollapsedIds()
+        if (collapsedIds.includes(id)) {
+            const updated = collapsedIds.filter((item) => item !== id)
+            setCollapsedIds(updated)
+        } else {
+            collapsedIds.push(id)
+            setCollapsedIds(collapsedIds)
+        }
+        redraw()
+    })
+}
+
+const renderContent = (tests) => {
+    const sortAttr = getSort(manager.initialSort)
+    const sortAsc = JSON.parse(getSortDirection())
+    const rows = tests.map(dom.getResultTBody)
+    const table = document.getElementById('results-table')
+    const tableHeader = document.getElementById('results-table-head')
+
+    const newTable = document.createElement('table')
+    newTable.id = 'results-table'
+
+    // remove all sorting classes and set the relevant
+    findAll('.sortable', tableHeader).forEach((elem) => elem.classList.remove('asc', 'desc'))
+    tableHeader.querySelector(`.sortable[data-column-type="${sortAttr}"]`)?.classList.add(sortAsc ? 'desc' : 'asc')
+    newTable.appendChild(tableHeader)
+
+    if (!rows.length) {
+        const emptyTable = document.getElementById('template_results-table__body--empty').content.cloneNode(true)
+        newTable.appendChild(emptyTable)
+    } else {
+        rows.forEach((row) => {
+            if (!!row) {
+                findAll('.collapsible td:not(.col-links', row).forEach(addItemToggleListener)
+                find('.logexpander', row).addEventListener('click',
+                    (evt) => evt.target.parentNode.classList.toggle('expanded'),
+                )
+                newTable.appendChild(row)
+            }
+        })
+    }
+
+    table.replaceWith(newTable)
+}
+
+const renderDerived = () => {
+    const currentFilter = getVisible()
+    possibleFilters.forEach((result) => {
+        const input = document.querySelector(`input[data-test-result="${result}"]`)
+        input.checked = currentFilter.includes(result)
+    })
+}
+
+const bindEvents = () => {
+    const filterColumn = (evt) => {
+        const { target: element } = evt
+        const { testResult } = element.dataset
+
+        doFilter(testResult, element.checked)
+        const collapsedIds = getCollapsedIds()
+        const updated = manager.renderData.tests.map((test) => {
+            return {
+                ...test,
+                collapsed: collapsedIds.includes(test.id),
+            }
+        })
+        manager.setRender(updated)
+        redraw()
+    }
+
+    const header = document.getElementById('environment-header')
+    header.addEventListener('click', () => {
+        const table = document.getElementById('environment')
+        table.classList.toggle('hidden')
+        header.classList.toggle('collapsed')
+    })
+
+    findAll('input[name="filter_checkbox"]').forEach((elem) => {
+        elem.addEventListener('click', filterColumn)
+    })
+
+    findAll('.sortable').forEach((elem) => {
+        elem.addEventListener('click', (evt) => {
+            const { target: element } = evt
+            const { columnType } = element.dataset
+            doSort(columnType)
+            redraw()
+        })
+    })
+
+    document.getElementById('show_all_details').addEventListener('click', () => {
+        manager.allCollapsed = false
+        setCollapsedIds([])
+        redraw()
+    })
+    document.getElementById('hide_all_details').addEventListener('click', () => {
+        manager.allCollapsed = true
+        const allIds = manager.renderData.tests.map((test) => test.id)
+        setCollapsedIds(allIds)
+        redraw()
+    })
+}
+
+const redraw = () => {
+    const { testSubset } = manager
+
+    renderContent(testSubset)
+    renderDerived()
+}
+
+module.exports = {
+    redraw,
+    bindEvents,
+    renderStatic,
+}
+
+},{"./datamanager.js":1,"./dom.js":2,"./filter.js":3,"./sort.js":7,"./storage.js":8}],6:[function(require,module,exports){
+class MediaViewer {
+    constructor(assets) {
+        this.assets = assets
+        this.index = 0
+    }
+
+    nextActive() {
+        this.index = this.index === this.assets.length - 1 ? 0 : this.index + 1
+        return [this.activeFile, this.index]
+    }
+
+    prevActive() {
+        this.index = this.index === 0 ? this.assets.length - 1 : this.index -1
+        return [this.activeFile, this.index]
+    }
+
+    get currentIndex() {
+        return this.index
+    }
+
+    get activeFile() {
+        return this.assets[this.index]
+    }
+}
+
+
+const setup = (resultBody, assets) => {
+    if (!assets.length) {
+        resultBody.querySelector('.media').classList.add('hidden')
+        return
+    }
+
+    const mediaViewer = new MediaViewer(assets)
+    const container = resultBody.querySelector('.media-container')
+    const leftArrow = resultBody.querySelector('.media-container__nav--left')
+    const rightArrow = resultBody.querySelector('.media-container__nav--right')
+    const mediaName = resultBody.querySelector('.media__name')
+    const counter = resultBody.querySelector('.media__counter')
+    const imageEl = resultBody.querySelector('img')
+    const sourceEl = resultBody.querySelector('source')
+    const videoEl = resultBody.querySelector('video')
+
+    const setImg = (media, index) => {
+        if (media?.format_type === 'image') {
+            imageEl.src = media.path
+
+            imageEl.classList.remove('hidden')
+            videoEl.classList.add('hidden')
+        } else if (media?.format_type === 'video') {
+            sourceEl.src = media.path
+
+            videoEl.classList.remove('hidden')
+            imageEl.classList.add('hidden')
+        }
+
+        mediaName.innerText = media?.name
+        counter.innerText = `${index + 1} / ${assets.length}`
+    }
+    setImg(mediaViewer.activeFile, mediaViewer.currentIndex)
+
+    const moveLeft = () => {
+        const [media, index] = mediaViewer.prevActive()
+        setImg(media, index)
+    }
+    const doRight = () => {
+        const [media, index] = mediaViewer.nextActive()
+        setImg(media, index)
+    }
+    const openImg = () => {
+        window.open(mediaViewer.activeFile.path, '_blank')
+    }
+    if (assets.length === 1) {
+        container.classList.add('media-container--fullscreen')
+    } else {
+        leftArrow.addEventListener('click', moveLeft)
+        rightArrow.addEventListener('click', doRight)
+    }
+    imageEl.addEventListener('click', openImg)
+}
+
+module.exports = {
+    setup,
+}
+
+},{}],7:[function(require,module,exports){
+const { manager } = require('./datamanager.js')
+const storageModule = require('./storage.js')
+
+const genericSort = (list, key, ascending, customOrder) => {
+    let sorted
+    if (customOrder) {
+        sorted = list.sort((a, b) => {
+            const aValue = a.result.toLowerCase()
+            const bValue = b.result.toLowerCase()
+
+            const aIndex = customOrder.findIndex((item) => item.toLowerCase() === aValue)
+            const bIndex = customOrder.findIndex((item) => item.toLowerCase() === bValue)
+
+            // Compare the indices to determine the sort order
+            return aIndex - bIndex
+        })
+    } else {
+        sorted = list.sort((a, b) => a[key] === b[key] ? 0 : a[key] > b[key] ? 1 : -1)
+    }
+
+    if (ascending) {
+        sorted.reverse()
+    }
+    return sorted
+}
+
+const durationSort = (list, ascending) => {
+    const parseDuration = (duration) => {
+        if (duration.includes(':')) {
+            // If it's in the format "HH:mm:ss"
+            const [hours, minutes, seconds] = duration.split(':').map(Number)
+            return (hours * 3600 + minutes * 60 + seconds) * 1000
+        } else {
+            // If it's in the format "nnn ms"
+            return parseInt(duration)
+        }
+    }
+    const sorted = list.sort((a, b) => parseDuration(a['duration']) - parseDuration(b['duration']))
+    if (ascending) {
+        sorted.reverse()
+    }
+    return sorted
+}
+
+const doInitSort = () => {
+    const type = storageModule.getSort(manager.initialSort)
+    const ascending = storageModule.getSortDirection()
+    const list = manager.testSubset
+    const initialOrder = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed', 'Skipped', 'Passed']
+
+    storageModule.setSort(type)
+    storageModule.setSortDirection(ascending)
+
+    if (type?.toLowerCase() === 'original') {
+        manager.setRender(list)
+    } else {
+        let sortedList
+        switch (type) {
+        case 'duration':
+            sortedList = durationSort(list, ascending)
+            break
+        case 'result':
+            sortedList = genericSort(list, type, ascending, initialOrder)
+            break
+        default:
+            sortedList = genericSort(list, type, ascending)
+            break
+        }
+        manager.setRender(sortedList)
+    }
+}
+
+const doSort = (type, skipDirection) => {
+    const newSortType = storageModule.getSort(manager.initialSort) !== type
+    const currentAsc = storageModule.getSortDirection()
+    let ascending
+    if (skipDirection) {
+        ascending = currentAsc
+    } else {
+        ascending = newSortType ? false : !currentAsc
+    }
+    storageModule.setSort(type)
+    storageModule.setSortDirection(ascending)
+
+    const list = manager.testSubset
+    const sortedList = type === 'duration' ? durationSort(list, ascending) : genericSort(list, type, ascending)
+    manager.setRender(sortedList)
+}
+
+module.exports = {
+    doInitSort,
+    doSort,
+}
+
+},{"./datamanager.js":1,"./storage.js":8}],8:[function(require,module,exports){
+const possibleFilters = [
+    'passed',
+    'skipped',
+    'failed',
+    'error',
+    'xfailed',
+    'xpassed',
+    'rerun',
+]
+
+const getVisible = () => {
+    const url = new URL(window.location.href)
+    const settings = new URLSearchParams(url.search).get('visible')
+    const lower = (item) => {
+        const lowerItem = item.toLowerCase()
+        if (possibleFilters.includes(lowerItem)) {
+            return lowerItem
+        }
+        return null
+    }
+    return settings === null ?
+        possibleFilters :
+        [...new Set(settings?.split(',').map(lower).filter((item) => item))]
+}
+
+const hideCategory = (categoryToHide) => {
+    const url = new URL(window.location.href)
+    const visibleParams = new URLSearchParams(url.search).get('visible')
+    const currentVisible = visibleParams ? visibleParams.split(',') : [...possibleFilters]
+    const settings = [...new Set(currentVisible)].filter((f) => f !== categoryToHide).join(',')
+
+    url.searchParams.set('visible', settings)
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const showCategory = (categoryToShow) => {
+    if (typeof window === 'undefined') {
+        return
+    }
+    const url = new URL(window.location.href)
+    const currentVisible = new URLSearchParams(url.search).get('visible')?.split(',').filter(Boolean) ||
+        [...possibleFilters]
+    const settings = [...new Set([categoryToShow, ...currentVisible])]
+    const noFilter = possibleFilters.length === settings.length || !settings.length
+
+    noFilter ? url.searchParams.delete('visible') : url.searchParams.set('visible', settings.join(','))
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const getSort = (initialSort) => {
+    const url = new URL(window.location.href)
+    let sort = new URLSearchParams(url.search).get('sort')
+    if (!sort) {
+        sort = initialSort || 'result'
+    }
+    return sort
+}
+
+const setSort = (type) => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('sort', type)
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const getCollapsedCategory = (renderCollapsed) => {
+    let categories
+    if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href)
+        const collapsedItems = new URLSearchParams(url.search).get('collapsed')
+        switch (true) {
+        case !renderCollapsed && collapsedItems === null:
+            categories = ['passed']
+            break
+        case collapsedItems?.length === 0 || /^["']{2}$/.test(collapsedItems):
+            categories = []
+            break
+        case /^all$/.test(collapsedItems) || collapsedItems === null && /^all$/.test(renderCollapsed):
+            categories = [...possibleFilters]
+            break
+        default:
+            categories = collapsedItems?.split(',').map((item) => item.toLowerCase()) || renderCollapsed
+            break
+        }
+    } else {
+        categories = []
+    }
+    return categories
+}
+
+const getSortDirection = () => JSON.parse(sessionStorage.getItem('sortAsc')) || false
+const setSortDirection = (ascending) => sessionStorage.setItem('sortAsc', ascending)
+
+const getCollapsedIds = () => JSON.parse(sessionStorage.getItem('collapsedIds')) || []
+const setCollapsedIds = (list) => sessionStorage.setItem('collapsedIds', JSON.stringify(list))
+
+module.exports = {
+    getVisible,
+    hideCategory,
+    showCategory,
+    getCollapsedIds,
+    setCollapsedIds,
+    getSort,
+    setSort,
+    getSortDirection,
+    setSortDirection,
+    getCollapsedCategory,
+    possibleFilters,
+}
+
+},{}]},{},[4]);
+    </script>
+  </footer>
+  </body>
+</html>

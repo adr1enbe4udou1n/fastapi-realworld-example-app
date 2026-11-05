@@ -87,6 +87,7 @@ async def test_crear_articulo_titulo_vacio_retorna_422(
             "title": "",  # BVA: valor en el límite inferior (0 < mínimo de 1)
             "description": "Test Description",
             "body": "Test Body",
+            "tagList": [],
         }
     }
 
