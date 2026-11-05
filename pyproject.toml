@@ -3,7 +3,7 @@ name = "fastapi-realworld-example-app"
 version = "0.1.0"
 description = ""
 readme = "README.md"
-requires-python = ">=3.15"
+requires-python = ">=3.14"
 authors = [
   { name = "Adrien Beaudouin", email = "adrien.beaudouin@outlook.com" },
 ]
@@ -29,6 +29,8 @@ dev = [
   "pytest>=9.0.0",
   "pytest-asyncio>=0.25.3",
   "pytest-cov>=7.0.0",
+  "pytest-html>=4.2.0",
+  "pytest-json-report>=1.5.0",
   "ruff<1.0.0,>=0.8.0",
   "types-python-slugify<9.0.0,>=8.0.0",
 ]
@@ -37,7 +39,7 @@ dev = [
 ignore_missing_imports = true
 disallow_untyped_defs = true
 
-[tool.pytest]
+[tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 
