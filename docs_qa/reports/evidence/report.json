@@ -1,0 +1,69 @@
+{
+  "contract": "Conduit API QA Metrics Frontend Dashboard (docs_qa/reports/dashboard_qa.html): operational slate-paper light cockpit aligned with m_tricas_de_prueba_de_software_teor_a_completa.md (6-step lifecycle, 4 metric families, 6 verified formulas, 41 test cases, 9 MantisBT defects, 82.78% coverage, NO-GO gate).",
+  "targetViewports": [
+    "1440x900",
+    "390x844"
+  ],
+  "accessibility": {
+    "status": "pass",
+    "evidence": "Verified semantic landmarks (header, nav[role=tablist], main, footer), ARIA attributes (aria-selected, aria-controls, aria-live=polite), Escape-closable dialog modal, ArrowRight keyboard tab switching passed in Chrome headless DOM check, high-contrast WCAG AA+ palette, and 40-44px minimum touch controls."
+  },
+  "responsive": {
+    "status": "pass",
+    "evidence": "Desktop 1440x900 rendered with innerWidth=1422, scrollWidth=1407 and 0 overflowing elements across all 4 tabs; true 390x844 iframe viewport screenshot confirmed stacked NO-GO verdict banner, full-width KPI panel with aligned badge, 2-column command buttons, 2x2 tab grid, and zero horizontal clipping."
+  },
+  "contentStates": {
+    "loading": {
+      "status": "pass",
+      "evidence": "Clicking 'Recalcular Fuentes' displays #global-feedback with .is-loading skeleton shimmer and functional 'Cancelar' button (#btn-cancel-load), verified in headless Chrome DOM run."
+    },
+    "empty": {
+      "status": "pass",
+      "evidence": "Filtering the 41 test cases table with 'no_existe_caso' triggers #cp-empty-state ('Ningún caso de prueba coincide...') with #btn-empty-reset restoring all 41 rows."
+    },
+    "error": {
+      "status": "pass",
+      "evidence": "Triggering 'Probar Error JSON Inválido' (or uploading malformed JSON in #json-upload) shows .is-error banner with #btn-restore-official recovery resetting to .is-success."
+    },
+    "partial": {
+      "status": "pass",
+      "evidence": "Explicitly surfaced in Family 3 MantisBT status (9 Confirmados / 0 Cerrados pending regression) and in Tab 3 coverage breakdown (82.78% global vs 92.17% API runtime because app/seed.py CLI helper has 0/68 covered lines)."
+    },
+    "success": {
+      "status": "pass",
+      "evidence": "Default hydrated view displays 41/41 executed, 100% DRE, 82.78% coverage; switching cycles and clicking 'Exportar CSV' triggers .is-success confirmation bar."
+    },
+    "permission": {
+      "status": "pass",
+      "evidence": "Clicking 'Autorizar Pase a Producción' opens #qa-modal with explicit Release Gate policy boundary ('Permiso Denegado' due to open Critical BUG-04) and safe navigation button to inspect BUG-04."
+    }
+  },
+  "renderedEvidence": [
+    {
+      "viewport": "1440x900",
+      "artifact": "desktop-1440x900.png",
+      "observation": "Topbar, NO-GO banner, 6 KPI cards with formulas and target badges, 58.5% execution SVG donut + mode stacked bars, and ISTQB defect clustering bars render without overlap or truncation."
+    },
+    {
+      "viewport": "1440x900",
+      "artifact": "tab2-lifecycle.png",
+      "observation": "6-step metrics lifecycle selector and 6 mathematical formula blocks with substituted Conduit metrics render cleanly without raw LaTeX delimiters."
+    },
+    {
+      "viewport": "1440x900",
+      "artifact": "tab3-coverage.png",
+      "observation": "82.8% coverage SVG ring, 6 layer bars (noting seed.py 0%), JSON integrity checker, 29-file coverage table, and 26-test pytest outcomes table render cleanly."
+    },
+    {
+      "viewport": "1440x900",
+      "artifact": "tab4-cases-bugs.png",
+      "observation": "All 9 MantisBT defect rows display single-line BUG-01..BUG-09 IDs, causal chains, severity/priority badges, associated test case chips, and crisp non-wrapping 'Ver Captura'/'Ver Ficha' buttons."
+    },
+    {
+      "viewport": "390x844",
+      "artifact": "mobile-390x844.png",
+      "observation": "Rendered inside exact 390x844 mobile viewport frame: header wraps cleanly, buttons fit 2-column row, tabs render in 2x2 grid, NO-GO banner stacks vertically, and KPI card fits cleanly within 390px."
+    }
+  ]
+}
+

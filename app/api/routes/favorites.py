@@ -33,7 +33,7 @@ async def favorite(
     articles: Annotated[ArticlesRepository, Depends(get_articles_service)],
 ) -> SingleArticleResponse:
     article = await _get_article_from_slug(slug, articles)
-    await articles.favorite(db_obj=article, user=current_user)
+    await articles.favorite(db_obj=article, user=current_user, favorite=False)
     return SingleArticleResponse(article=article.schema(current_user))
 
 

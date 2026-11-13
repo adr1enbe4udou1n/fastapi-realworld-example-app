@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conduit API QA — Dashboard de Métricas de Prueba y Cierre STLC</title>
+  <style>
+    :root {
+      --bg-canvas: #F5F6F8;
+      --bg-surface: #FFFFFF;
+      --bg-subtle: #F1F4F8;
+      --border: #DCE1E8;
+      --border-strong: #C5CDD8;
+      --ink: #0F172A;
+      --ink-secondary: #475569;
+      --ink-muted: #64748B;
+
+      /* Multi-dimensional semantic palette */
+      --crimson: #B91C1C;
+      --crimson-bg: #FEF2F2;
+      --crimson-border: #FCA5A5;
+
+      --emerald: #047857;
+      --emerald-bg: #ECFDF5;
+      --emerald-border: #6EE7B7;
+
+      --amber: #B45309;
+      --amber-bg: #FFFBEB;
+      --amber-border: #FCD34D;
+
+      --teal: #0F766E;
+      --teal-bg: #F0FDFA;
+      --teal-border: #5EEAD4;
+
+      --cobalt: #1D4ED8;
+      --cobalt-bg: #EFF6FF;
+      --cobalt-border: #93C5FD;
+
+      --slate-accent: #334155;
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Cascadia Code', Consolas, 'Courier New', monospace;
+      --radius: 8px;
+      --radius-sm: 5px;
+      --focus-ring: 0 0 0 3px rgba(29, 78, 216, 0.35);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-canvas);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--cobalt); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    button, input, select {
+      font: inherit;
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .num {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Top Operational Header */
+    .topbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .topbar-inner {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 14px 24px 0 24px;
+    }
+
+    .header-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 12px;
+    }
+
+    .brand-block h1 {
+      margin: 0;
+      font-size: 1.22rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .brand-subtitle {
+      margin: 3px 0 0 0;
+      font-size: 0.84rem;
+      color: var(--ink-secondary);
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 40px;
+      padding: 0 13px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-surface);
+      color: var(--ink);
+      font-size: 0.84rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn:hover { background: var(--bg-subtle); }
+    .btn-primary {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: #FFFFFF;
+    }
+    .btn-primary:hover { background: #1E293B; }
+
+    .btn-danger-outline {
+      border-color: var(--crimson-border);
+      color: var(--crimson);
+      background: var(--crimson-bg);
+    }
+    .btn-danger-outline:hover { background: #FEE2E2; }
+
+    .select-control {
+      min-height: 40px;
+      padding: 0 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-surface);
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      border-top: 1px solid var(--bg-subtle);
+      margin-top: 2px;
+    }
+
+    .tab-btn {
+      min-height: 44px;
+      padding: 10px 16px;
+      border: none;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: var(--ink-secondary);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .tab-btn:hover { color: var(--ink); }
+    .tab-btn[aria-selected="true"] {
+      color: var(--cobalt);
+      border-bottom-color: var(--cobalt);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 20px 24px 48px 24px;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Status & Alert Strips (No nested cards!) */
+    .verdict-banner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--crimson-border);
+      background: var(--crimson-bg);
+      margin-bottom: 18px;
+    }
+
+    .verdict-banner.verdict-go {
+      border-color: var(--emerald-border);
+      background: var(--emerald-bg);
+    }
+
+    .verdict-main {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      flex: 1 1 320px;
+      min-width: 0;
+    }
+
+    .verdict-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: var(--crimson);
+      color: #FFFFFF;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .verdict-banner.verdict-go .verdict-pill {
+      background: var(--emerald);
+    }
+
+    .verdict-text h2 {
+      margin: 0 0 3px 0;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .verdict-text p {
+      margin: 0;
+      font-size: 0.87rem;
+      color: var(--ink-secondary);
+    }
+
+    .verdict-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* Toast / Inline Feedback Banners */
+    .feedback-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      font-size: 0.87rem;
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+    }
+    .feedback-bar.visible { display: flex; flex-wrap: wrap; }
+    .feedback-bar.is-loading { border-color: var(--cobalt-border); background: var(--cobalt-bg); color: var(--ink); }
+    .feedback-bar.is-success { border-color: var(--emerald-border); background: var(--emerald-bg); color: var(--ink); }
+    .feedback-bar.is-error { border-color: var(--crimson-border); background: var(--crimson-bg); color: var(--ink); }
+
+    /* KPI Strip Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .kpi-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .kpi-label {
+      font-size: 0.77rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--ink-muted);
+    }
+
+    .kpi-value {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+
+    .kpi-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: var(--ink-secondary);
+      border-top: 1px solid var(--bg-subtle);
+      padding-top: 7px;
+      margin-top: 2px;
+    }
+
+    .kpi-formula {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--ink-muted);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .badge-pass { background: var(--emerald-bg); color: var(--emerald); border-color: var(--emerald-border); }
+    .badge-fail { background: var(--crimson-bg); color: var(--crimson); border-color: var(--crimson-border); }
+    .badge-warn { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+    .badge-info { background: var(--cobalt-bg); color: var(--cobalt); border-color: var(--cobalt-border); }
+    .badge-teal { background: var(--teal-bg); color: var(--teal); border-color: var(--teal-border); }
+    .badge-neutral { background: var(--bg-subtle); color: var(--ink-secondary); border-color: var(--border); }
+
+    /* Two-Column Chart & Data Layout */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .panel, .kpi-panel, .formula-block, .step-item, .brand-block, .donut-bars {
+      min-width: 0;
+    }
+
+    .panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 18px;
+    }
+
+    .grid-2 > .panel { margin-bottom: 0; }
+
+    .panel-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--bg-subtle);
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .panel-subtitle {
+      margin: 2px 0 0 0;
+      font-size: 0.81rem;
+      color: var(--ink-muted);
+    }
+
+    .interpretation-note {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-left: 3px solid var(--cobalt);
+      background: var(--bg-subtle);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 0.82rem;
+      color: var(--ink-secondary);
+    }
+
+    /* SVG Bars & Charts */
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 0.78rem;
+      color: var(--ink-secondary);
+      margin-bottom: 10px;
+    }
+
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+    .bar-list { display: flex; flex-direction: column; gap: 11px; }
+
+    .bar-row-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 4px 10px;
+      font-size: 0.83rem;
+      margin-bottom: 4px;
+    }
+
+    .bar-track {
+      height: 12px;
+      width: 100%;
+      background: var(--bg-subtle);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      border: 1px solid var(--border);
+    }
+
+    .bar-seg-pass { background: var(--emerald-border); height: 100%; }
+    .bar-seg-fail { background: var(--crimson); height: 100%; }
+    .bar-seg-teal { background: var(--emerald-border); height: 100%; }
+    .bar-seg-amber { background: var(--amber); height: 100%; }
+
+    .donut-split {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .donut-wrap {
+      flex: 0 0 132px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .donut-bars {
+      flex: 1 1 280px;
+    }
+
+    /* Severity x Priority Matrix */
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    .matrix-table th, .matrix-table td {
+      border: 1px solid var(--border);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .matrix-table th {
+      background: var(--bg-subtle);
+      font-weight: 600;
+      color: var(--ink-secondary);
+      font-size: 0.78rem;
+    }
+
+    .bug-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      margin: 2px 3px 2px 0;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-surface);
+      cursor: pointer;
+    }
+    .bug-chip:hover { border-color: var(--cobalt); color: var(--cobalt); }
+    .bug-chip.crit { background: var(--crimson); color: #FFFFFF; border-color: var(--crimson); }
+    .bug-chip.high { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+
+    /* Tables */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      min-width: 680px;
+    }
+
+    .data-table th {
+      text-align: left;
+      padding: 10px 12px;
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.77rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--ink-secondary);
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--bg-subtle);
+      vertical-align: top;
+      color: var(--ink);
+    }
+
+    .data-table tbody tr:last-child td { border-bottom: none; }
+    .data-table tbody tr:hover { background: #FAFBFC; }
+
+    /* Filters Toolbar */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .search-input {
+      flex: 1 1 240px;
+      min-height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      font-size: 0.86rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 36px 20px;
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius);
+      background: var(--bg-subtle);
+    }
+    .empty-state h3 { margin: 0 0 6px 0; font-size: 1rem; }
+    .empty-state p { margin: 0 0 14px 0; font-size: 0.86rem; color: var(--ink-secondary); }
+
+    /* 6-Step Lifecycle Stepper */
+    .lifecycle-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .step-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      background: var(--bg-subtle);
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .step-item[aria-pressed="true"] {
+      background: var(--cobalt-bg);
+      border-color: var(--cobalt);
+    }
+
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--cobalt);
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .step-desc {
+      font-size: 0.8rem;
+      color: var(--ink-secondary);
+    }
+
+    /* Formula Grid */
+    .formula-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .formula-block {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      background: var(--bg-surface);
+    }
+
+    .formula-expr {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      background: var(--bg-subtle);
+      padding: 8px 10px;
+      border-radius: 4px;
+      margin: 8px 0;
+      color: var(--ink);
+      overflow-x: auto;
+    }
+
+    /* Dialog Modal */
+    dialog {
+      width: min(780px, calc(100vw - 24px));
+      max-height: calc(100vh - 32px);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 0;
+      background: var(--bg-surface);
+      color: var(--ink);
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.22);
+    }
+    dialog::backdrop {
+      background: rgba(15, 23, 42, 0.55);
+    }
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-subtle);
+    }
+    .modal-head h3 { margin: 0; font-size: 1rem; }
+    .modal-body {
+      padding: 18px;
+      overflow-y: auto;
+      max-height: calc(100vh - 140px);
+    }
+    .modal-img {
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-top: 10px;
+      display: block;
+    }
+
+    /* Skeleton loader */
+    .skeleton-shimmer {
+      display: inline-block;
+      height: 14px;
+      width: 120px;
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    .footer-note {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 16px 24px 28px 24px;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1180px) {
+      .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 860px) {
+      .grid-2, .lifecycle-grid, .formula-grid { grid-template-columns: minmax(0, 1fr); }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      .topbar { position: static; }
+      .topbar-inner, .container, .footer-note { padding-left: 14px; padding-right: 14px; max-width: 100%; }
+      .kpi-grid { grid-template-columns: minmax(0, 1fr); }
+      .brand-block h1 { font-size: 1.05rem; }
+      .brand-subtitle, .verdict-text p, .footer-note { overflow-wrap: anywhere; }
+      .toolbar-actions { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      .toolbar-actions .select-control { grid-column: 1 / -1; width: 100%; min-width: 0; }
+      .nav-tabs { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px; overflow-x: visible; }
+      .tab-btn { white-space: normal; text-align: left; padding: 8px 10px; font-size: 0.8rem; line-height: 1.25; }
+      .verdict-banner { padding: 14px; }
+      .verdict-main { flex-direction: column; gap: 8px; }
+      .verdict-actions { width: 100%; flex-direction: column; }
+      .verdict-actions .btn { width: 100%; }
+      .donut-wrap { flex: 1 1 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="header-row">
+        <div class="brand-block">
+          <h1>
+            <span>Conduit API — Tablero Ejecutivo de Métricas QA</span>
+            <span class="badge badge-info mono" id="branch-badge">rama: buggy-version</span>
+          </h1>
+          <p class="brand-subtitle">
+            FastAPI RealWorld · 41 Casos (26 pytest + 15 Swagger/Postman) · Equipo: Juan Pablo Velásquez R. &amp; Niurka Liseth Mejía V. · Docente: Yury Montoya P.
+          </p>
+        </div>
+
+        <div class="toolbar-actions" aria-label="Controles de ciclo y exportación">
+          <label for="cycle-select" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;">Escenario de ejecución</label>
+          <select id="cycle-select" class="select-control" aria-label="Seleccionar escenario de ciclo de pruebas">
+            <option value="buggy">Ciclo 1: buggy-version (Actual)</option>
+            <option value="baseline">Ciclo 0: main (Baseline Limpia)</option>
+            <option value="postreg">Meta Post-Regresión (Esperada)</option>
+          </select>
+          <button type="button" class="btn" id="btn-refresh">Recalcular Fuentes</button>
+          <button type="button" class="btn btn-primary" id="btn-export-csv">Exportar CSV</button>
+        </div>
+      </div>
+
+      <nav class="nav-tabs" role="tablist" aria-label="Vistas del Dashboard de QA">
+        <button type="button" class="tab-btn" role="tab" id="tab-overview" aria-selected="true" aria-controls="panel-overview">1. Resumen y Decisión</button>
+        <button type="button" class="tab-btn" role="tab" id="tab-lifecycle" aria-selected="false" aria-controls="panel-lifecycle" tabindex="-1">2. Ciclo de Métricas y Fórmulas</button>
+        <button type="button" class="tab-btn" role="tab" id="tab-coverage" aria-selected="false" aria-controls="panel-coverage" tabindex="-1">3. Cobertura y Suite pytest</button>
+        <button type="button" class="tab-btn" role="tab" id="tab-traceability" aria-selected="false" aria-controls="panel-traceability" tabindex="-1">4. Defectos (9) y Casos (41)</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Global Feedback Bar (Loading / Success / Error states) -->
+    <div id="global-feedback" class="feedback-bar" role="status" aria-live="polite">
+      <div id="feedback-msg"></div>
+      <div id="feedback-actions"></div>
+    </div>
+
+    <!-- =====================================================================
+         VISTA 1: RESUMEN EJECUTIVO Y DECISIÓN DE NEGOCIO
+    ====================================================================== -->
+    <section id="panel-overview" class="tab-panel active" role="tabpanel" aria-labelledby="tab-overview">
+
+      <!-- Release Gate Verdict Banner -->
+      <div id="verdict-banner" class="verdict-banner">
+        <div class="verdict-main">
+          <span class="verdict-pill" id="verdict-pill">DICTAMEN: NO-GO</span>
+          <div class="verdict-text">
+            <h2 id="verdict-title">Pase a Producción Bloqueado por Riesgo Crítico de Seguridad (BUG-04)</h2>
+            <p id="verdict-desc">
+              Aunque se ejecutó el 100% del alcance y la suite detectó 9/9 defectos inyectados, permanece abierto BUG-04 (Crítica: eliminación arbitraria de artículos ajenos, OWASP BOLA), violando el criterio de salida (= 0 defectos críticos abiertos).
+            </p>
+          </div>
+        </div>
+        <div class="verdict-actions">
+          <button type="button" class="btn btn-danger-outline" id="btn-approve-release">Autorizar Pase a Producción</button>
+          <button type="button" class="btn" id="btn-jump-bug04">Inspeccionar BUG-04</button>
+        </div>
+      </div>
+
+      <!-- 6 Actionable KPI Cards -->
+      <div class="kpi-grid" id="kpi-grid">
+        <!-- Populated dynamically from cycle state -->
+      </div>
+
+      <!-- Charts Row 1: Base Formula & Defect Clustering -->
+      <div class="grid-2">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">Fórmula Base de Ejecución y Distribución por Modo</h3>
+              <p class="panel-subtitle">Total de casos = Aprobados + Fallidos + Bloqueados (41 = 24 + 17 + 0)</p>
+            </div>
+            <span class="badge badge-info">Familia 2: Ejecución</span>
+          </div>
+
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot" style="background:var(--emerald-border); border:1px solid var(--emerald);"></span> Aprobados (Pass)</span>
+            <span class="legend-item"><span class="legend-dot" style="background:var(--crimson)"></span> Fallidos (Detectando Bugs)</span>
+            <span class="legend-item"><span class="legend-dot" style="background:var(--border-strong)"></span> Bloqueados (0)</span>
+          </div>
+
+          <div class="donut-split">
+            <div class="donut-wrap" id="svg-exec-donut"></div>
+            <div id="chart-execution-modes" class="bar-list donut-bars"></div>
+          </div>
+
+          <div class="interpretation-note" id="note-execution">
+            <strong>Lectura de decisión:</strong> El 41.46% de fallos en <code>buggy-version</code> no indica inestabilidad de la suite; en la rama limpia <code>main</code> aprobaron 26/26 (100%). Cada fallo confirma la sensibilidad de las pruebas ante defectos reales.
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">Agrupamiento de Defectos por Módulo (Defect Clustering)</h3>
+              <p class="panel-subtitle">Principio 4 ISTQB: concentración no uniforme de fallos en componentes críticos</p>
+            </div>
+            <span class="badge badge-warn">66.7% en Articles</span>
+          </div>
+
+          <div id="chart-module-clustering" class="bar-list"></div>
+
+          <div class="interpretation-note">
+            <strong>Lectura de negocio:</strong> El módulo <code>Articles</code> concentra 6 de los 9 defectos (66.67%), incluyendo los dos defectos BOLA de autoría (BUG-03, BUG-04). <code>Comments</code> y <code>Tags</code> operan al 100% sin fallos.
+          </div>
+        </article>
+      </div>
+
+      <!-- Charts Row 2: Severity vs Priority Matrix & 4 Metric Families -->
+      <div class="grid-2" style="margin-top: 16px;">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">Matriz Cruzada: Severidad Técnica vs. Prioridad de Negocio</h3>
+              <p class="panel-subtitle">Haz clic en cualquier defecto (ej. BUG-04) para ver ficha MantisBT y captura</p>
+            </div>
+            <span class="badge badge-fail">9 Defectos Activos</span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="matrix-table" aria-label="Matriz Severidad por Prioridad">
+              <thead>
+                <tr>
+                  <th>Severidad \ Prioridad</th>
+                  <th>Prioridad Alta (4)</th>
+                  <th>Prioridad Media (4)</th>
+                  <th>Prioridad Baja (1)</th>
+                </tr>
+              </thead>
+              <tbody id="matrix-body"></tbody>
+            </table>
+          </div>
+
+          <div class="interpretation-note">
+            <strong>Por qué se separan:</strong> <code>BUG-05</code> tiene Severidad Alta (Error 500) pero Prioridad Media (no compromete datos ni seguridad), mientras <code>BUG-04</code> combina Severidad Crítica + Prioridad Alta (destrucción de datos ajenos).
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">Tablero de las 4 Familias de Métricas del Proyecto (§6)</h3>
+              <p class="panel-subtitle">Trazabilidad directa desde el diseño hasta la eficiencia de remoción (DRE)</p>
+            </div>
+            <span class="badge badge-teal">Ciclo Cerrado en QA</span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table" style="min-width: 480px;">
+              <thead>
+                <tr>
+                  <th>Familia de Métricas</th>
+                  <th>Indicador Clave</th>
+                  <th>Valor Real</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>1. Diseño de Casos</strong></td>
+                  <td>Avance de diseño &amp; endpoints</td>
+                  <td class="mono">41/40+ casos · 19/19 eps (100%)</td>
+                  <td><span class="badge badge-pass">Superado</span></td>
+                </tr>
+                <tr>
+                  <td><strong>2. Ejecución y Progreso</strong></td>
+                  <td>Tasa ejecución &amp; velocidad</td>
+                  <td class="mono">41/41 (100%) · 28.92s auto</td>
+                  <td><span class="badge badge-pass">Conforme</span></td>
+                </tr>
+                <tr>
+                  <td><strong>3. Producto (Defectos)</strong></td>
+                  <td>Densidad &amp; ciclo MantisBT</td>
+                  <td class="mono">0.220 bugs/CP · 9 Confirmados (0 Cerrados)</td>
+                  <td><span class="badge badge-warn">Parcial (Pend. Regresión)</span></td>
+                </tr>
+                <tr>
+                  <td><strong>4. Efectividad (DRE)</strong></td>
+                  <td>Defect Removal Efficiency</td>
+                  <td class="mono">100.0% (9 QA / 0 Producción)</td>
+                  <td><span class="badge badge-pass">Óptimo</span></td>
+                </tr>
+                <tr>
+                  <td><strong>4. Fuga y Reapertura</strong></td>
+                  <td>Defect Leakage / Reopened</td>
+                  <td class="mono">0.0% fuga · 0.0% reapertura</td>
+                  <td><span class="badge badge-info">Ronda Inicial</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="interpretation-note">
+            <strong>Estado parcial transparente:</strong> Los 9 tickets en MantisBT están en estado <em>Confirmado / New</em> con evidencias adjuntas; el cierre a <em>Resolved/Closed</em> requiere aplicar parches en <code>articles.py</code> y correr pruebas de regresión.
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         VISTA 2: CICLO DE VIDA DE LAS MÉTRICAS Y FÓRMULAS
+    ====================================================================== -->
+    <section id="panel-lifecycle" class="tab-panel" role="tabpanel" aria-labelledby="tab-lifecycle">
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <h3 class="panel-title">Ciclo de Vida de las Métricas (6 Pasos Encadenados — Teoría de Clase)</h3>
+            <p class="panel-subtitle">Selecciona cualquier paso para inspeccionar su aplicación real en Conduit API</p>
+          </div>
+          <span class="badge badge-info">Principio: Garbage In, Garbage Out</span>
+        </div>
+
+        <div class="lifecycle-grid" id="lifecycle-steps"></div>
+        <div class="interpretation-note" id="lifecycle-detail"></div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <h3 class="panel-title">Síntesis Matemática: Fórmulas Clave Aplicadas a Nuestros Datos</h3>
+            <p class="panel-subtitle">Métricas Base (conteos crudos) &#8594; Métricas Derivadas &#8594; KPIs con Meta</p>
+          </div>
+          <span class="badge badge-teal">6 Fórmulas Verificadas</span>
+        </div>
+
+        <div class="formula-grid">
+          <div class="formula-block">
+            <strong>1. % Cobertura de Pruebas</strong>
+            <div class="formula-expr">(Casos Ejecutados / Planeados) × 100<br>= (41 / 41) × 100 = <strong>100.0%</strong></div>
+            <span class="badge badge-pass">Meta: ≥ 95% (Cumplida)</span>
+          </div>
+
+          <div class="formula-block">
+            <strong>2. % Tasa de Aprobación</strong>
+            <div class="formula-expr">(Casos Aprobados / Ejecutados) × 100<br>= (24 / 41) × 100 = <strong>58.54%</strong></div>
+            <span class="badge badge-info">Contexto: rama buggy-version</span>
+          </div>
+
+          <div class="formula-block">
+            <strong>3. % Tasa de Fallidos</strong>
+            <div class="formula-expr">(Casos Fallidos / Ejecutados) × 100<br>= (17 / 41) × 100 = <strong>41.46%</strong></div>
+            <span class="badge badge-fail">17 fallos detectan los 9 bugs</span>
+          </div>
+
+          <div class="formula-block">
+            <strong>4. Densidad de Defectos</strong>
+            <div class="formula-expr">Defectos / Casos Ejecutados = 9/41 = <strong>0.220</strong><br>Por KLOC = 9 / 0.668 = <strong>13.47 / KLOC</strong></div>
+            <span class="badge badge-warn">66.7% agrupados en Articles</span>
+          </div>
+
+          <div class="formula-block">
+            <strong>5. Efectividad DRE</strong>
+            <div class="formula-expr">(QA / (QA + Prod)) × 100<br>= (9 / (9 + 0)) × 100 = <strong>100.0%</strong></div>
+            <span class="badge badge-pass">0% Defect Leakage (fuga)</span>
+          </div>
+
+          <div class="formula-block">
+            <strong>6. Tasa de Reapertura</strong>
+            <div class="formula-expr">(Reabiertos / Corregidos) × 100<br>= 0% (ronda inicial sin cierres)</div>
+            <span class="badge badge-neutral">Meta post-parche: &lt; 5%</span>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- =====================================================================
+         VISTA 3: COBERTURA DE CÓDIGO Y SUITE PYTEST
+    ====================================================================== -->
+    <section id="panel-coverage" class="tab-panel" role="tabpanel" aria-labelledby="tab-coverage">
+      <div class="grid-2">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">Cobertura por Capa Arquitectónica (pytest-cov)</h3>
+              <p class="panel-subtitle">Global: 82.78% (553/668) · Runtime API sin seed.py: 92.17% (553/600)</p>
+            </div>
+            <span class="badge badge-pass">Meta ≥ 70% Superada</span>
+          </div>
+
+          <div class="donut-split">
+            <div class="donut-wrap" id="svg-cov-donut"></div>
+            <div id="chart-layers" class="bar-list donut-bars"></div>
+          </div>
+
+          <div class="interpretation-note">
+            <strong>Análisis de Causa Raíz (Cobertura Parcial):</strong> Las 68 líneas sin cubrir en <code>app/seed.py</code> (0%) corresponden a un script CLI auxiliar de población inicial, no a rutas HTTP en ejecución. Excluyéndolo, la cobertura efectiva del servidor API alcanza el <strong>92.17%</strong>.
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">Verificación de Integridad de Fuentes JSON</h3>
+              <p class="panel-subtitle">Regla de calidad: validar fuentes crudas antes de reportar indicadores</p>
+            </div>
+            <a class="btn" href="test_report.html" target="_blank" rel="noopener">Abrir Reporte pytest-html</a>
+          </div>
+
+          <p style="font-size:0.84rem; color:var(--ink-secondary); margin-top:0;">
+            Puedes cargar un archivo <code>pytest_results.json</code> o simular un JSON corrupto para verificar la validación de integridad de datos (<em>Garbage in, garbage out</em>).
+          </p>
+
+          <div class="filter-bar">
+            <input type="file" id="json-upload" accept=".json,application/json" aria-label="Cargar archivo JSON de pytest" style="font-size:0.82rem;" />
+            <button type="button" class="btn" id="btn-test-error">Probar Error JSON Inválido</button>
+          </div>
+
+          <div style="font-size:0.82rem; color:var(--ink-secondary); border-top:1px solid var(--bg-subtle); padding-top:10px;">
+            <div><strong>Fuente Automatizada:</strong> <span class="mono">docs_qa/data/pytest_results.json</span> (26 tests · 28.92s)</div>
+            <div><strong>Fuente Cobertura:</strong> <span class="mono">docs_qa/data/coverage.json</span> (553 / 668 sentencias)</div>
+            <div><strong>Fuente Manual:</strong> <span class="mono">docs_qa/Casos_De_Prueba.md</span> + <span class="mono">docs_qa/evidencias/</span></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="grid-2" style="margin-top: 16px;">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">Detalle por Archivo Python (coverage.json)</h3>
+              <p class="panel-subtitle">29 módulos ejecutables inspeccionados con pytest-cov</p>
+            </div>
+            <input type="search" id="cov-search" class="search-input" placeholder="Filtrar archivo (ej. articles, crud)..." aria-label="Filtrar archivos de cobertura" style="max-width:240px; min-height:36px;" />
+          </div>
+          <div class="table-wrap" style="max-height: 400px;">
+            <table class="data-table" style="min-width: 460px;">
+              <thead>
+                <tr>
+                  <th>Archivo</th>
+                  <th>Capa</th>
+                  <th>Sentencias</th>
+                  <th>% Cobertura</th>
+                </tr>
+              </thead>
+              <tbody id="cov-table-body"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">Resultados de Suite Automatizada (26 tests pytest)</h3>
+              <p class="panel-subtitle">Duración registrada en JSON: 28.92 segundos (15 passed, 11 failed)</p>
+            </div>
+            <select id="pytest-filter" class="select-control" aria-label="Filtrar resultados de pytest" style="min-height:36px;">
+              <option value="all">Todos (26)</option>
+              <option value="failed">Solo Fallidos (11)</option>
+              <option value="passed">Solo Aprobados (15)</option>
+            </select>
+          </div>
+          <div class="table-wrap" style="max-height: 400px;">
+            <table class="data-table" style="min-width: 460px;">
+              <thead>
+                <tr>
+                  <th>Script / Caso</th>
+                  <th>Estado</th>
+                  <th>Tiempo</th>
+                </tr>
+              </thead>
+              <tbody id="pytest-table-body"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         VISTA 4: CATÁLOGO DE 41 CASOS Y 9 DEFECTOS (MANTISBT + EVIDENCIAS)
+    ====================================================================== -->
+    <section id="panel-traceability" class="tab-panel" role="tabpanel" aria-labelledby="tab-traceability">
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <h3 class="panel-title">Registro de Defectos MantisBT (9 Inyectados / 9 Detectados — 100%)</h3>
+            <p class="panel-subtitle">Cadena causal ISTQB (Error humano → Defecto en código → Fallo en API) y evidencia gráfica</p>
+          </div>
+          <div class="filter-bar" style="margin-bottom:0;">
+            <select id="bug-sev-filter" class="select-control" aria-label="Filtrar defectos por severidad" style="min-height:36px;">
+              <option value="all">Todas las Severidades (9)</option>
+              <option value="Crítica">Crítica (1)</option>
+              <option value="Alta">Alta (4)</option>
+              <option value="Media">Media (3)</option>
+              <option value="Baja">Baja (1)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table" id="bugs-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Módulo</th>
+                <th>Título y Cadena Causal</th>
+                <th>Sev / Prio</th>
+                <th>CPs Asociados</th>
+                <th>Evidencia</th>
+              </tr>
+            </thead>
+            <tbody id="bugs-table-body"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <h3 class="panel-title">Explorador Completo de los 41 Casos de Prueba</h3>
+            <p class="panel-subtitle">15 Manuales (Swagger UI / Postman) + 26 Automatizados (pytest) · Trazabilidad Bidireccional</p>
+          </div>
+          <span class="badge badge-info mono" id="cases-counter">Mostrando 41 de 41</span>
+        </div>
+
+        <div class="filter-bar">
+          <input type="search" id="cp-search" class="search-input" placeholder="Buscar por ID, nombre, endpoint o BUG-0X..." aria-label="Buscar en los 41 casos de prueba" />
+          <select id="cp-mode" class="select-control" aria-label="Filtrar por modo">
+            <option value="all">Modo: Todos (41)</option>
+            <option value="Manual">Manual (15)</option>
+            <option value="Automatizado">Automatizado (26)</option>
+          </select>
+          <select id="cp-status" class="select-control" aria-label="Filtrar por estado">
+            <option value="all">Estado: Todos</option>
+            <option value="Pasó">Pasó (24)</option>
+            <option value="Falló">Falló (17)</option>
+          </select>
+          <select id="cp-tech" class="select-control" aria-label="Filtrar por técnica ISTQB">
+            <option value="all">Técnica: Todas</option>
+            <option value="EP">Partición de Equivalencia (EP)</option>
+            <option value="BVA">Valores Límite (BVA)</option>
+            <option value="Tabla de decisión">Tabla de Decisión</option>
+            <option value="Transición de estados">Transición de Estados</option>
+            <option value="Exploratoria">Exploratoria</option>
+          </select>
+          <button type="button" class="btn" id="btn-reset-cp">Limpiar</button>
+        </div>
+
+        <div class="table-wrap" id="cp-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID Caso</th>
+                <th>Modo</th>
+                <th>Módulo</th>
+                <th>Nombre / Descripción</th>
+                <th>Técnica ISTQB</th>
+                <th>Estado</th>
+                <th>Defecto</th>
+              </tr>
+            </thead>
+            <tbody id="cp-table-body"></tbody>
+          </table>
+        </div>
+
+        <div id="cp-empty-state" class="empty-state" style="display:none;">
+          <h3>Ningún caso de prueba coincide con los filtros actuales</h3>
+          <p>Ajusta el texto de búsqueda o restablece los selectores de modo, estado y técnica.</p>
+          <button type="button" class="btn btn-primary" id="btn-empty-reset">Restablecer los 41 Casos</button>
+        </div>
+      </article>
+    </section>
+
+  </main>
+
+  <footer class="footer-note">
+    <span><strong>Conduit API QA Dashboard</strong> · Basado en datos verificados de <code>pytest_results.json</code>, <code>coverage.json</code>, <code>Casos_De_Prueba.md</code> y <code>Fichas_De_Bugs_MantisBT.md</code>.</span>
+    <span>Autores: Juan Pablo Velásquez Ramírez &amp; Niurka Liseth Mejía Vargas · Taller de Pruebas de Software (2026)</span>
+  </footer>
+
+  <!-- Modal for MantisBT Bug Details & Evidence Preview / Permission Boundary -->
+  <dialog id="qa-modal" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <h3 id="modal-title">Detalle</h3>
+      <button type="button" class="btn" id="modal-close" style="min-height:34px; padding:0 12px;">Cerrar (Esc)</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </dialog>
+
+  <script>
+    const QA_DATA = {"meta": {"project": "FastAPI RealWorld Example App — Conduit (Backend API)", "branch": "buggy-version", "baseline_branch": "main", "date": "2026-11-09", "environment": "Python 3.14 · FastAPI · PostgreSQL (Docker 5433/5434)", "team": {"qa_lead": "Juan Pablo Velásquez Ramírez", "qa_analyst": "Niurka Liseth Mejía Vargas", "docente": "Yury Montoya Pérez"}, "endpoints_total": 19, "endpoints_covered": 19, "injected_bugs_total": 9, "detected_bugs_total": 9, "escaped_bugs": 0, "reopened_bugs": 0}, "cases": [{"id": "CP-EXP-M-001", "nombre": "Flujo completo de usuario: registro → login → artículo → seguir → feed → comentar → favoritar", "endpoint": "Múltiples: POST /api/users, POST /api/users/login, POST /api/articles, POST /api/profiles/{username}/follow, GET /api/articles/feed, POST /api/articles/{slug}/comments, POST /api/articles/{slug}/favorite", "modulo": "Exploratorio", "modo": "Manual", "prioridad": "Alta", "estado": "Falló", "tecnica": "Exploratoria", "tecnica_detalle": "Exploratoria", "defectos": ["BUG-01", "BUG-05", "BUG-06", "BUG-07"], "resultado_obtenido": "El flujo se ejecutó en Swagger UI detectando múltiples anomalías: registro retornó 200 en lugar de 201 (BUG-01); al seguir usuario B la respuesta retornó following: false (BUG-06); feed sin auth no valida token (BUG-07); al marcar favorito se produjo error HTTP 500 (BUG-05)."}, {"id": "CP-EXP-M-002", "nombre": "Crear artículos con caracteres especiales en el título y observar los slugs generados", "endpoint": "POST /api/articles", "modulo": "Exploratorio", "modo": "Manual", "prioridad": "Media", "estado": "Pasó", "tecnica": "Exploratoria", "tecnica_detalle": "Exploratoria", "defectos": [], "resultado_obtenido": "Variante 1 (emoji) retornó 422 por caracteres especiales en slug. Variante 2 (<script>) sanitizó correctamente a slug \"script-alert-xss-script\" (HTTP 200, sin inyección). Variantes 3 y 4 pasaron con sanitización de caracteres."}, {"id": "CP-EXP-M-003", "nombre": "Acceder a endpoints protegidos con tokens JWT inválidos o manipulados", "endpoint": "GET /api/user (endpoint protegido como representante de todos los endpoints con autenticación requerida)", "modulo": "Exploratorio", "modo": "Manual", "prioridad": "Alta", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (particiones inválidas del token)", "defectos": [], "resultado_obtenido": "Al enviar token JWT manipulado/inválido en GET /api/user, el sistema rechazó el acceso con código HTTP 403 Forbidden y mensaje {\"detail\": \"Could not validate credentials\"}."}, {"id": "CP-EXP-M-004", "nombre": "BVA: solicitar limit=100 con 25+ artículos y verificar que se retornan máximo 20", "endpoint": "GET /api/articles?limit={n}", "modulo": "Exploratorio", "modo": "Manual", "prioridad": "Media", "estado": "Falló", "tecnica": "BVA", "tecnica_detalle": "BVA (límite máximo del parámetro limit)", "defectos": ["BUG-09"], "resultado_obtenido": "Al solicitar GET /api/articles?limit=100 en base de datos con 25 artículos, el backend retornó los 25 artículos en la lista en lugar de respetar el tope máximo especificado de 20 (BUG-09)."}, {"id": "CP-EXP-M-005", "nombre": "Crear artículos con títulos similares y observar colisión de slugs", "endpoint": "POST /api/articles — generación y unicidad de slug", "modulo": "Exploratorio", "modo": "Manual", "prioridad": "Baja", "estado": "Pasó", "tecnica": "Exploratoria", "tecnica_detalle": "Exploratoria", "defectos": [], "resultado_obtenido": "Al intentar crear un artículo con título equivalente que deriva en un slug preexistente, la API retornó HTTP 400 Bad Request con mensaje descriptivo \"Article with this title already exists\"."}, {"id": "CP-TOOL-M-001", "nombre": "Verificar que Swagger UI documenta correctamente los 19 endpoints de la API", "endpoint": "GET http://localhost:8000/docs — documentación automática de FastAPI", "modulo": "Herramientas", "modo": "Manual", "prioridad": "Media", "estado": "Pasó", "tecnica": "Exploratoria", "tecnica_detalle": "Exploratoria (revisión de completitud)", "defectos": [], "resultado_obtenido": "Se inspeccionó Swagger UI montado en http://localhost:8000/api/. Se verificaron los 19 endpoints distribuidos en las secciones users, articles, profiles, comments y tags con schemas de request y response documentados."}, {"id": "CP-TOOL-M-002", "nombre": "Ejecutar flujo autenticado completo usando el botón Authorize de Swagger UI", "endpoint": "Swagger UI — sistema de autenticación Bearer. Endpoints: GET /api/user, POST /api/articles, DELETE /api/articles/{slug}", "modulo": "Herramientas", "modo": "Manual", "prioridad": "Alta", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (flujo con credenciales válidas)", "defectos": [], "resultado_obtenido": "Se realizó autenticación mediante botón Authorize en Swagger UI con esquema Bearer token de usuario registrado. Solicitudes posteriores como GET /api/user respondieron con HTTP 200 y datos de usuario sin reautenticación."}, {"id": "CP-TOOL-M-003", "nombre": "Importar y ejecutar la colección postman.json del repositorio en Postman", "endpoint": "Colección Postman pre-existente en la raíz del repositorio (postman.json)", "modulo": "Herramientas", "modo": "Manual", "prioridad": "Alta", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (flujos definidos en la colección)", "defectos": [], "resultado_obtenido": "Colección postman.json presente y validada en la raíz del repositorio con estructura estándar de endpoints y variables de entorno para integración."}, {"id": "CP-QUAL-M-001", "nombre": "Evaluar la calidad y claridad de los mensajes de error ante datos inválidos", "endpoint": "Múltiples endpoints: POST /api/users/login, POST /api/articles, GET /api/articles/{slug}, POST /api/profiles/{username}/follow", "modulo": "Calidad", "modo": "Manual", "prioridad": "Media", "estado": "Pasó", "tecnica": "EP + Exploratoria", "tecnica_detalle": "EP (particiones inválidas) Exploratoria", "defectos": [], "resultado_obtenido": "Al enviar datos con formato inválido (email sin @ y contraseña < 8 caracteres), la API retornó HTTP 422 Unprocessable Entity con detalle JSON descriptivo por campo (Pydantic ValidationError), sin exponer datos sensibles ni trazas internas."}, {"id": "CP-QUAL-M-002", "nombre": "Verificar la estructura completa del JSON de respuesta contra la especificación RealWorld", "endpoint": "GET /api/user, GET /api/articles/{slug}, GET /api/articles/{slug}/comments, GET /api/profiles/{username}", "modulo": "Calidad", "modo": "Manual", "prioridad": "Alta", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (verificación de partición válida completa)", "defectos": [], "resultado_obtenido": "La consulta GET /api/articles/{slug} retornó código HTTP 200 con estructura anidada bajo clave \"article\", conteniendo slug, title, description, body, tagList, createdAt, updatedAt, favorited, favoritesCount y author, cumpliendo la especificación RealWorld."}, {"id": "CP-QUAL-M-003", "nombre": "Editar artículo ajeno autenticado como no-autor y verificar que el sistema lo rechaza", "endpoint": "PUT /api/articles/{slug} — control de acceso por autoría", "modulo": "Calidad", "modo": "Manual", "prioridad": "Alta", "estado": "Falló", "tecnica": "Tabla de decisión", "tecnica_detalle": "Tabla de decisión (autenticado × no-autor)", "defectos": ["BUG-03"], "resultado_obtenido": "Usuario autenticado no-autor (Carlos) ejecutó PUT /api/articles/{slug} sobre artículo de Laura. La API aceptó la modificación retornando HTTP 200 en vez de 403 Forbidden (BUG-03)."}, {"id": "CP-QUAL-M-004", "nombre": "Eliminar artículo ajeno autenticado como no-autor y verificar que el sistema lo rechaza", "endpoint": "DELETE /api/articles/{slug} — seguridad y control de acceso", "modulo": "Calidad", "modo": "Manual", "prioridad": "Crítica", "estado": "Falló", "tecnica": "Tabla de decisión", "tecnica_detalle": "Tabla de decisión (autenticado × no-autor)", "defectos": ["BUG-04"], "resultado_obtenido": "Usuario autenticado no-autor (Carlos) ejecutó DELETE /api/articles/{slug} sobre artículo de Laura. La API permitió la eliminación retornando HTTP 200 y eliminando el recurso de la base de datos (BUG-04)."}, {"id": "CP-EST-M-001", "nombre": "Flujo follow → unfollow: verificar transición del campo following false → true → false", "endpoint": "POST /api/profiles/{username}/follow, DELETE /api/profiles/{username}/follow, GET /api/profiles/{username}", "modulo": "Estados", "modo": "Manual", "prioridad": "Media", "estado": "Falló", "tecnica": "Transición de estados", "tecnica_detalle": "Transición de estados (following: false → true → false)", "defectos": ["BUG-06"], "resultado_obtenido": "Al ejecutar POST /api/profiles/{username}/follow, la respuesta HTTP 200 retornó perfil con following: false a pesar de haberse registrado el seguimiento (BUG-06)."}, {"id": "CP-EST-M-002", "nombre": "Flujo favoritos: marcar → verificar contador → desmarcar → verificar contador", "endpoint": "POST /api/articles/{slug}/favorite, DELETE /api/articles/{slug}/favorite, GET /api/articles/{slug}", "modulo": "Estados", "modo": "Manual", "prioridad": "Media", "estado": "Falló", "tecnica": "Transición de estados", "tecnica_detalle": "Transición de estados (favorited: false → true → false)", "defectos": ["BUG-05"], "resultado_obtenido": "Al ejecutar POST /api/articles/{slug}/favorite para marcar un artículo como favorito, el servidor falló internamente retornando HTTP 500 Internal Server Error (BUG-05)."}, {"id": "CP-EST-M-003", "nombre": "Eliminar artículo propio y verificar que un GET posterior retorna 404", "endpoint": "DELETE /api/articles/{slug} → GET /api/articles/{slug}", "modulo": "Estados", "modo": "Manual", "prioridad": "Media", "estado": "Pasó", "tecnica": "Transición de estados", "tecnica_detalle": "Transición de estados (recurso: existe → eliminado → no encontrado)", "defectos": [], "resultado_obtenido": "El autor legítimo eliminó su artículo propio con DELETE /api/articles/{slug} retornando HTTP 200. La consulta GET posterior retornó HTTP 404 Not Found confirmando la transición de ciclo de vida."}, {"id": "CP-AUTH-A-001", "nombre": "Registro exitoso de nuevo usuario retorna HTTP 201 Created", "endpoint": "POST /api/users", "modulo": "Auth", "modo": "Automatizado", "prioridad": "Alta", "estado": "Falló", "tecnica": "EP", "tecnica_detalle": "EP (partición válida: datos de registro correctos)", "defectos": ["BUG-01"], "resultado_obtenido": "Retornó HTTP 200 OK en lugar de HTTP 201 Created."}, {"id": "CP-AUTH-A-002", "nombre": "Registro exitoso retorna token JWT no vacío en el body de respuesta", "endpoint": "POST /api/users", "modulo": "Auth", "modo": "Automatizado", "prioridad": "Alta", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (partición válida)", "defectos": [], "resultado_obtenido": "Retornó token JWT válido en body.user.token (3 segmentos)."}, {"id": "CP-AUTH-A-003", "nombre": "Login con credenciales válidas retorna HTTP 200 y token JWT", "endpoint": "POST /api/users/login", "modulo": "Auth", "modo": "Automatizado", "prioridad": "Alta", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (partición válida)", "defectos": [], "resultado_obtenido": "Login exitoso retornó HTTP 200 y JWT decodificable con sub de usuario."}, {"id": "CP-AUTH-A-004", "nombre": "Login con email no registrado retorna HTTP 400 Bad Request", "endpoint": "POST /api/users/login", "modulo": "Auth", "modo": "Automatizado", "prioridad": "Alta", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (partición inválida: email no registrado)", "defectos": [], "resultado_obtenido": "Login con email inexistente retornó HTTP 400 Bad Request."}, {"id": "CP-AUTH-A-005", "nombre": "Registro con email ya existente retorna HTTP 400 Bad Request", "endpoint": "POST /api/users", "modulo": "Auth", "modo": "Automatizado", "prioridad": "Alta", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (partición inválida: email duplicado)", "defectos": [], "resultado_obtenido": "Registro con email duplicado retornó HTTP 400 Bad Request."}, {"id": "CP-ART-A-001", "nombre": "Crear artículo con datos válidos retorna HTTP 200 con estructura de respuesta correcta", "endpoint": "POST /api/articles", "modulo": "Articles", "modo": "Automatizado", "prioridad": "Alta", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (partición válida: todos los campos correctos)", "defectos": [], "resultado_obtenido": "Creación de artículo retornó HTTP 200 con contrato y slug válidos."}, {"id": "CP-ART-A-002", "nombre": "Crear artículo con título vacío retorna HTTP 422 Unprocessable Entity", "endpoint": "POST /api/articles — validación del campo title", "modulo": "Articles", "modo": "Automatizado", "prioridad": "Alta", "estado": "Falló", "tecnica": "BVA", "tecnica_detalle": "BVA (valor en el límite inferior: string vacío = longitud 0, por debajo del mínimo de 1)", "defectos": ["BUG-02"], "resultado_obtenido": "Crear artículo con título vacío retornó HTTP 200 en lugar de HTTP 422."}, {"id": "CP-ART-A-003", "nombre": "Crear artículo sin token de autenticación retorna HTTP 401 Unauthorized", "endpoint": "POST /api/articles — autenticación requerida", "modulo": "Articles", "modo": "Automatizado", "prioridad": "Alta", "estado": "Pasó", "tecnica": "Tabla de decisión", "tecnica_detalle": "Tabla de decisión (no autenticado × endpoint protegido)", "defectos": [], "resultado_obtenido": "Crear artículo sin header Authorization retornó HTTP 401 Unauthorized."}, {"id": "CP-ART-A-004", "nombre": "Editar artículo como autor legítimo retorna HTTP 200 con artículo actualizado", "endpoint": "PUT /api/articles/{slug}", "modulo": "Articles", "modo": "Automatizado", "prioridad": "Alta", "estado": "Pasó", "tecnica": "Tabla de decisión", "tecnica_detalle": "Tabla de decisión (autenticado × autor)", "defectos": [], "resultado_obtenido": "Edición de artículo propio por su autor retornó HTTP 200 y cambios reflejados."}, {"id": "CP-ART-A-005", "nombre": "Editar artículo de otro usuario retorna HTTP 400 Bad Request", "endpoint": "PUT /api/articles/{slug} — control de acceso por autoría", "modulo": "Articles", "modo": "Automatizado", "prioridad": "Alta", "estado": "Falló", "tecnica": "Tabla de decisión", "tecnica_detalle": "Tabla de decisión (autenticado × no-autor)", "defectos": ["BUG-03"], "resultado_obtenido": "Edición de artículo ajeno retornó HTTP 200 en lugar de HTTP 400/403."}, {"id": "CP-ART-A-006", "nombre": "Eliminar artículo de otro usuario retorna HTTP 400 Bad Request", "endpoint": "DELETE /api/articles/{slug} — seguridad crítica", "modulo": "Articles", "modo": "Automatizado", "prioridad": "Crítica", "estado": "Falló", "tecnica": "Tabla de decisión", "tecnica_detalle": "Tabla de decisión (autenticado × no-autor)", "defectos": ["BUG-04"], "resultado_obtenido": "Eliminación de artículo ajeno retornó HTTP 200 en lugar de rechazar con error."}, {"id": "CP-ART-A-007", "nombre": "Acceder a GET /api/articles/feed sin autenticación retorna HTTP 401", "endpoint": "GET /api/articles/feed — endpoint que requiere autenticación obligatoria", "modulo": "Articles", "modo": "Automatizado", "prioridad": "Alta", "estado": "Falló", "tecnica": "Tabla de decisión", "tecnica_detalle": "Tabla de decisión (no autenticado × endpoint protegido)", "defectos": ["BUG-07"], "resultado_obtenido": "Consulta de feed sin token de autenticación no retornó HTTP 401 Unauthorized."}, {"id": "CP-ART-A-008", "nombre": "Filtrar artículos por tag retorna únicamente artículos etiquetados con ese tag", "endpoint": "GET /api/articles?tag={tag}", "modulo": "Articles", "modo": "Automatizado", "prioridad": "Media", "estado": "Falló", "tecnica": "EP", "tecnica_detalle": "EP (partición: con filtro activo vs. sin filtro)", "defectos": ["BUG-08"], "resultado_obtenido": "Filtro por tag retornó conteo incorrecto (articlesCount=3 en vez de 2)."}, {"id": "CP-ART-A-009", "nombre": "Solicitar ?limit=100 retorna máximo 20 artículos (límite máximo del sistema)", "endpoint": "GET /api/articles?limit={n} — validación del parámetro limit", "modulo": "Articles", "modo": "Automatizado", "prioridad": "Media", "estado": "Falló", "tecnica": "BVA", "tecnica_detalle": "BVA (valor muy por encima del límite: 100 >> 20)", "defectos": ["BUG-09"], "resultado_obtenido": "Parámetro limit=100 retornó 25 artículos superando el tope máximo de 20."}, {"id": "CP-COM-A-001", "nombre": "Crear comentario en artículo existente retorna HTTP 200 con el comentario creado", "endpoint": "POST /api/articles/{slug}/comments", "modulo": "Comments", "modo": "Automatizado", "prioridad": "Media", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (partición válida)", "defectos": [], "resultado_obtenido": "Creación de comentario en artículo retornó HTTP 200 con id y autor."}, {"id": "CP-COM-A-002", "nombre": "Crear comentario sin autenticación retorna HTTP 401 Unauthorized", "endpoint": "POST /api/articles/{slug}/comments", "modulo": "Comments", "modo": "Automatizado", "prioridad": "Media", "estado": "Pasó", "tecnica": "Tabla de decisión", "tecnica_detalle": "Tabla de decisión (no autenticado × endpoint protegido)", "defectos": [], "resultado_obtenido": "Crear comentario sin autenticación retornó HTTP 401 Unauthorized."}, {"id": "CP-COM-A-003", "nombre": "Eliminar comentario propio retorna HTTP 200 y el comentario deja de existir", "endpoint": "DELETE /api/articles/{slug}/comments/{id}", "modulo": "Comments", "modo": "Automatizado", "prioridad": "Media", "estado": "Pasó", "tecnica": "Tabla de decisión", "tecnica_detalle": "Tabla de decisión (autenticado × autor del comentario)", "defectos": [], "resultado_obtenido": "Eliminación de comentario propio por su autor retornó HTTP 200 OK."}, {"id": "CP-COM-A-004", "nombre": "Obtener comentarios de un artículo inexistente retorna HTTP 404 Not Found", "endpoint": "GET /api/articles/{slug}/comments", "modulo": "Comments", "modo": "Automatizado", "prioridad": "Media", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (partición inválida: recurso inexistente)", "defectos": [], "resultado_obtenido": "Consultar comentarios de artículo inexistente retornó HTTP 404 Not Found."}, {"id": "CP-PRF-A-001", "nombre": "Seguir a un usuario cambia el campo following a true en la respuesta", "endpoint": "POST /api/profiles/{username}/follow", "modulo": "Profiles", "modo": "Automatizado", "prioridad": "Media", "estado": "Falló", "tecnica": "Transición de estados", "tecnica_detalle": "Transición de estados (following: false → true)", "defectos": ["BUG-06"], "resultado_obtenido": "Seguir usuario retornó following: false en vez de true en respuesta."}, {"id": "CP-PRF-A-002", "nombre": "Dejar de seguir a un usuario cambia following a false", "endpoint": "DELETE /api/profiles/{username}/follow", "modulo": "Profiles", "modo": "Automatizado", "prioridad": "Media", "estado": "Falló", "tecnica": "Transición de estados", "tecnica_detalle": "Transición de estados (following: true → false)", "defectos": ["BUG-06"], "resultado_obtenido": "Dejar de seguir usuario falló en reflejar transición adecuada."}, {"id": "CP-PRF-A-003", "nombre": "Obtener perfil de usuario inexistente retorna HTTP 404 Not Found", "endpoint": "GET /api/profiles/{username}", "modulo": "Profiles", "modo": "Automatizado", "prioridad": "Media", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (partición inválida: recurso inexistente)", "defectos": [], "resultado_obtenido": "Consultar perfil inexistente retornó HTTP 404 Not Found."}, {"id": "CP-PRF-A-004", "nombre": "Intentar seguir usuario sin autenticación retorna HTTP 401 Unauthorized", "endpoint": "POST /api/profiles/{username}/follow", "modulo": "Profiles", "modo": "Automatizado", "prioridad": "Media", "estado": "Pasó", "tecnica": "Tabla de decisión", "tecnica_detalle": "Tabla de decisión (no autenticado × endpoint protegido)", "defectos": [], "resultado_obtenido": "Intentar seguir usuario sin autenticación retornó HTTP 401 Unauthorized."}, {"id": "CP-FAV-A-001", "nombre": "Marcar artículo como favorito incrementa favoritesCount en 1 y favorited cambia a true", "endpoint": "POST /api/articles/{slug}/favorite", "modulo": "Favorites", "modo": "Automatizado", "prioridad": "Media", "estado": "Falló", "tecnica": "Transición de estados", "tecnica_detalle": "Transición de estados (favorited: false → true)", "defectos": ["BUG-05"], "resultado_obtenido": "Marcar favorito arrojó error interno de servidor (HTTP 500 / ValueError)."}, {"id": "CP-FAV-A-002", "nombre": "Desmarcar artículo favorito decrementa favoritesCount en 1 y favorited cambia a false", "endpoint": "DELETE /api/articles/{slug}/favorite", "modulo": "Favorites", "modo": "Automatizado", "prioridad": "Media", "estado": "Falló", "tecnica": "Transición de estados", "tecnica_detalle": "Transición de estados (favorited: true → false)", "defectos": ["BUG-05"], "resultado_obtenido": "Desmarcar favorito arrojó error interno de servidor (HTTP 500 / ValueError)."}, {"id": "CP-TAG-A-001", "nombre": "GET /api/tags retorna HTTP 200 con lista de tags existentes ordenada alfabéticamente", "endpoint": "GET /api/tags", "modulo": "Tags", "modo": "Automatizado", "prioridad": "Baja", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (partición válida: tags existentes)", "defectos": [], "resultado_obtenido": "GET /api/tags retornó HTTP 200 y array de strings ordenado alfabéticamente."}, {"id": "CP-TAG-A-002", "nombre": "Tags asignados al crear un artículo aparecen en GET /api/tags", "endpoint": "POST /api/articles → GET /api/tags (integración entre módulos)", "modulo": "Tags", "modo": "Automatizado", "prioridad": "Baja", "estado": "Pasó", "tecnica": "EP", "tecnica_detalle": "EP (integración entre módulo de artículos y módulo de tags)", "defectos": [], "resultado_obtenido": "Tags asignados a nuevo artículo se reflejaron en GET /api/tags."}], "coverage": {"total_covered": 553, "total_statements": 668, "total_missing": 115, "total_pct": 82.78, "runtime_covered": 553, "runtime_statements": 600, "runtime_pct": 92.17, "layers": [{"layer": "Core, DB & Main", "covered": 74, "total": 76, "files": 6, "pct": 97.37}, {"layer": "API Routes & Deps", "covered": 214, "total": 242, "files": 9, "pct": 88.43}, {"layer": "CRUD Repositories", "covered": 121, "total": 138, "files": 3, "pct": 87.68}, {"layer": "SQLAlchemy Models", "covered": 84, "total": 84, "files": 4, "pct": 100.0}, {"layer": "Pydantic Schemas", "covered": 60, "total": 60, "files": 6, "pct": 100.0}, {"layer": "CLI Seed Script", "covered": 0, "total": 68, "files": 1, "pct": 0.0}], "files": [{"file": "app/__init__.py", "layer": "Core, DB & Main", "covered": 1, "total": 1, "missing": 0, "pct": 100.0}, {"file": "app/api/api.py", "layer": "API Routes & Deps", "covered": 10, "total": 10, "missing": 0, "pct": 100.0}, {"file": "app/api/deps.py", "layer": "API Routes & Deps", "covered": 52, "total": 59, "missing": 7, "pct": 88.14}, {"file": "app/api/routes/articles.py", "layer": "API Routes & Deps", "covered": 39, "total": 42, "missing": 3, "pct": 92.86}, {"file": "app/api/routes/auth.py", "layer": "API Routes & Deps", "covered": 19, "total": 19, "missing": 0, "pct": 100.0}, {"file": "app/api/routes/comments.py", "layer": "API Routes & Deps", "covered": 34, "total": 37, "missing": 3, "pct": 91.89}, {"file": "app/api/routes/favorites.py", "layer": "API Routes & Deps", "covered": 17, "total": 22, "missing": 5, "pct": 77.27}, {"file": "app/api/routes/profiles.py", "layer": "API Routes & Deps", "covered": 22, "total": 26, "missing": 4, "pct": 84.62}, {"file": "app/api/routes/tags.py", "layer": "API Routes & Deps", "covered": 11, "total": 11, "missing": 0, "pct": 100.0}, {"file": "app/api/routes/user.py", "layer": "API Routes & Deps", "covered": 10, "total": 16, "missing": 6, "pct": 62.5}, {"file": "app/core/config.py", "layer": "Core, DB & Main", "covered": 38, "total": 40, "missing": 2, "pct": 95.0}, {"file": "app/core/security.py", "layer": "Core, DB & Main", "covered": 17, "total": 17, "missing": 0, "pct": 100.0}, {"file": "app/crud/crud_article.py", "layer": "CRUD Repositories", "covered": 58, "total": 64, "missing": 6, "pct": 90.62}, {"file": "app/crud/crud_comment.py", "layer": "CRUD Repositories", "covered": 29, "total": 29, "missing": 0, "pct": 100.0}, {"file": "app/crud/crud_user.py", "layer": "CRUD Repositories", "covered": 34, "total": 45, "missing": 11, "pct": 75.56}, {"file": "app/db/base_class.py", "layer": "Core, DB & Main", "covered": 3, "total": 3, "missing": 0, "pct": 100.0}, {"file": "app/db/session.py", "layer": "Core, DB & Main", "covered": 6, "total": 6, "missing": 0, "pct": 100.0}, {"file": "app/main.py", "layer": "Core, DB & Main", "covered": 9, "total": 9, "missing": 0, "pct": 100.0}, {"file": "app/models/article.py", "layer": "SQLAlchemy Models", "covered": 27, "total": 27, "missing": 0, "pct": 100.0}, {"file": "app/models/comment.py", "layer": "SQLAlchemy Models", "covered": 19, "total": 19, "missing": 0, "pct": 100.0}, {"file": "app/models/tag.py", "layer": "SQLAlchemy Models", "covered": 10, "total": 10, "missing": 0, "pct": 100.0}, {"file": "app/models/user.py", "layer": "SQLAlchemy Models", "covered": 28, "total": 28, "missing": 0, "pct": 100.0}, {"file": "app/schemas/articles.py", "layer": "Pydantic Schemas", "covered": 15, "total": 15, "missing": 0, "pct": 100.0}, {"file": "app/schemas/base.py", "layer": "Pydantic Schemas", "covered": 11, "total": 11, "missing": 0, "pct": 100.0}, {"file": "app/schemas/comments.py", "layer": "Pydantic Schemas", "covered": 9, "total": 9, "missing": 0, "pct": 100.0}, {"file": "app/schemas/profiles.py", "layer": "Pydantic Schemas", "covered": 5, "total": 5, "missing": 0, "pct": 100.0}, {"file": "app/schemas/tags.py", "layer": "Pydantic Schemas", "covered": 2, "total": 2, "missing": 0, "pct": 100.0}, {"file": "app/schemas/users.py", "layer": "Pydantic Schemas", "covered": 18, "total": 18, "missing": 0, "pct": 100.0}, {"file": "app/seed.py", "layer": "CLI Seed Script", "covered": 0, "total": 68, "missing": 68, "pct": 0.0}]}, "pytest": {"duration": 28.92, "summary": {"passed": 15, "failed": 11, "total": 26, "collected": 26}, "tests": [{"nodeid": "tests/test_articles.py::test_crear_articulo_valido", "file": "tests/test_articles.py", "name": "test_crear_articulo_valido", "outcome": "passed", "duration": 0.961, "message": ""}, {"nodeid": "tests/test_articles.py::test_crear_articulo_titulo_vacio_retorna_422", "file": "tests/test_articles.py", "name": "test_crear_articulo_titulo_vacio_retorna_422", "outcome": "failed", "duration": 0.69, "message": "AssertionError: [CP-ART-A-002] Se esperaba HTTP 422, se obtuvo 200. Posible BUG-02: la validación min_length=1 en el campo 'title' fue eliminada.\nassert 200 == 422\n +  where 200 = <Response [200 OK]>.status_code"}, {"nodeid": "tests/test_articles.py::test_crear_articulo_sin_auth_retorna_401", "file": "tests/test_articles.py", "name": "test_crear_articulo_sin_auth_retorna_401", "outcome": "passed", "duration": 0.01, "message": ""}, {"nodeid": "tests/test_articles.py::test_editar_articulo_como_autor", "file": "tests/test_articles.py", "name": "test_editar_articulo_como_autor", "outcome": "passed", "duration": 1.433, "message": ""}, {"nodeid": "tests/test_articles.py::test_editar_articulo_ajeno_retorna_400", "file": "tests/test_articles.py", "name": "test_editar_articulo_ajeno_retorna_400", "outcome": "failed", "duration": 1.593, "message": "AssertionError: [CP-ART-A-005] Se esperaba HTTP 400, se obtuvo 200. Posible BUG-03: la verificación de autoría en PUT fue eliminada. Cualquier usuario autenticado puede editar artículos ajenos.\nassert 200 == 400\n +  where 200 = <Response [200 OK]>.status_code"}, {"nodeid": "tests/test_articles.py::test_eliminar_articulo_ajeno_retorna_400", "file": "tests/test_articles.py", "name": "test_eliminar_articulo_ajeno_retorna_400", "outcome": "failed", "duration": 1.143, "message": "AssertionError: [CP-ART-A-006] Se esperaba HTTP 400, se obtuvo 200. ALERTA DE SEGURIDAD (BUG-04): la verificación de autoría en DELETE fue eliminada. Cualquier usuario autenticado puede eliminar artículos ajenos.\nassert 200 == 400\n +  where 200 = <Response [20"}, {"nodeid": "tests/test_articles.py::test_feed_sin_auth_retorna_401", "file": "tests/test_articles.py", "name": "test_feed_sin_auth_retorna_401", "outcome": "failed", "duration": 0.015, "message": "AttributeError: 'NoneType' object has no attribute 'id'"}, {"nodeid": "tests/test_articles.py::test_filtrar_articulos_por_tag", "file": "tests/test_articles.py", "name": "test_filtrar_articulos_por_tag", "outcome": "failed", "duration": 1.283, "message": "AssertionError: [CP-ART-A-008] Se esperaban 2 artículos con tag 'python', se obtuvieron 3. Posible BUG-08: el filtro por tag está siendo ignorado (retorna todos los artículos).\nassert 3 == 2"}, {"nodeid": "tests/test_articles.py::test_limit_capeado_en_20_articulos", "file": "tests/test_articles.py", "name": "test_limit_capeado_en_20_articulos", "outcome": "failed", "duration": 1.454, "message": "AssertionError: [CP-ART-A-009] Se esperaban máximo 20 artículos, se obtuvieron 25. Posible BUG-09: el parámetro limit no está siendo capado al máximo de 20.\nassert 25 <= 20"}, {"nodeid": "tests/test_auth.py::test_registro_retorna_201", "file": "tests/test_auth.py", "name": "test_registro_retorna_201", "outcome": "failed", "duration": 0.586, "message": "AssertionError: [CP-AUTH-A-001] Se esperaba HTTP 201, se obtuvo 200. Posible BUG-01: el endpoint retorna 200 en lugar de 201.\nassert 200 == 201\n +  where 200 = <Response [200 OK]>.status_code"}, {"nodeid": "tests/test_auth.py::test_registro_retorna_token_jwt", "file": "tests/test_auth.py", "name": "test_registro_retorna_token_jwt", "outcome": "passed", "duration": 0.581, "message": ""}, {"nodeid": "tests/test_auth.py::test_login_retorna_token_jwt", "file": "tests/test_auth.py", "name": "test_login_retorna_token_jwt", "outcome": "passed", "duration": 1.272, "message": ""}, {"nodeid": "tests/test_auth.py::test_login_email_inexistente_retorna_400", "file": "tests/test_auth.py", "name": "test_login_email_inexistente_retorna_400", "outcome": "passed", "duration": 0.021, "message": ""}, {"nodeid": "tests/test_auth.py::test_registro_email_duplicado_retorna_400", "file": "tests/test_auth.py", "name": "test_registro_email_duplicado_retorna_400", "outcome": "passed", "duration": 0.555, "message": ""}, {"nodeid": "tests/test_comments.py::test_crear_comentario_en_articulo_existente", "file": "tests/test_comments.py", "name": "test_crear_comentario_en_articulo_existente", "outcome": "passed", "duration": 1.332, "message": ""}, {"nodeid": "tests/test_comments.py::test_crear_comentario_sin_auth_retorna_401", "file": "tests/test_comments.py", "name": "test_crear_comentario_sin_auth_retorna_401", "outcome": "passed", "duration": 0.581, "message": ""}, {"nodeid": "tests/test_comments.py::test_eliminar_comentario_propio", "file": "tests/test_comments.py", "name": "test_eliminar_comentario_propio", "outcome": "passed", "duration": 0.774, "message": ""}, {"nodeid": "tests/test_comments.py::test_get_comentarios_articulo_inexistente_retorna_404", "file": "tests/test_comments.py", "name": "test_get_comentarios_articulo_inexistente_retorna_404", "outcome": "passed", "duration": 0.03, "message": ""}, {"nodeid": "tests/test_favorites.py::test_marcar_favorito_incrementa_contador", "file": "tests/test_favorites.py", "name": "test_marcar_favorito_incrementa_contador", "outcome": "failed", "duration": 0.63, "message": "ValueError: list.remove(x): x not in list"}, {"nodeid": "tests/test_favorites.py::test_desmarcar_favorito_decrementa_contador", "file": "tests/test_favorites.py", "name": "test_desmarcar_favorito_decrementa_contador", "outcome": "failed", "duration": 0.877, "message": "ValueError: list.remove(x): x not in list"}, {"nodeid": "tests/test_profiles.py::test_seguir_usuario_cambia_following_a_true", "file": "tests/test_profiles.py", "name": "test_seguir_usuario_cambia_following_a_true", "outcome": "failed", "duration": 1.395, "message": "AssertionError: [CP-PRF-A-001] Se esperaba following=true después de seguir, se obtuvo False. Posible BUG-06: el método profile() siempre retorna following=False.\nassert False is True"}, {"nodeid": "tests/test_profiles.py::test_dejar_de_seguir_cambia_following_a_false", "file": "tests/test_profiles.py", "name": "test_dejar_de_seguir_cambia_following_a_false", "outcome": "failed", "duration": 1.969, "message": "AssertionError: [CP-PRF-A-002] El follow inicial no dejó following=true. No se puede validar el unfollow.\nassert False is True"}, {"nodeid": "tests/test_profiles.py::test_get_perfil_inexistente_retorna_404", "file": "tests/test_profiles.py", "name": "test_get_perfil_inexistente_retorna_404", "outcome": "passed", "duration": 0.027, "message": ""}, {"nodeid": "tests/test_profiles.py::test_seguir_usuario_sin_auth_retorna_401", "file": "tests/test_profiles.py", "name": "test_seguir_usuario_sin_auth_retorna_401", "outcome": "passed", "duration": 0.561, "message": ""}, {"nodeid": "tests/test_tags.py::test_get_tags_retorna_lista", "file": "tests/test_tags.py", "name": "test_get_tags_retorna_lista", "outcome": "passed", "duration": 0.932, "message": ""}, {"nodeid": "tests/test_tags.py::test_tags_de_articulo_creado_aparecen_en_get_tags", "file": "tests/test_tags.py", "name": "test_tags_de_articulo_creado_aparecen_en_get_tags", "outcome": "passed", "duration": 1.042, "message": ""}]}, "bugs": [{"id": "BUG-01", "titulo": "POST /api/users retorna HTTP 200 en lugar de 201 Created al registrar usuario", "modulo": "Auth", "severidad": "Baja", "prioridad": "Baja", "estado": "Confirmado (New)", "cps_auto": ["CP-AUTH-A-001"], "cps_manual": ["CP-EXP-M-001"], "error_humano": "Omisión del parámetro status_code=201 en el decorador @router.post de app/api/routes/auth.py.", "defecto_codigo": "Endpoint responde por defecto HTTP 200 OK violando la semántica REST de creación.", "fallo_observado": "Al registrar un usuario nuevo, Swagger UI y pytest reciben HTTP 200 en lugar de 201.", "impacto_negocio": "Bajo: el usuario se persiste correctamente y recibe su JWT; desviación menor de contrato.", "evidencia_img": "../evidencias/CP-EXP-M-001_registro- Codigo 200 Error Creacion de Usuario.png", "evidencia_label": "Captura Swagger UI (HTTP 200 en registro) + Assert pytest"}, {"id": "BUG-02", "titulo": "Permite creación de artículos con título vacío (falta min_length=1)", "modulo": "Articles", "severidad": "Alta", "prioridad": "Alta", "estado": "Confirmado (New)", "cps_auto": ["CP-ART-A-002"], "cps_manual": [], "error_humano": "Se removió la restricción Pydantic Field(..., min_length=1) en app/schemas/articles.py.", "defecto_codigo": "Esquema NewArticle acepta string vacío '' sin lanzar ValidationError 422.", "fallo_observado": "POST /api/articles con title=\"\" retorna HTTP 200 y guarda un artículo sin título ni slug válido.", "impacto_negocio": "Alto: degrada la calidad del catálogo editorial y rompe URLs de lectura basadas en slug.", "evidencia_img": null, "evidencia_label": "Reporte pytest-html (test_crear_articulo_titulo_vacio_retorna_422)"}, {"id": "BUG-03", "titulo": "Falla de autorización (BOLA): Cualquier usuario puede editar artículos ajenos", "modulo": "Articles", "severidad": "Alta", "prioridad": "Alta", "estado": "Confirmado (New)", "cps_auto": ["CP-ART-A-005"], "cps_manual": ["CP-QUAL-M-003"], "error_humano": "Se omitió la verificación if article.author != current_user en PUT /api/articles/{slug}.", "defecto_codigo": "Controlador update() ejecuta la actualización en BD sin comprobar propiedad del recurso.", "fallo_observado": "Usuario Carlos edita exitosamente el artículo de Laura recibiendo HTTP 200 OK.", "impacto_negocio": "Alto: vulnerabilidad OWASP API1:2023 (BOLA); permite adulterar contenido de otros autores.", "evidencia_img": "../evidencias/P-QUAL-M-003_edit_ajeno_bug03.png", "evidencia_label": "Captura Swagger UI (Carlos edita post de Laura -> HTTP 200)"}, {"id": "BUG-04", "titulo": "BRECHA CRÍTICA (BOLA): Cualquier usuario puede eliminar artículos ajenos", "modulo": "Articles", "severidad": "Crítica", "prioridad": "Alta", "estado": "Confirmado (New)", "cps_auto": ["CP-ART-A-006"], "cps_manual": ["CP-QUAL-M-004"], "error_humano": "Se eliminó el guardián de autoría en el controlador DELETE /api/articles/{slug}.", "defecto_codigo": "El método delete() borra cualquier registro coincidente por slug para cualquier token válido.", "fallo_observado": "Carlos elimina permanentemente el artículo de Laura con HTTP 200; un GET posterior confirma borrado.", "impacto_negocio": "CRÍTICO (Bloqueante NO-GO): destrucción masiva de propiedad intelectual y fuga de creadores.", "evidencia_img": "../evidencias/CP-QUAL-M-004_delete_ajeno_bug04.png", "evidencia_label": "Captura Swagger UI (Carlos elimina post de Laura -> HTTP 200)"}, {"id": "BUG-05", "titulo": "Lógica invertida en favoritos detona HTTP 500 Internal Server Error", "modulo": "Favorites", "severidad": "Alta", "prioridad": "Media", "estado": "Confirmado (New)", "cps_auto": ["CP-FAV-A-001", "CP-FAV-A-002"], "cps_manual": ["CP-EXP-M-001", "CP-EST-M-002"], "error_humano": "Llamada invertida con favorite=False dentro del endpoint POST /favorite en app/api/routes/favorites.py.", "defecto_codigo": "SQLAlchemy intenta ejecutar list.remove(user) cuando el usuario aún no está en favoritos.", "fallo_observado": "ValueError: list.remove(x): x not in list en pytest y HTTP 500 Internal Server Error en Swagger UI.", "impacto_negocio": "Medio/Alto: rompe el mecanismo de engagement y valoración de artículos.", "evidencia_img": "../evidencias/CP-EST-M-002_favorite_500_bug05.png", "evidencia_label": "Captura Swagger UI (HTTP 500 en POST /favorite) + Traceback pytest"}, {"id": "BUG-06", "titulo": "Perfil de usuario siempre retorna 'following: false' aunque se siga al autor", "modulo": "Profiles", "severidad": "Media", "prioridad": "Media", "estado": "Confirmado (New)", "cps_auto": ["CP-PRF-A-001", "CP-PRF-A-002"], "cps_manual": ["CP-EXP-M-001", "CP-EST-M-001"], "error_humano": "Hardcodeo del atributo following=False en el método profile() del modelo app/models/user.py.", "defecto_codigo": "Aunque se inserta el vínculo en BD, la serialización ignora self.followers.__contains__(user).", "fallo_observado": "POST /api/profiles/laura_dev/follow responde HTTP 200 pero con following: false.", "impacto_negocio": "Medio: desincroniza el estado visual en frontend y confunde la interacción social.", "evidencia_img": "../evidencias/CP-EST-M-001_follow_false_bug06.png", "evidencia_label": "Captura Swagger UI (following: false tras POST /follow)"}, {"id": "BUG-07", "titulo": "Endpoint de Feed (/api/articles/feed) omite autenticación obligatoria", "modulo": "Articles", "severidad": "Alta", "prioridad": "Alta", "estado": "Confirmado (New)", "cps_auto": ["CP-ART-A-007"], "cps_manual": ["CP-EXP-M-001"], "error_humano": "Uso incorrecto de la dependencia OptionalCurrentUser en lugar de CurrentUser en get_feed().", "defecto_codigo": "El endpoint permite paso a peticiones sin token JWT y pasa current_user=None al servicio.", "fallo_observado": "GET /api/articles/feed sin token detona AttributeError: 'NoneType' object has no attribute 'id' (no 401).", "impacto_negocio": "Alto: expone fallo 500 o acceso anónimo indebido en una ruta personalizada privada.", "evidencia_img": null, "evidencia_label": "Reporte pytest-html (test_feed_sin_auth_retorna_401)"}, {"id": "BUG-08", "titulo": "Filtro por tag (?tag=...) en GET /api/articles es ignorado", "modulo": "Articles", "severidad": "Media", "prioridad": "Media", "estado": "Confirmado (New)", "cps_auto": ["CP-ART-A-008"], "cps_manual": [], "error_humano": "La cláusula condicional de filtrado por tag en app/crud/crud_article.py fue comentada.", "defecto_codigo": "La consulta SQL omite el JOIN/WHERE sobre Tag.name cuando recibe parámetro query tag.", "fallo_observado": "GET /api/articles?tag=python retorna 3 artículos (incluyendo los de otros tags) en lugar de 2.", "impacto_negocio": "Medio: deteriora el descubrimiento temático de contenido para lectores.", "evidencia_img": null, "evidencia_label": "Reporte pytest-html (test_filtrar_articulos_por_tag)"}, {"id": "BUG-09", "titulo": "Parámetro ?limit=100 no es capeado al tope máximo permitido de 20 (BVA)", "modulo": "Articles", "severidad": "Media", "prioridad": "Media", "estado": "Confirmado (New)", "cps_auto": ["CP-ART-A-009"], "cps_manual": ["CP-EXP-M-004"], "error_humano": "Se eliminó la protección min(limit, max_limit) al pasar el argumento a articles.get_list().", "defecto_codigo": "El controlador traslada cualquier entero sin acotarlo al máximo de 20 registros por página.", "fallo_observado": "GET /api/articles?limit=100 con 25 artículos retorna los 25 artículos en lugar de 20.", "impacto_negocio": "Medio: riesgo de saturación de memoria y DoS si un cliente solicita limit=100000.", "evidencia_img": "../evidencias/CP-EXP-M-004_limit_100_bug09.png..png", "evidencia_label": "Captura Swagger UI (limit=100 retorna 25 artículos) + BVA pytest"}]};
+
+    const LIFECYCLE_STEPS = [
+      {
+        num: "PASO 1",
+        title: "Identificar las métricas",
+        short: "Definición por propósito, audiencia y meta.",
+        detail: "<strong>Aplicación en Conduit:</strong> Antes de capturar datos se respondieron las 4 preguntas de clase: medir cobertura de ejecución (meta ≥ 95%), cobertura de código (meta ≥ 70%), densidad de defectos y DRE (meta 100%) para que el equipo QA y la docente decidan el Go/No-Go."
+      },
+      {
+        num: "PASO 2",
+        title: "Identificar los datos (Base vs. Derivadas)",
+        short: "Conteos crudos alimentan fórmulas exactas.",
+        detail: "<strong>Aplicación en Conduit:</strong> Medidas base: 41 planeados, 41 ejecutados, 24 aprobados, 17 fallidos, 0 bloqueados, 553/668 sentencias, 9 bugs. Derivadas: 58.54% aprobación, 82.78% cobertura, 0.220 densidad y 100% DRE."
+      },
+      {
+        num: "PASO 3",
+        title: "Comunicar a los interesados",
+        short: "Alineación RACI desde la planeación.",
+        detail: "<strong>Aplicación en Conduit:</strong> Definido en §4.1 del Plan de Pruebas entre Juan Pablo Velásquez (QA Lead / Automatizador), Niurka Liseth Mejía (QA Analyst / Bug Manager en MantisBT) y la docente Yury Montoya Pérez."
+      },
+      {
+        num: "PASO 4",
+        title: "Capturar y verificar datos",
+        short: "Regla 'Garbage in, garbage out'.",
+        detail: "<strong>Aplicación en Conduit:</strong> Captura automatizada sin intervención manual mediante <code>pytest --json-report</code> y <code>pytest-cov</code>, cruzada contra 11 capturas reales en <code>docs_qa/evidencias/</code> y verificación de los 41 casos en Markdown."
+      },
+      {
+        num: "PASO 5",
+        title: "Analizar y procesar los datos",
+        short: "Contexto e interpretación más allá del número.",
+        detail: "<strong>Aplicación en Conduit:</strong> Se explicó por qué 41.46% de fallos en <code>buggy-version</code> es positivo (el baseline en <code>main</code> es 100% pass) y por qué la cobertura global de 82.78% sube a 92.17% al aislar el script auxiliar <code>seed.py</code>."
+      },
+      {
+        num: "PASO 6",
+        title: "Reportar las métricas (Dashboard)",
+        short: "Resumen ejecutivo, gráficos, alertas y decisión.",
+        detail: "<strong>Aplicación en Conduit:</strong> Este tablero frontend integra el resumen ejecutivo NO-GO, gráficos comparados contra metas, matriz de severidad vs. prioridad, trazabilidad MantisBT y exportación CSV."
+      }
+    ];
+
+    const MODULE_ORDER = ["Articles", "Auth", "Profiles", "Favorites", "Comments", "Tags"];
+
+    let currentCycle = "buggy";
+    let activeStepIndex = 0;
+
+    // --- Helper UI Feedback ---
+    function showFeedback(type, html, actionsHtml = "") {
+      const bar = document.getElementById("global-feedback");
+      bar.className = "feedback-bar visible " + type;
+      document.getElementById("feedback-msg").innerHTML = html;
+      document.getElementById("feedback-actions").innerHTML = actionsHtml;
+    }
+
+    function clearFeedback() {
+      const bar = document.getElementById("global-feedback");
+      bar.className = "feedback-bar";
+      document.getElementById("feedback-msg").innerHTML = "";
+      document.getElementById("feedback-actions").innerHTML = "";
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    // --- Tab Switching with Keyboard Support ---
+    const tabButtons = Array.from(document.querySelectorAll(".tab-btn"));
+    const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
+
+    const TAB_HASH_MAP = {
+      "tab-overview": "resumen",
+      "tab-lifecycle": "ciclo",
+      "tab-coverage": "cobertura",
+      "tab-traceability": "defectos"
+    };
+
+    function activateTab(tabId, pushHash = true) {
+      tabButtons.forEach((btn) => {
+        const selected = btn.id === tabId;
+        btn.setAttribute("aria-selected", selected ? "true" : "false");
+        btn.tabIndex = selected ? 0 : -1;
+      });
+      tabPanels.forEach((panel) => {
+        const matches = panel.getAttribute("aria-labelledby") === tabId;
+        panel.classList.toggle("active", matches);
+      });
+      if (pushHash && TAB_HASH_MAP[tabId]) {
+        history.replaceState(null, "", "#" + TAB_HASH_MAP[tabId]);
+      }
+    }
+
+    function syncTabFromHash() {
+      const h = window.location.hash.replace("#", "").toLowerCase();
+      const entry = Object.entries(TAB_HASH_MAP).find(([, val]) => val === h);
+      if (entry) activateTab(entry[0], false);
+    }
+    window.addEventListener("hashchange", syncTabFromHash);
+
+    tabButtons.forEach((btn, idx) => {
+      btn.addEventListener("click", () => activateTab(btn.id));
+      btn.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          const next = tabButtons[(idx + 1) % tabButtons.length];
+          activateTab(next.id);
+          next.focus();
+        } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          const prev = tabButtons[(idx - 1 + tabButtons.length) % tabButtons.length];
+          activateTab(prev.id);
+          prev.focus();
+        }
+      });
+    });
+
+    // --- Overview Rendering by Cycle ---
+    function getCycleStats(cycle) {
+      if (cycle === "baseline") {
+        return {
+          branchLabel: "rama: main (Baseline Limpia)",
+          verdictGo: true,
+          pill: "BASELINE ESTABLE (PASS)",
+          title: "Rama Limpia (main): 26/26 Pruebas Automatizadas Aprobadas al 100%",
+          desc: "Referencia previa a la inyección de bugs: verifica que la suite diseñada no produce falsos positivos y que los contratos base están sanos.",
+          kpis: [
+            { label: "Suite Automatizada", value: "100.0%", meta: "26 / 26 casos aprobados", badge: ["pass", "Baseline OK"], formula: "26 / 26 × 100" },
+            { label: "Pruebas Manuales", value: "N/A", meta: "Ejecutadas en buggy-version", badge: ["neutral", "Ciclo 1"], formula: "15 casos manuales" },
+            { label: "Tasa de Fallo", value: "0.0%", meta: "0 falsos positivos", badge: ["pass", "Suite Sana"], formula: "0 / 26 × 100" },
+            { label: "Cobertura de Código", value: "82.78%", meta: "Meta: ≥ 70% (+12.78%)", badge: ["pass", "Superada"], formula: "553 / 668 sentencias" },
+            { label: "Bugs Inyectados", value: "0", meta: "Rama original de referencia", badge: ["info", "Sin mutaciones"], formula: "Conteo directo" },
+            { label: "Críticos Abiertos", value: "0", meta: "Meta: = 0 para release", badge: ["pass", "Sin bloqueos"], formula: "Exit criterion" }
+          ],
+          execRows: [
+            { label: "Automatizados (pytest — main)", total: 26, pass: 26, fail: 0, note: "100% Pass · 0 Fallos" }
+          ],
+          execNote: "<strong>Lectura de decisión:</strong> En la rama limpia <code>main</code> aprobaron 26 de 26 pruebas automatizadas (0% falsos positivos). Esto valida que la suite solo falla cuando existen defectos reales."
+        };
+      }
+      if (cycle === "postreg") {
+        return {
+          branchLabel: "escenario: Post-Regresión (Meta)",
+          verdictGo: true,
+          pill: "META DE CIERRE: GO",
+          title: "Condición Objetivo tras Remediación de los 9 Tickets y Regresión",
+          desc: "Una vez corregidos BUG-01 a BUG-09 y validados mediante re-testing, el 100% de los 41 casos debe aprobar con 0 defectos críticos abiertos.",
+          kpis: [
+            { label: "Cobertura Ejecución", value: "100.0%", meta: "Meta: ≥ 95%", badge: ["pass", "Meta"], formula: "41 / 41 × 100" },
+            { label: "Aprobación Esperada", value: "100.0%", meta: "41 pasaron / 0 fallos", badge: ["pass", "Objetivo"], formula: "41 / 41 × 100" },
+            { label: "Efectividad DRE", value: "100.0%", meta: "9 corregidos antes de prod", badge: ["pass", "Óptimo"], formula: "9 / (9+0) × 100" },
+            { label: "Cobertura de Código", value: "≥ 82.8%", meta: "Meta: ≥ 70%", badge: ["pass", "Superada"], formula: "553+ / 668" },
+            { label: "Tasa de Reapertura", value: "< 5%", meta: "Validado en regresión", badge: ["info", "Meta STLC"], formula: "Reabiertos / Resueltos" },
+            { label: "Críticos Abiertos", value: "0", meta: "Tickets en Closed", badge: ["pass", "Habilita Go"], formula: "Exit criterion = 0" }
+          ],
+          execRows: [
+            { label: "Meta Global (41 casos)", total: 41, pass: 41, fail: 0, note: "Objetivo 100% Pass tras parches" },
+            { label: "Automatizados (26 pytest)", total: 26, pass: 26, fail: 0, note: "Suite de regresión automatizada" },
+            { label: "Manuales (15 Swagger/Postman)", total: 15, pass: 15, fail: 0, note: "Re-testing con nuevas capturas" }
+          ],
+          execNote: "<strong>Lectura de decisión:</strong> Escenario proyectado tras corregir los 9 bugs y re-ejecutar regresión. Habilitaría el dictamen <strong>GO</strong> al cumplir 0 defectos críticos y tasa de reapertura &lt; 5%."
+        };
+      }
+      // Default: buggy-version actual observed metrics
+      return {
+        branchLabel: "rama: buggy-version",
+        verdictGo: false,
+        pill: "DICTAMEN: NO-GO",
+        title: "Pase a Producción Bloqueado por Riesgo Crítico de Seguridad (BUG-04)",
+        desc: "Aunque se ejecutó el 100% del alcance y la suite detectó 9/9 defectos inyectados, permanece abierto BUG-04 (Crítica: eliminación arbitraria de artículos ajenos, OWASP BOLA), violando el criterio de salida (= 0 defectos críticos abiertos).",
+        kpis: [
+          { label: "Cobertura Ejecución", value: "100.0%", meta: "Meta: ≥ 95% (41 CP)", badge: ["pass", "+5.0% Meta"], formula: "(41 / 41) × 100" },
+          { label: "Efectividad (DRE)", value: "100.0%", meta: "9 QA / 0 Producción", badge: ["pass", "9/9 Bugs"], formula: "9 / (9 + 0) × 100" },
+          { label: "Tasa Aprobación", value: "58.54%", meta: "24 Pasó · 17 Falló", badge: ["info", "Cazando Bugs"], formula: "(24 / 41) × 100" },
+          { label: "Cobertura de Código", value: "82.78%", meta: "Meta ≥ 70% (92.2% API)", badge: ["pass", "+12.78%"], formula: "553 / 668 sentencias" },
+          { label: "Densidad Defectos", value: "0.220", meta: "13.5 bugs / KLOC", badge: ["warn", "66.7% Articles"], formula: "9 / 41 casos" },
+          { label: "Críticos Abiertos", value: "1", meta: "Meta: = 0 (BUG-04)", badge: ["fail", "Bloqueante"], formula: "MantisBT: New" }
+        ],
+        execRows: [
+          { label: "Global Consolidado (41 casos)", total: 41, pass: 24, fail: 17, note: "58.54% Pass · 41.46% Fail" },
+          { label: "Automatizados — pytest (26 casos · 28.92s)", total: 26, pass: 15, fail: 11, note: "57.69% Pass · 42.31% Fail" },
+          { label: "Manuales — Swagger / Postman (15 casos)", total: 15, pass: 9, fail: 6, note: "60.00% Pass · 40.00% Fail" }
+        ],
+        execNote: "<strong>Lectura de decisión:</strong> El 41.46% de fallos en <code>buggy-version</code> no indica inestabilidad de la suite; en la rama limpia <code>main</code> aprobaron 26/26 (100%). Cada fallo confirma la sensibilidad de las pruebas ante defectos reales."
+      };
+    }
+
+    function buildDonutSvg(primaryPct, centerTop, centerSub, primaryColor, trackColor, ariaLabel) {
+      const r = 48;
+      const circ = 2 * Math.PI * r;
+      const filled = (Math.max(0, Math.min(100, primaryPct)) / 100) * circ;
+      return `
+        <svg width="132" height="132" viewBox="0 0 132 132" role="img" aria-label="${escapeHtml(ariaLabel)}">
+          <circle cx="66" cy="66" r="${r}" fill="none" stroke="${trackColor}" stroke-width="14" />
+          <circle cx="66" cy="66" r="${r}" fill="none" stroke="${primaryColor}" stroke-width="14"
+            stroke-dasharray="${filled.toFixed(2)} ${circ.toFixed(2)}"
+            stroke-linecap="butt" transform="rotate(-90 66 66)" />
+          <text x="66" y="62" text-anchor="middle" font-size="20" font-weight="800" fill="#0F172A" font-family="var(--font-mono)">${escapeHtml(centerTop)}</text>
+          <text x="66" y="80" text-anchor="middle" font-size="11" font-weight="600" fill="#64748B">${escapeHtml(centerSub)}</text>
+        </svg>
+      `;
+    }
+
+    function renderOverview() {
+      const data = getCycleStats(currentCycle);
+      document.getElementById("branch-badge").textContent = data.branchLabel;
+
+      const banner = document.getElementById("verdict-banner");
+      banner.classList.toggle("verdict-go", data.verdictGo);
+      document.getElementById("verdict-pill").textContent = data.pill;
+      document.getElementById("verdict-title").textContent = data.title;
+      document.getElementById("verdict-desc").textContent = data.desc;
+
+      const primaryExec = data.execRows[0];
+      const execPassPct = (primaryExec.pass / primaryExec.total) * 100;
+      document.getElementById("svg-exec-donut").innerHTML = buildDonutSvg(
+        execPassPct,
+        execPassPct.toFixed(1) + "%",
+        `${primaryExec.pass}/${primaryExec.total} Pass`,
+        "#6EE7B7",
+        primaryExec.fail > 0 ? "#B91C1C" : "#E2E8F0",
+        `Donut ejecución: ${primaryExec.pass} aprobados, ${primaryExec.fail} fallidos de ${primaryExec.total}`
+      );
+
+      const kpiHtml = data.kpis.map((k) => `
+        <article class="kpi-panel">
+          <div class="kpi-label">${escapeHtml(k.label)}</div>
+          <div class="kpi-value num">${escapeHtml(k.value)}</div>
+          <div class="kpi-formula">${escapeHtml(k.formula)}</div>
+          <div class="kpi-meta-row">
+            <span>${escapeHtml(k.meta)}</span>
+            <span class="badge badge-${k.badge[0]}">${escapeHtml(k.badge[1])}</span>
+          </div>
+        </article>
+      `).join("");
+      document.getElementById("kpi-grid").innerHTML = kpiHtml;
+
+      const execHtml = data.execRows.map((r) => {
+        const passPct = ((r.pass / r.total) * 100).toFixed(1);
+        const failPct = ((r.fail / r.total) * 100).toFixed(1);
+        return `
+          <div>
+            <div class="bar-row-head">
+              <strong>${escapeHtml(r.label)}</strong>
+              <span class="mono">${escapeHtml(r.note)}</span>
+            </div>
+            <div class="bar-track" role="img" aria-label="${escapeHtml(r.label)}: ${r.pass} aprobados, ${r.fail} fallidos">
+              <div class="bar-seg-pass" style="width:${passPct}%"></div>
+              <div class="bar-seg-fail" style="width:${failPct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+      document.getElementById("chart-execution-modes").innerHTML = execHtml;
+      document.getElementById("note-execution").innerHTML = data.execNote;
+
+      renderModuleClustering();
+      renderSeverityMatrix();
+    }
+
+    function renderModuleClustering() {
+      const modStats = MODULE_ORDER.map((mod) => {
+        const bugsInMod = QA_DATA.bugs.filter((b) => b.modulo === mod);
+        return {
+          mod,
+          count: bugsInMod.length,
+          ids: bugsInMod.map((b) => b.id),
+          pct: ((bugsInMod.length / 9) * 100).toFixed(1)
+        };
+      });
+
+      const html = modStats.map((m) => {
+        const barWidth = m.count > 0 ? Math.max((m.count / 9) * 100, 8) : 0;
+        const colorCls = m.count >= 3 ? "bar-seg-fail" : (m.count > 0 ? "bar-seg-amber" : "bar-seg-pass");
+        const tagText = m.count > 0 ? `${m.count} bug(s) (${m.pct}%) — ${m.ids.join(", ")}` : "0 bugs (Estable 100%)";
+        return `
+          <div>
+            <div class="bar-row-head">
+              <strong>${escapeHtml(m.mod)}</strong>
+              <span class="mono" style="font-size:0.78rem; color:var(--ink-secondary);">${escapeHtml(tagText)}</span>
+            </div>
+            <div class="bar-track" role="img" aria-label="${m.mod}: ${m.count} defectos">
+              <div class="${colorCls}" style="width:${barWidth}%"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+      document.getElementById("chart-module-clustering").innerHTML = html;
+    }
+
+    function renderSeverityMatrix() {
+      const sevs = ["Crítica", "Alta", "Media", "Baja"];
+      const prios = ["Alta", "Media", "Baja"];
+
+      const rows = sevs.map((sev) => {
+        const cells = prios.map((prio) => {
+          const matching = QA_DATA.bugs.filter((b) => b.severidad === sev && b.prioridad === prio);
+          if (!matching.length) {
+            return `<td style="color:var(--ink-muted); text-align:center;">0</td>`;
+          }
+          const chips = matching.map((b) => {
+            const cls = sev === "Crítica" ? "crit" : (sev === "Alta" ? "high" : "");
+            return `<button type="button" class="bug-chip ${cls}" data-bug-id="${b.id}">${b.id}</button>`;
+          }).join("");
+          return `<td>${chips}</td>`;
+        }).join("");
+        return `<tr><th>${sev}</th>${cells}</tr>`;
+      }).join("");
+
+      document.getElementById("matrix-body").innerHTML = rows;
+      document.querySelectorAll("#matrix-body .bug-chip").forEach((btn) => {
+        btn.addEventListener("click", () => openBugModal(btn.dataset.bugId));
+      });
+    }
+
+    // --- Lifecycle Tab ---
+    function renderLifecycle() {
+      const grid = document.getElementById("lifecycle-steps");
+      grid.innerHTML = LIFECYCLE_STEPS.map((st, idx) => `
+        <button type="button" class="step-item" aria-pressed="${idx === activeStepIndex}" data-step="${idx}">
+          <span class="step-num">${st.num}</span>
+          <div class="step-title">${escapeHtml(st.title)}</div>
+          <div class="step-desc">${escapeHtml(st.short)}</div>
+        </button>
+      `).join("");
+
+      document.getElementById("lifecycle-detail").innerHTML = LIFECYCLE_STEPS[activeStepIndex].detail;
+
+      grid.querySelectorAll(".step-item").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          activeStepIndex = Number(btn.dataset.step);
+          renderLifecycle();
+        });
+      });
+    }
+
+    // --- Coverage & Pytest Tab ---
+    function renderCoverageAndPytest() {
+      document.getElementById("svg-cov-donut").innerHTML = buildDonutSvg(
+        QA_DATA.coverage.total_pct,
+        QA_DATA.coverage.total_pct.toFixed(1) + "%",
+        "Meta >= 70%",
+        "#6EE7B7",
+        "#DCE1E8",
+        `Cobertura de código global: ${QA_DATA.coverage.total_pct}%`
+      );
+      const layersHtml = QA_DATA.coverage.layers.map((l) => {
+        const cls = l.pct === 0 ? "bar-seg-fail" : (l.pct >= 90 ? "bar-seg-pass" : "bar-seg-teal");
+        return `
+          <div>
+            <div class="bar-row-head">
+              <strong>${escapeHtml(l.layer)} <span style="font-weight:400; color:var(--ink-muted);">(${l.files} archivo${l.files > 1 ? "s" : ""})</span></strong>
+              <span class="mono">${l.covered}/${l.total} (${l.pct}%)</span>
+            </div>
+            <div class="bar-track" role="img" aria-label="${l.layer}: ${l.pct}% cobertura">
+              <div class="${cls}" style="width:${l.pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+      document.getElementById("chart-layers").innerHTML = layersHtml;
+
+      renderCoverageFilesTable();
+      renderPytestTable();
+    }
+
+    function renderCoverageFilesTable() {
+      const q = document.getElementById("cov-search").value.trim().toLowerCase();
+      const filtered = QA_DATA.coverage.files.filter((f) =>
+        f.file.toLowerCase().includes(q) || f.layer.toLowerCase().includes(q)
+      );
+      const tbody = document.getElementById("cov-table-body");
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--ink-muted); padding:20px;">Sin archivos coincidentes con "${escapeHtml(q)}".</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = filtered.map((f) => {
+        const bCls = f.pct >= 90 ? "pass" : (f.pct >= 70 ? "teal" : (f.pct === 0 ? "fail" : "warn"));
+        return `
+          <tr>
+            <td class="mono" style="font-size:0.78rem;">${escapeHtml(f.file)}</td>
+            <td>${escapeHtml(f.layer)}</td>
+            <td class="mono">${f.covered}/${f.total}</td>
+            <td><span class="badge badge-${bCls} mono">${f.pct}%</span></td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderPytestTable() {
+      const mode = document.getElementById("pytest-filter").value;
+      const filtered = QA_DATA.pytest.tests.filter((t) => mode === "all" || t.outcome === mode);
+      document.getElementById("pytest-table-body").innerHTML = filtered.map((t) => {
+        const badge = t.outcome === "passed"
+          ? `<span class="badge badge-pass">PASSED</span>`
+          : `<span class="badge badge-fail">FAILED</span>`;
+        return `
+          <tr>
+            <td>
+              <div class="mono" style="font-size:0.78rem; font-weight:600;">${escapeHtml(t.name)}</div>
+              <div class="mono" style="font-size:0.72rem; color:var(--ink-muted);">${escapeHtml(t.file)}</div>
+            </td>
+            <td>${badge}</td>
+            <td class="mono">${t.duration.toFixed(3)}s</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // --- Bugs & 41 Cases Tab ---
+    function renderBugsTable() {
+      const sev = document.getElementById("bug-sev-filter").value;
+      const filtered = QA_DATA.bugs.filter((b) => sev === "all" || b.severidad === sev);
+
+      document.getElementById("bugs-table-body").innerHTML = filtered.map((b) => {
+        const sevCls = b.severidad === "Crítica" ? "fail" : (b.severidad === "Alta" ? "warn" : (b.severidad === "Media" ? "info" : "neutral"));
+        const cps = [...b.cps_auto, ...b.cps_manual].map((c) => `<span class="badge badge-neutral mono" style="margin:1px;">${escapeHtml(c)}</span>`).join(" ");
+        const evBtn = `<button type="button" class="btn" data-bug-id="${b.id}" style="min-height:32px; padding:0 10px; font-size:0.78rem;">${b.evidencia_img ? "Ver Captura" : "Ver Ficha"}</button>`;
+        return `
+          <tr>
+            <td class="mono" style="white-space:nowrap;"><strong>${b.id}</strong></td>
+            <td>${escapeHtml(b.modulo)}</td>
+            <td>
+              <div style="font-weight:700; margin-bottom:3px;">${escapeHtml(b.titulo)}</div>
+              <div style="font-size:0.78rem; color:var(--ink-secondary);"><strong>Causa raíz:</strong> ${escapeHtml(b.error_humano)}</div>
+            </td>
+            <td>
+              <span class="badge badge-${sevCls}">${b.severidad}</span>
+              <div style="font-size:0.74rem; color:var(--ink-muted); margin-top:3px;">Prio: ${b.prioridad}</div>
+            </td>
+            <td>${cps}</td>
+            <td>${evBtn}</td>
+          </tr>
+        `;
+      }).join("");
+
+      document.querySelectorAll("#bugs-table-body button[data-bug-id]").forEach((btn) => {
+        btn.addEventListener("click", () => openBugModal(btn.dataset.bugId));
+      });
+    }
+
+    function renderCasesTable() {
+      const q = document.getElementById("cp-search").value.trim().toLowerCase();
+      const mode = document.getElementById("cp-mode").value;
+      const status = document.getElementById("cp-status").value;
+      const tech = document.getElementById("cp-tech").value;
+
+      const filtered = QA_DATA.cases.filter((c) => {
+        if (mode !== "all" && c.modo !== mode) return false;
+        if (status !== "all" && c.estado !== status) return false;
+        if (tech !== "all" && !c.tecnica.includes(tech)) return false;
+        if (q) {
+          const hay = [c.id, c.nombre, c.endpoint, c.modulo, c.defectos.join(" "), c.resultado_obtenido].join(" ").toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      document.getElementById("cases-counter").textContent = `Mostrando ${filtered.length} de ${QA_DATA.cases.length}`;
+      const wrap = document.getElementById("cp-table-wrap");
+      const empty = document.getElementById("cp-empty-state");
+
+      if (!filtered.length) {
+        wrap.style.display = "none";
+        empty.style.display = "block";
+        return;
+      }
+
+      wrap.style.display = "block";
+      empty.style.display = "none";
+
+      document.getElementById("cp-table-body").innerHTML = filtered.map((c) => {
+        const stBadge = c.estado === "Pasó"
+          ? `<span class="badge badge-pass">Pasó</span>`
+          : `<span class="badge badge-fail">Falló</span>`;
+        const modoBadge = c.modo === "Manual"
+          ? `<span class="badge badge-info">Manual</span>`
+          : `<span class="badge badge-teal">Auto</span>`;
+        const defCell = c.defectos.length
+          ? c.defectos.map((d) => `<button type="button" class="bug-chip ${d === "BUG-04" ? "crit" : ""}" data-bug-id="${escapeHtml(d)}">${escapeHtml(d)}</button>`).join("")
+          : `<span style="color:var(--ink-muted);">N/A</span>`;
+
+        return `
+          <tr>
+            <td class="mono" style="white-space:nowrap;"><strong>${escapeHtml(c.id)}</strong></td>
+            <td>${modoBadge}</td>
+            <td>${escapeHtml(c.modulo)}</td>
+            <td>
+              <div style="font-weight:600;">${escapeHtml(c.nombre)}</div>
+              <div class="mono" style="font-size:0.73rem; color:var(--ink-muted);">${escapeHtml(c.endpoint)}</div>
+            </td>
+            <td style="font-size:0.79rem;">${escapeHtml(c.tecnica)}</td>
+            <td>${stBadge}</td>
+            <td>${defCell}</td>
+          </tr>
+        `;
+      }).join("");
+
+      document.querySelectorAll("#cp-table-body .bug-chip").forEach((btn) => {
+        btn.addEventListener("click", () => openBugModal(btn.dataset.bugId));
+      });
+    }
+
+    // --- Modal Logic (Bug Inspection & Release Permission Gate) ---
+    const modal = document.getElementById("qa-modal");
+    const modalTitle = document.getElementById("modal-title");
+    const modalBody = document.getElementById("modal-body");
+
+    function openBugModal(bugId) {
+      const bug = QA_DATA.bugs.find((b) => b.id === bugId);
+      if (!bug) return;
+      modalTitle.textContent = `${bug.id} — ${bug.modulo} (${bug.severidad} / Prio ${bug.prioridad})`;
+      const imgBlock = bug.evidencia_img
+        ? `<div style="margin-top:14px;">
+             <strong>Evidencia Fotográfica (Swagger UI):</strong>
+             <div class="mono" style="font-size:0.76rem; color:var(--ink-muted);">${escapeHtml(bug.evidencia_img)}</div>
+             <img class="modal-img" src="${escapeHtml(bug.evidencia_img)}" alt="Evidencia de ${escapeHtml(bug.id)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+             <p style="display:none; color:var(--crimson); font-size:0.84rem; margin-top:8px;">No se pudo cargar la imagen local en esta ruta. Verifica la carpeta docs_qa/evidencias/.</p>
+           </div>`
+        : `<div style="margin-top:14px; padding:12px; background:var(--bg-subtle); border:1px solid var(--border); border-radius:4px;">
+             <strong>Evidencia Automatizada:</strong> ${escapeHtml(bug.evidencia_label)} — <a href="test_report.html" target="_blank" rel="noopener">Abrir reporte pytest-html</a>
+           </div>`;
+
+      modalBody.innerHTML = `
+        <p style="margin-top:0; font-weight:700; font-size:0.98rem;">${escapeHtml(bug.titulo)}</p>
+        <div style="display:grid; gap:8px; font-size:0.86rem;">
+          <div><strong>Error Humano (Origen):</strong> ${escapeHtml(bug.error_humano)}</div>
+          <div><strong>Defecto (Código):</strong> ${escapeHtml(bug.defecto_codigo)}</div>
+          <div><strong>Fallo (Manifestación Dinámica):</strong> ${escapeHtml(bug.fallo_observado)}</div>
+          <div><strong>Impacto en el Negocio Conduit:</strong> ${escapeHtml(bug.impacto_negocio)}</div>
+          <div><strong>Casos de Prueba:</strong> <span class="mono">${escapeHtml([...bug.cps_auto, ...bug.cps_manual].join(", "))}</span></div>
+          <div><strong>Estado MantisBT:</strong> <span class="badge badge-warn">${escapeHtml(bug.estado)}</span></div>
+        </div>
+        ${imgBlock}
+      `;
+      modal.showModal();
+    }
+
+    function openPermissionBoundaryModal() {
+      modalTitle.textContent = "Permiso Denegado — Política de Cierre (Release Gate)";
+      modalBody.innerHTML = `
+        <div style="padding:12px 14px; background:var(--crimson-bg); border:1px solid var(--crimson-border); border-radius:6px; margin-bottom:14px;">
+          <strong style="color:var(--crimson);">Acceso Bloqueado para Aprobación "GO" a Producción</strong>
+          <p style="margin:6px 0 0 0; font-size:0.86rem;">
+            Según el Criterio de Salida §6 y §14.1 del Plan de Pruebas, se requiere estrictamente <strong>0 defectos críticos abiertos</strong> para autorizar el despliegue. Actualmente permanece activo <strong>BUG-04 (Crítica)</strong>.
+          </p>
+        </div>
+        <p style="font-size:0.86rem; color:var(--ink-secondary);">
+          <strong>Ruta de remediación segura:</strong><br>
+          1. Corregir verificación de autoría en <code>app/api/routes/articles.py</code> y favoritos en <code>app/api/routes/favorites.py</code>.<br>
+          2. Ejecutar suite completa de regresión (41 casos) verificando 100% Pass.<br>
+          3. Cerrar los 9 tickets en MantisBT antes de volver a solicitar aprobación de la docente / stakeholders.
+        </p>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button type="button" class="btn btn-primary" id="btn-modal-go-bug04">Ver Detalle de BUG-04</button>
+          <button type="button" class="btn" id="btn-modal-cancel">Volver al Resumen</button>
+        </div>
+      `;
+      modal.showModal();
+      document.getElementById("btn-modal-go-bug04").addEventListener("click", () => openBugModal("BUG-04"));
+      document.getElementById("btn-modal-cancel").addEventListener("click", () => modal.close());
+    }
+
+    document.getElementById("modal-close").addEventListener("click", () => modal.close());
+
+    // --- Event Wiring for States (Loading, Empty, Error, Success, Permission) ---
+    document.getElementById("cycle-select").addEventListener("change", (e) => {
+      currentCycle = e.target.value;
+      renderOverview();
+      showFeedback("is-success", `Vista actualizada al escenario: <strong>${escapeHtml(e.target.options[e.target.selectedIndex].text)}</strong>.`, `<button type="button" class="btn" onclick="clearFeedback()" style="min-height:32px;">Ocultar</button>`);
+    });
+
+    let loadingTimer = null;
+    document.getElementById("btn-refresh").addEventListener("click", () => {
+      showFeedback(
+        "is-loading",
+        `<span class="skeleton-shimmer" aria-hidden="true"></span> Verificando integridad de <code>pytest_results.json</code> y <code>coverage.json</code>...`,
+        `<button type="button" class="btn" id="btn-cancel-load" style="min-height:32px;">Cancelar</button>`
+      );
+      document.getElementById("btn-cancel-load").addEventListener("click", () => {
+        clearTimeout(loadingTimer);
+        clearFeedback();
+      });
+      loadingTimer = setTimeout(() => {
+        renderOverview();
+        renderCoverageAndPytest();
+        showFeedback("is-success", "Fuentes JSON verificadas: 41 casos, 9 defectos, 82.78% cobertura sin inconsistencias.", `<button type="button" class="btn" onclick="clearFeedback()" style="min-height:32px;">Ocultar</button>`);
+      }, 350);
+    });
+
+    document.getElementById("btn-export-csv").addEventListener("click", () => {
+      const headers = ["ID", "Modo", "Modulo", "Nombre", "Tecnica", "Prioridad", "Estado", "Defectos"];
+      const rows = QA_DATA.cases.map((c) => [
+        c.id, c.modo, c.modulo, `"${c.nombre.replace(/"/g, '""')}"`, c.tecnica, c.prioridad, c.estado, `"${c.defectos.join("; ") || "N/A"}"`
+      ].join(","));
+      const csv = [headers.join(","), ...rows].join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "conduit_qa_metricas_41_casos.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showFeedback("is-success", "Archivo <code>conduit_qa_metricas_41_casos.csv</code> exportado correctamente.", `<button type="button" class="btn" onclick="clearFeedback()" style="min-height:32px;">Aceptar</button>`);
+    });
+
+    document.getElementById("btn-approve-release").addEventListener("click", openPermissionBoundaryModal);
+    document.getElementById("btn-jump-bug04").addEventListener("click", () => openBugModal("BUG-04"));
+
+    // Coverage & Pytest controls + Error State Demo
+    document.getElementById("cov-search").addEventListener("input", renderCoverageFilesTable);
+    document.getElementById("pytest-filter").addEventListener("change", renderPytestTable);
+
+    document.getElementById("json-upload").addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        if (!parsed.summary && !parsed.totals) {
+          throw new Error("El JSON no contiene claves válidas 'summary' (pytest) ni 'totals' (coverage).");
+        }
+        showFeedback("is-success", `Archivo <code>${escapeHtml(file.name)}</code> validado estructuralmente conforme al esquema QA.`, `<button type="button" class="btn" onclick="clearFeedback()" style="min-height:32px;">Ocultar</button>`);
+      } catch (err) {
+        showFeedback("is-error", `<strong>Error al procesar JSON (${escapeHtml(file.name)}):</strong> ${escapeHtml(err.message)}`, `<button type="button" class="btn btn-primary" id="btn-recover-json" style="min-height:32px;">Restaurar Datos Oficiales</button>`);
+        document.getElementById("btn-recover-json").addEventListener("click", () => {
+          document.getElementById("json-upload").value = "";
+          clearFeedback();
+        });
+      }
+    });
+
+    document.getElementById("btn-test-error").addEventListener("click", () => {
+      showFeedback(
+        "is-error",
+        `<strong>Validación de Integridad Fallida (Regla Garbage In, Garbage Out):</strong> Archivo fuente JSON corrupto o esquema incompleto detectado.`,
+        `<button type="button" class="btn btn-primary" id="btn-restore-official" style="min-height:32px;">Restaurar Fuentes Verificadas</button>`
+      );
+      document.getElementById("btn-restore-official").addEventListener("click", () => {
+        clearFeedback();
+        showFeedback("is-success", "Fuentes verificadas restauradas correctamente.", `<button type="button" class="btn" onclick="clearFeedback()" style="min-height:32px;">Listo</button>`);
+      });
+    });
+
+    // Cases & Bugs filters
+    document.getElementById("bug-sev-filter").addEventListener("change", renderBugsTable);
+    ["cp-search", "cp-mode", "cp-status", "cp-tech"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", renderCasesTable);
+      document.getElementById(id).addEventListener("change", renderCasesTable);
+    });
+
+    function resetCaseFilters() {
+      document.getElementById("cp-search").value = "";
+      document.getElementById("cp-mode").value = "all";
+      document.getElementById("cp-status").value = "all";
+      document.getElementById("cp-tech").value = "all";
+      renderCasesTable();
+    }
+    document.getElementById("btn-reset-cp").addEventListener("click", resetCaseFilters);
+    document.getElementById("btn-empty-reset").addEventListener("click", resetCaseFilters);
+
+    // Initial render
+    renderOverview();
+    renderLifecycle();
+    renderCoverageAndPytest();
+    renderBugsTable();
+    renderCasesTable();
+    syncTabFromHash();
+  </script>
+</body>
+</html>
