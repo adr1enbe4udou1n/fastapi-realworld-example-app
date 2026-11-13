@@ -54,7 +54,15 @@ HTTP 200 OK. La respuesta devuelve el JSON del usuario pero con código 200.
 
 EVIDENCIA (pytest):
 FAILED tests/test_auth.py::test_registro_retorna_201 - AssertionError: [CP-AUTH-A-001] Se esperaba HTTP 201, se obtuvo 200.
-```
+
+EVIDENCIA MANUAL (Swagger UI):
+Captura de pantalla: CP-EXP-M-001_registro- Codigo 200 Error Creacion de Usuario.png
+`
+
+### 📸 Evidencia Adjunta para MantisBT:
+Archivo a subir: docs_qa/evidencias/CP-EXP-M-001_registro- Codigo 200 Error Creacion de Usuario.png
+
+![Evidencia BUG-01](evidencias/CP-EXP-M-001_registro-%20Codigo%20200%20Error%20Creacion%20de%20Usuario.png)``
 
 ---
 
@@ -95,7 +103,10 @@ HTTP 200 OK. El sistema crea el artículo con título en blanco "" en la base de
 
 EVIDENCIA (pytest):
 FAILED tests/test_articles.py::test_crear_articulo_titulo_vacio_retorna_422 - AssertionError: [CP-ART-A-002] Se esperaba HTTP 422, se obtuvo 200.
-```
+`
+
+### 📸 Evidencia Adjunta para MantisBT:
+Archivo a subir: docs_qa/reports/test_report.html (Reporte de fallo en pytest)``
 
 ---
 
@@ -134,7 +145,15 @@ HTTP 200 OK. El artículo del Usuario A es modificado exitosamente por el Usuari
 
 EVIDENCIA (pytest):
 FAILED tests/test_articles.py::test_editar_articulo_ajeno_retorna_400 - AssertionError: [CP-ART-A-005] Se esperaba HTTP 400, se obtuvo 200. Posible BUG-03: la verificación de autoría en PUT fue eliminada.
-```
+
+EVIDENCIA MANUAL (Swagger UI):
+Captura de pantalla: P-QUAL-M-003_edit_ajeno_bug03.png (Carlos edita exitosamente el post de Laura recibiendo 200 OK)
+`
+
+### 📸 Evidencia Adjunta para MantisBT:
+Archivo a subir: docs_qa/evidencias/P-QUAL-M-003_edit_ajeno_bug03.png
+
+![Evidencia BUG-03](evidencias/P-QUAL-M-003_edit_ajeno_bug03.png)``
 
 ---
 
@@ -168,7 +187,15 @@ HTTP 200 OK (o 204 No Content). El artículo ajeno es borrado permanentemente de
 
 EVIDENCIA (pytest):
 FAILED tests/test_articles.py::test_eliminar_articulo_ajeno_retorna_400 - AssertionError: [CP-ART-A-006] Se esperaba HTTP 400, se obtuvo 200. ALERTA DE SEGURIDAD (BUG-04): la verificación de autoría en DELETE fue eliminada.
-```
+
+EVIDENCIA MANUAL (Swagger UI):
+Captura de pantalla: CP-QUAL-M-004_delete_ajeno_bug04.png (Carlos elimina artículo de Laura con DELETE /api/articles/{slug} recibiendo 200 OK y borrando el registro de BD)
+`
+
+### 📸 Evidencia Adjunta para MantisBT:
+Archivo a subir: docs_qa/evidencias/CP-QUAL-M-004_delete_ajeno_bug04.png
+
+![Evidencia BUG-04](evidencias/CP-QUAL-M-004_delete_ajeno_bug04.png)``
 
 ---
 
@@ -202,7 +229,15 @@ Error interno / Falla de estado: la operación no incrementa el contador y no ma
 EVIDENCIA (pytest):
 FAILED tests/test_favorites.py::test_marcar_favorito_incrementa_contador - ValueError: list.remove(x): x not in list
 FAILED tests/test_favorites.py::test_desmarcar_favorito_decrementa_contador
-```
+
+EVIDENCIA MANUAL (Swagger UI):
+Captura de pantalla: CP-EST-M-002_favorite_500_bug05.png (Llamada a POST /api/articles/{slug}/favorite detona HTTP 500 Internal Server Error)
+`
+
+### 📸 Evidencia Adjunta para MantisBT:
+Archivo a subir: docs_qa/evidencias/CP-EST-M-002_favorite_500_bug05.png
+
+![Evidencia BUG-05](evidencias/CP-EST-M-002_favorite_500_bug05.png)``
 
 ---
 
@@ -235,7 +270,15 @@ HTTP 200 OK pero con 'following: false'.
 
 EVIDENCIA (pytest):
 FAILED tests/test_profiles.py::test_seguir_usuario_cambia_following_a_true - AssertionError: [CP-PRF-A-001] Se esperaba following=true después de seguir, se obtuvo False.
-```
+
+EVIDENCIA MANUAL (Swagger UI):
+Captura de pantalla: CP-EST-M-001_follow_false_bug06.png (Llamada a POST /api/profiles/{username}/follow devuelve objeto perfil con following: false)
+`
+
+### 📸 Evidencia Adjunta para MantisBT:
+Archivo a subir: docs_qa/evidencias/CP-EST-M-001_follow_false_bug06.png
+
+![Evidencia BUG-06](evidencias/CP-EST-M-001_follow_false_bug06.png)``
 
 ---
 
@@ -266,7 +309,10 @@ Error interno 500 (AttributeError: 'NoneType' object has no attribute 'id') o HT
 
 EVIDENCIA (pytest):
 FAILED tests/test_articles.py::test_feed_sin_auth_retorna_401 - AttributeError: 'NoneType' object has no attribute 'id' (el endpoint intentó procesar la petición de un usuario anónimo en vez de rechazarla con 401).
-```
+`
+
+### 📸 Evidencia Adjunta para MantisBT:
+Archivo a subir: docs_qa/reports/test_report.html (Reporte de fallo en pytest)``
 
 ---
 
@@ -298,7 +344,10 @@ HTTP 200 OK. 'articlesCount: 3'. Se retornan todos los artículos existentes, in
 
 EVIDENCIA (pytest):
 FAILED tests/test_articles.py::test_filtrar_articulos_por_tag - AssertionError: [CP-ART-A-008] Se esperaban 2 artículos con tag 'python', se obtuvieron 3.
-```
+`
+
+### 📸 Evidencia Adjunta para MantisBT:
+Archivo a subir: docs_qa/reports/test_report.html (Reporte de fallo en pytest)``
 
 ---
 
@@ -330,4 +379,13 @@ HTTP 200 OK. len(articles) = 25 (el sistema devuelve todos los artículos solici
 
 EVIDENCIA (pytest):
 FAILED tests/test_articles.py::test_limit_capeado_en_20_articulos - AssertionError: [CP-ART-A-009] Se esperaban máximo 20 artículos, se obtuvieron 25.
-```
+
+EVIDENCIA MANUAL (Swagger UI):
+Captura de pantalla: CP-EXP-M-004_limit_100_bug09.png..png (Solicitud con limit=100 devuelve 25 artículos en la lista en vez del tope de 20)
+`
+
+### 📸 Evidencia Adjunta para MantisBT:
+Archivo a subir: docs_qa/evidencias/CP-EXP-M-004_limit_100_bug09.png..png
+
+![Evidencia BUG-09](evidencias/CP-EXP-M-004_limit_100_bug09.png..png)``
+
